@@ -5,7 +5,7 @@
              :as s]
             [com.stuartsierra.component
              :as co]
-            [componad.core
+            [juncture.componad
              :refer [within]]
             [juncture.core
              :as ju

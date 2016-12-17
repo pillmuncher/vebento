@@ -10,7 +10,7 @@
              :refer [mdo return catch-error put-state get-state]]
             [monads.types
              :refer [fst snd]]
-            [componad.core
+            [juncture.componad
              :refer [>>=]]
             [juncture.event
              :as event

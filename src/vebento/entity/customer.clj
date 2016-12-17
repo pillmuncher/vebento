@@ -9,7 +9,7 @@
              :as co]
             [monads.util
              :refer [mwhen]]
-            [componad.core
+            [juncture.componad
              :refer [within]]
             [juncture.core
              :as ju

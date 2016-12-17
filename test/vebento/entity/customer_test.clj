@@ -3,7 +3,7 @@
              :refer :all]
             [com.stuartsierra.component
              :as co]
-            [componad.core
+            [juncture.componad
              :refer [within system]]
             [juncture.core
              :as ju]

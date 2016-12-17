@@ -1,4 +1,4 @@
-(ns componad.core
+(ns juncture.componad
   (:require [clojure.future
              :refer :all]
             [monads.core

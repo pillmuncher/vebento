@@ -6,7 +6,7 @@
              :refer [return ask asks]]
             [monads.util
              :refer [mwhen]]
-            [componad.core
+            [juncture.componad
              :refer [within system component >>=]]
             [juncture.util
              :refer [ns-alias]]

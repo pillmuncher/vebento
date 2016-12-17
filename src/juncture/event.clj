@@ -9,7 +9,7 @@
              :refer [mdo return fail ask asks]]
             [monads.util
              :refer [sequence-m mwhen]]
-            [componad.core
+            [juncture.componad
              :refer [within system >>=]]
             [juncture.util
              :refer [ns-alias inst uuid]]))
