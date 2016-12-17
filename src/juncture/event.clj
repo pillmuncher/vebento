@@ -103,6 +103,7 @@
 
 (defn raise
   [event]
+  (print "\n\n---------------" event "\n\n")
   (mdo
     (>>= (asks :dispatcher)
          #(return (dispatch % event)))
@@ -158,9 +159,9 @@
 
 
 (defn get-events
-   ([& {:as criteria}]
-    (>>= (asks :event-log)
-         #(-> % (do-fetch criteria) (return)))))
+  [& {:as criteria}]
+  (>>= (asks :event-log)
+       #(-> % (do-fetch criteria) (return))))
 
 
 (def get-commands (partial get-events ::kind ::ju/command))

@@ -8,39 +8,31 @@
             [com.stuartsierra.component
              :as co]
             [monads.util
+             :as m-util
              :refer [mwhen]]
             [juncture.componad
+             :as componad
              :refer [within]]
+            [juncture.util
+             :as j-util
+             :refer [ns-alias not-in?]]
             [juncture.core
              :as ju
-             :refer [def-aggregate
-                     aggregate
-                     get-entity
-                     fail-if-exists
-                     fail-unless-exists
-                     f-mwhen]]
-            [juncture.util
-             :refer [ns-alias not-in?]]
+             :refer [def-aggregate aggregate get-entity fail-if-exists
+                     fail-unless-exists f-mwhen]]
             [juncture.event
              :as event
-             :refer [publish
-                     execute
-                     fail-with
-                     def-command
-                     def-message
-                     def-failure
-                     subscribe
-                     do-unsubscribe
-                     store]]
+             :refer [publish execute fail-with def-command def-message
+                     def-failure subscribe do-unsubscribe store]]
             [juncture.entity
              :as entity
-             :refer [create
-                     transform
-                     def-entity]]))
+             :refer [create transform def-entity]]
+            [vebento.core
+             :as vebento]
+            [vebento.specs
+             :as specs]))
 
 
-(ns-alias 'specs 'vebento.specs)
-(ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'retailer 'vebento.entity.retailer)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
@@ -243,8 +235,10 @@
 
         dispatcher
 
-        [::event/kind ::ju/message #(store event-log %)]
-        [::event/kind ::ju/failure #(store event-log %)]
+        [::event/kind ::ju/message
+         #(do (print "\n\n>>>>>>>>>>>>>>>>\n\n" % "\n\n") (store event-log %))]
+        [::event/kind ::ju/failure
+         #(do (print "\n\n>>>>>>>>>>>>>>>>\n\n" % "\n\n") (store event-log %))]
 
         [::event/type ::register
          (fn [{customer-id ::id

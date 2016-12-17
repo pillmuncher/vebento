@@ -1,38 +1,42 @@
 (ns vebento.entity.customer-test
   (:require [clojure.future
              :refer :all]
+            [clojure.test
+             :refer :all]
             [com.stuartsierra.component
              :as co]
+            [monads.core
+             :as monad
+             :refer [return]]
             [juncture.componad
+             :as componad
              :refer [within system]]
+            [juncture.util
+             :as j-util
+             :refer [ns-alias uuid]]
             [juncture.core
              :as ju]
-            [juncture.util
-             :refer [ns-alias uuid]]
+            [juncture.entity
+             :as entity]
             [juncture.event
              :as event
-             :refer [command message failure]]
+             :refer [command message failure get-events]]
             [juncture.testing
              :as testing
-             :refer [def-scenario
-                     given
-                     after
-                     expect
-                     testing-event-log
+             :refer [def-scenario given after expect testing-event-log
                      testing-event-dispatcher]]
+            [vebento.core
+             :as vebento]
             [vebento.specs
              :as specs]
+            [vebento.entity.customer
+             :as customer]
             [vebento.entity.retailer
              :as retailer]
-            [vebento.entity.customer
-             :as customer]))
-
-
-(ns-alias 'entity 'juncture.entity)
-(ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'retailer 'vebento.entity.retailer)
-(ns-alias 'product 'vebento.entity.product)
-(ns-alias 'order 'vebento.entity.order)
+            [vebento.entity.order
+             :as order]
+            [vebento.entity.product
+             :as product]))
 
 
 (defn test-bench []
@@ -51,12 +55,7 @@
       (co/start)))
 
 
-
-
-(def-scenario customer-order-gets-placed
-  (print))
-
-(clojure.test/run-tests)
+;(clojure.test/run-tests)
 
 
 (let [customer-id (uuid)
@@ -88,7 +87,7 @@
       (expect
         (message
           ::customer/registered
-          ::customer/id customer-id))))
+          ::customer/id customer-id)))))
 
   (def-scenario customer-gets-registered-even-without-address
     (within (system (test-bench))
@@ -169,6 +168,8 @@
           ::customer/select-retailer
           ::customer/id customer-id
           ::retailer/id retailer-id))
+      e <- (get-events)
+      (return (print "\n\n--------------- " e "\n\n"))
       (expect
         (message
           ::customer/retailer-selected

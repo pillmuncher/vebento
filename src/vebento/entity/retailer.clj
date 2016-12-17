@@ -6,31 +6,27 @@
             [com.stuartsierra.component
              :as co]
             [juncture.componad
+             :as componad
              :refer [within]]
+            [juncture.util
+             :as j-util
+             :refer [ns-alias]]
             [juncture.core
              :as ju
-             :refer [def-aggregate
-                     aggregate
-                     fail-if-exists
-                     fail-unless-exists]]
-            [juncture.util
-             :refer [ns-alias]]
+             :refer [def-aggregate aggregate fail-if-exists fail-unless-exists]]
             [juncture.event
              :as event
-             :refer [publish
-                     def-command
-                     def-message
-                     subscribe
-                     do-unsubscribe
+             :refer [publish def-command def-message subscribe do-unsubscribe
                      store]]
             [juncture.entity
              :as entity
-             :refer [create
-                     transform
-                     def-entity]]))
+             :refer [create transform def-entity]]
+            [vebento.core
+             :as vebento]
+            [vebento.specs
+             :as specs]))
 
 
-(ns-alias 'specs 'vebento.specs)
 (ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)

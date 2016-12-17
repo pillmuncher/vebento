@@ -9,7 +9,7 @@
              :as monad
              :refer [mdo return catch-error put-state get-state]]
             [monads.types
-             :refer [fst snd]]
+             :refer [fst snd either]]
             [juncture.componad
              :refer [>>=]]
             [juncture.event
@@ -67,6 +67,7 @@
 
   (do-dispatch
     [this events]
+    (print "\n\n===============\n\n" events "\n\n" @(:trail event-log))
     (when-not (empty? events)
       (let [event (first events)]
         (loop [handlers (->> #{(kind-key event) (type-key event)}
@@ -106,5 +107,7 @@
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-     (let [[events# result#] (snd (fst (mdo ~computation)))]
+      identity
+      identity
+     (let [[events# result#] (fst (either identity identity (mdo ~computation)))]
        (is (= events# result#)))))

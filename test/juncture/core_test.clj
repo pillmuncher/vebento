@@ -1,6 +1,6 @@
-(ns vebento.core-test
+(ns juncture.core-test
   (:require [clojure.test
              :refer :all]
-            [vebento.core
-             :as vebento
+            [juncture.core
+             :as ju
              :refer :all]))

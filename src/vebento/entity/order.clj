@@ -6,33 +6,26 @@
             [com.stuartsierra.component
              :as co]
             [juncture.componad
+             :as componad
              :refer [within]]
+            [juncture.util
+             :as j-util
+             :refer [ns-alias]]
             [juncture.core
              :as ju
-             :refer [fail-if
-                     fail-if-exists
-                     fail-unless-exists]]
-            [juncture.util
-             :refer [ns-alias not-in?]]
+             :refer []]
             [juncture.event
-             :refer [publish
-                     def-subscription
-                     def-command
-                     def-message
-                     def-failure]]
+             :as event
+             :refer []]
             [juncture.entity
              :as entity
-             :refer [create
-                     transform
-                     get-entity
-                     def-entity
-                     def-aggregate
-                     aggregate]]
+             :refer [create transform def-entity]]
+            [vebento.core
+             :as vebento]
             [vebento.specs
              :as specs]))
 
 
-(ns-alias 'specs 'vebento.specs)
 (ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'retailer 'vebento.entity.retailer)
 (ns-alias 'product 'vebento.entity.product)
@@ -67,13 +60,13 @@
       items ::items
       schedule ::schedule
       payment-method ::payment-method}]
-  (entity/create ::entity
-                 ::entity/id order-id
-                 ::retailer/id retailer-id
-                 ::customer/id customer-id
-                 ::address address
-                 ::items items
-                 ::schedule schedule
-                 ::payment-method payment-method
-                 ::paid false
-                 ::shipped false))
+  (create ::entity
+          ::entity/id order-id
+          ::retailer/id retailer-id
+          ::customer/id customer-id
+          ::address address
+          ::items items
+          ::schedule schedule
+          ::payment-method payment-method
+          ::paid false
+          ::shipped false))
