@@ -107,7 +107,7 @@
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-      identity
-      identity
+     identity
+     identity
      (let [[events# result#] (fst (either identity identity (mdo ~computation)))]
        (is (= events# result#)))))

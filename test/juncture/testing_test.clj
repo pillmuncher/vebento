@@ -1,1 +1,3 @@
-(ns juncture.testing-test)
+(ns juncture.testing-test
+  (:require [clojure.future
+             :refer :all]))

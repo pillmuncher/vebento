@@ -1,1 +1,3 @@
-(ns vebento.entity.order-test)
+(ns vebento.entity.order-test
+  (:require [clojure.future
+             :refer :all]))

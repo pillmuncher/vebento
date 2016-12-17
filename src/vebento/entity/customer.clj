@@ -27,8 +27,6 @@
             [juncture.entity
              :as entity
              :refer [create transform def-entity]]
-            [vebento.core
-             :as vebento]
             [vebento.specs
              :as specs]))
 
@@ -406,6 +404,6 @@
              (publish ::cart-cleared
                       ::id customer-id)))])))
 
-  (stop [this]
-    (do-unsubscribe dispatcher subscriptions)
-    (assoc this :subscriptions nil)))
+(stop [this]
+      (do-unsubscribe dispatcher subscriptions)
+      (assoc this :subscriptions nil)))

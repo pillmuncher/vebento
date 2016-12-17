@@ -22,15 +22,15 @@
 
 (defn system
   [env]
-   (fn [computation]
-     (rws/run-rws-t error-rws computation nil env)))
+  (fn [computation]
+    (rws/run-rws-t error-rws computation nil env)))
 
 
 (defn component
   [component-selector & extra-keys]
   (fn [computation]
     (local #(-> % component-selector (merge (select-keys % extra-keys)))
-      computation)))
+           computation)))
 
 
 (defn >>=

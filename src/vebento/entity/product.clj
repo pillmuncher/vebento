@@ -23,7 +23,5 @@
             [juncture.entity
              :as entity
              :refer []]
-            [vebento.core
-             :as vebento]
             [vebento.specs
              :as specs]))

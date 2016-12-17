@@ -130,7 +130,7 @@
 (defn execute
   [& command-params]
   (mdo
-  (raise (apply command command-params))))
+    (raise (apply command command-params))))
 
 (defn execute-in
   [env & command-params]

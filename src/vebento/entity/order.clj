@@ -20,8 +20,6 @@
             [juncture.entity
              :as entity
              :refer [create transform def-entity]]
-            [vebento.core
-             :as vebento]
             [vebento.specs
              :as specs]))
 

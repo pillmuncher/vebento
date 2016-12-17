@@ -1,1 +1,3 @@
-(ns juncture.entity-test)
+(ns juncture.entity-test
+  (:require [clojure.future
+             :refer :all]))
