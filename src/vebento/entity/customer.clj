@@ -36,7 +36,7 @@
 (ns-alias 'retailer 'vebento.entity.retailer)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
-
+find . -name "*.old" -type f -delete
 
 (s/def ::id ::specs/id)
 (s/def ::address ::specs/address)
