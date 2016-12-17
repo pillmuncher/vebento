@@ -46,7 +46,7 @@
 
 (s/fdef dispatch-transform
         :args (s/cat :entity (s/nilable ::ju/entity)
-                     :event ::ju/event))
+                     :event ::event/spec))
 
 (s-test/instrument `dispatch-transform)
 

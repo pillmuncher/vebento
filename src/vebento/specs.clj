@@ -51,6 +51,8 @@
 (s/def ::phone ::string)
 (s/def ::schedule ::set)
 (s/def ::payment-method ::string)
+(s/def ::paid ::bool)
+(s/def ::shipped ::bool)
 
 
 (s/def ::address
@@ -61,3 +63,5 @@
                 ::city
                 ::email]
           :opt [::phone]))
+
+(s/def ::items set?)

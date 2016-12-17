@@ -16,6 +16,7 @@
 
 
 (ns-alias 'ju 'juncture.core)
+(ns-alias 'ju 'juncture.core)
 
 
 (defprotocol Dispatcher
@@ -57,15 +58,15 @@
 
 (defmacro def-command
   [command-type & {:as command-keys}]
-  `(juncture.event/def-event ::ju/command ~command-type ~command-keys))
+  `(juncture.event/def-event ::command ~command-type ~command-keys))
 
 (defmacro def-message
   [message-type & {:as message-keys}]
-  `(juncture.event/def-event ::ju/message ~message-type ~message-keys))
+  `(juncture.event/def-event ::message ~message-type ~message-keys))
 
 (defmacro def-failure
   [failure-type & {:as failure-keys}]
-  `(juncture.event/def-event ::ju/failure ~failure-type ~failure-keys))
+  `(juncture.event/def-event ::failure ~failure-type ~failure-keys))
 
 
 (defn valid?
@@ -91,19 +92,18 @@
                    ::id (uuid))))
 
 
-(def command (partial event ::ju/command))
-(def message (partial event ::ju/message))
-(def failure (partial event ::ju/failure))
+(def command (partial event ::command))
+(def message (partial event ::message))
+(def failure (partial event ::failure))
 
 
-(def command? #(s/valid? (s/and valid? ::ju/command) %))
-(def message? #(s/valid? (s/and valid? ::ju/message) %))
-(def failure? #(s/valid? (s/and valid? ::ju/failure) %))
+(def command? #(s/valid? (s/and valid? ::command) %))
+(def message? #(s/valid? (s/and valid? ::message) %))
+(def failure? #(s/valid? (s/and valid? ::failure) %))
 
 
 (defn raise
   [event]
-  (print "\n\n---------------" event "\n\n")
   (mdo
     (>>= (asks :dispatcher)
          #(return (dispatch % event)))
@@ -164,6 +164,6 @@
        #(-> % (do-fetch criteria) (return))))
 
 
-(def get-commands (partial get-events ::kind ::ju/command))
-(def get-messages (partial get-events ::kind ::ju/message))
-(def get-failures (partial get-events ::kind ::ju/failure))
+(def get-commands (partial get-events ::kind ::command))
+(def get-messages (partial get-events ::kind ::message))
+(def get-failures (partial get-events ::kind ::failure))

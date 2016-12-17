@@ -29,12 +29,12 @@
 (ns-alias 'product 'vebento.entity.product)
 
 
-(s/def ::address ::spec/address)
-(s/def ::items ::spec/items)
-(s/def ::schedule ::spec/schedule)
-(s/def ::payment-method ::spec/payment-method)
-(s/def ::paid ::spec/paid)
-(s/def ::shipped ::spec/shipped)
+(s/def ::address ::specs/address)
+(s/def ::items ::specs/items)
+(s/def ::schedule ::specs/schedule)
+(s/def ::payment-method ::specs/payment-method)
+(s/def ::paid ::specs/paid)
+(s/def ::shipped ::specs/shipped)
 
 
 

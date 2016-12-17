@@ -2,17 +2,12 @@
   (:require [clojure.future
              :refer :all]
             [vebento.specs
-             :as specs
-             :refer :all]
+             :as specs]
             [vebento.entity.product
-             :as product
-             :refer :all]
+             :as product]
             [vebento.entity.order
-             :as order
-             :refer :all]
+             :as order]
             [vebento.entity.retailer
-             :as retailer
-             :refer :all]
+             :as retailer]
             [vebento.entity.customer
-             :as customer
-             :refer :all]))
+             :as customer]))

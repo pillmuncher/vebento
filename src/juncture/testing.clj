@@ -24,7 +24,10 @@
   event/Log
 
   (do-store [this events]
-    (swap! trail clojure.set/union events))
+    (swap! trail clojure.set/union events)
+    (print "\n\n---------------\n\n")
+    (clojure.pprint/pprint @trail)
+    (print "\n\n===============\n\n"))
 
   (do-fetch [this criteria]
     (->> @trail
@@ -67,7 +70,6 @@
 
   (do-dispatch
     [this events]
-    (print "\n\n===============\n\n" events "\n\n" @(:trail event-log))
     (when-not (empty? events)
       (let [event (first events)]
         (loop [handlers (->> #{(kind-key event) (type-key event)}
@@ -99,7 +101,7 @@
   (mdo
     raised <- (get-events)
     result <- (>>= get-state
-                   #(return (clojure.set/difference (set raised) %)))
+                   #(->> % (clojure.set/difference (set raised)) (return)))
     (return [(->> result (map #(dissoc % ::event/id ::event/date)) (set))
              (->> events (map #(dissoc % ::event/id ::event/date)) (set))])))
 
@@ -107,7 +109,7 @@
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-     identity
-     identity
-     (let [[events# result#] (fst (either identity identity (mdo ~computation)))]
+     (let [[events# result#] (fst (either identity
+                                          identity
+                                          ~computation))]
        (is (= events# result#)))))

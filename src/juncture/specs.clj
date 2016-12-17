@@ -18,17 +18,15 @@
 (s/def ::event/id uuid?)
 (s/def ::event/date inst?)
 (s/def ::event/type keyword?)
-(s/def ::event/kind #{::ju/command ::ju/message ::ju/failure})
+(s/def ::event/kind #{::event/command ::event/message ::event/failure})
 (s/def ::event/spec (s/keys :req [::event/kind
                                   ::event/type
                                   ::event/date
                                   ::event/id]))
 
-(s/def ::ju/event ::event/spec)
-
-(s/def ::ju/command #(= (::event/kind %) ::ju/command))
-(s/def ::ju/message #(= (::event/kind %) ::ju/message))
-(s/def ::ju/failure #(= (::event/kind %) ::ju/failure))
+(s/def ::event/command #(= (::event/kind %) ::event/command))
+(s/def ::event/message #(= (::event/kind %) ::event/message))
+(s/def ::event/failure #(= (::event/kind %) ::event/failure))
 
 
 (s/def ::entity/id uuid?)
@@ -36,9 +34,6 @@
 (s/def ::entity/type keyword?)
 (s/def ::entity/kind #{::ju/entity})
 (s/def ::entity/spec (s/keys :req [::entity/kind ::entity/type ::entity/id]))
-
-(s/def ::ju/entity #(= (::entity/kind %) ::ju/entity))
-
 
 
 (def-failure ::entity/already-exists

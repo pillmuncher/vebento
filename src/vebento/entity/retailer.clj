@@ -153,10 +153,10 @@
 
         dispatcher
 
-        [::ju/kind ::ju/message #(store event-log %)]
-        [::ju/kind ::ju/failure #(store event-log %)]
+        [::event/kind ::event/message #(store event-log %)]
+        [::event/kind ::event/failure #(store event-log %)]
 
-        [::ju/type ::register
+        [::event/type ::register
          (fn [{retailer-id ::id address ::address}]
            (within (aggregate this [::account] retailer-id)
              (fail-if-exists ::id retailer-id)
@@ -164,7 +164,7 @@
                       ::id retailer-id
                       ::address address)))]
 
-        [::ju/type ::add-area
+        [::event/type ::add-area
          (fn [{retailer-id ::id zipcode ::zipcode}]
            (within (aggregate this [::account] retailer-id)
              (fail-unless-exists ::id retailer-id)
@@ -172,7 +172,7 @@
                       ::id retailer-id
                       ::zipcode zipcode)))]
 
-        [::ju/type ::add-product
+        [::event/type ::add-product
          (fn [{retailer-id ::id product-id ::product/id}]
            (within (aggregate this [::account] retailer-id)
              (fail-unless-exists ::id retailer-id)
@@ -181,7 +181,7 @@
                       ::id retailer-id
                       ::product/id product-id)))]
 
-        [::ju/type ::add-schedule
+        [::event/type ::add-schedule
          (fn [{retailer-id ::id schedule ::schedule}]
            (within (aggregate this [::account] retailer-id)
              (fail-unless-exists ::id retailer-id)
@@ -189,7 +189,7 @@
                       ::id retailer-id
                       ::schedule schedule)))]
 
-        [::ju/type ::add-payment-method
+        [::event/type ::add-payment-method
          (fn [{retailer-id ::id payment-method ::payment-method}]
            (within (aggregate this [::account] retailer-id)
              (fail-unless-exists ::id retailer-id)
