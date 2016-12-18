@@ -8,7 +8,7 @@
             [juncture.event
              :as event
              :refer [command message failure failure?
-                     dispatch fetch fetch-apply fetch-with]]
+                     dispatch fetch fetch-apply fetch*]]
             [juncture.entity
              :as entity
              :refer [run-transformer]]
@@ -107,6 +107,7 @@
   `(>>= ~m-condition #(mwhen (not %) ~computation)))
 
 
+;;FIXME: call to raise is bogus, also it is not clear as yet how to multi-fail.
 (defmacro f-mwhen
   [& {:as expression-failure-pairs}]
   (let [possible-failures (->> expression-failure-pairs
@@ -120,7 +121,7 @@
 (defn is-id-available?
   [id-key id]
   (>>= get-journal
-       #(-> (fetch-with % ::event/kind ::event/message id-key id)
+       #(-> (fetch* % ::event/kind ::event/message id-key id)
             (deref)
             (empty?)
             (return))))

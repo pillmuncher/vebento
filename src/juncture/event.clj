@@ -39,7 +39,7 @@
   [journal & events]
   (mapv #(store journal %) events))
 
-(defn fetch-with
+(defn fetch*
   [journal & {:as criteria}]
   (fetch journal criteria))
 
