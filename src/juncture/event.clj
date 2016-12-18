@@ -4,12 +4,7 @@
             [clojure.spec
              :as s]
             [clojure.spec.test
-             :as s-test])
-  (:import  [java.util UUID Date]))
-
-
-(def uuid #(UUID/randomUUID))
-(def inst #(Date.))
+             :as s-test]))
 
 
 (defprotocol Dispatcher
