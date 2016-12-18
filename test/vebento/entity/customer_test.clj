@@ -21,8 +21,8 @@
              :as specs]
             [vebento.testing
              :as testing
-             :refer [def-scenario given after expect testing-journal
-                     testing-event-dispatcher]]
+             :refer [def-scenario given after expect mock-journal
+                     mock-event-dispatcher]]
             [vebento.entity.product
              :as product]
             [vebento.entity.order
@@ -40,9 +40,9 @@
         :retailer
         (retailer/->Component nil nil nil)
         :dispatcher
-        (testing-event-dispatcher)
+        (mock-event-dispatcher)
         :journal
-        (testing-journal))
+        (mock-journal))
       (co/system-using
         {:customer [:journal :dispatcher]
          :retailer [:journal :dispatcher]

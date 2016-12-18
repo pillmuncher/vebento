@@ -22,7 +22,7 @@
              :refer [get-events get-dispatcher raise]]))
 
 
-(defrecord TestingEventJournal
+(defrecord MockEventJournal
 
   [trail counter]
 
@@ -46,8 +46,8 @@
     event))
 
 
-(defn testing-journal []
-  (->TestingEventJournal (atom []) (atom 0)))
+(defn mock-journal []
+  (->MockEventJournal (atom []) (atom 0)))
 
 
 (defn kind-key
@@ -58,7 +58,8 @@
   [{value ::event/type}]
   {:key [::event/type value]})
 
-(defrecord TestingEventDispatcher
+
+(defrecord MockEventDispatcher
 
   [journal handler-rel subscriptions]
 
@@ -96,8 +97,8 @@
     (assoc this :subscriptions nil)))
 
 
-(defn testing-event-dispatcher []
-  (->TestingEventDispatcher nil (atom #{}) nil))
+(defn mock-event-dispatcher []
+  (->MockEventDispatcher nil (atom #{}) nil))
 
 
 (defn strip-canonicals
@@ -112,20 +113,22 @@
 (defn given
   [& m-events]
   (>>= (catch-failure (sequence-m m-events))
-       #(-> % strip-canonicals set put-state)))
+       put-state))
 
 (defn after
   [& m-events]
   (>>= (catch-failure (sequence-m m-events))
-       #(->> % strip-canonicals set (modify union))))
+       #(modify union %)))
 
 (defn expect
   [& m-events]
   (mdo
-    before <- get-state
-    events <- (catch-failure (sequence-m m-events))
-    events <- (-> events strip-canonicals set return)
-    after <- (>>= (get-events) #(-> @% strip-canonicals set return))
+    before <- (>>= get-state
+                   #(-> % strip-canonicals set return))
+    events <- (>>= (catch-failure (sequence-m m-events))
+                   #(-> % strip-canonicals set return))
+    after <- (>>= (get-events)
+                  #(-> @% strip-canonicals set return))
     result <- (return (difference (set after) (set before)))
     (return [events result])))
 
