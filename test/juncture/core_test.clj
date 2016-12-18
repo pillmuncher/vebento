@@ -2,5 +2,5 @@
   (:require [clojure.test
              :refer :all]
             [juncture.core
-             :as ju
+             :as core
              :refer :all]))

@@ -1,18 +1,32 @@
-(ns juncture.componad
+(ns componad
   (:require [clojure.future
              :refer :all]
             [monads.core
              :as monad
-             :refer [mdo local]]
+             :refer [mdo return fail >>=]]
             [monads.types
-             :refer [fst]]
+             :refer [fst either]]
             [monads.rws
              :as rws]
             [monads.error
              :as error]))
 
 
-(def error-rws (rws/t error/m))
+(defn >>=
+  [m & mfs]
+  (reduce monad/>>= m mfs))
+
+
+(def error-rws (error/t rws/m))
+
+
+(defn extract
+  [mval]
+  (fst mval))
+
+(defn m-extract
+  [mval]
+  (either fail return (fst mval)))
 
 
 (defmacro within
@@ -24,15 +38,3 @@
   [env]
   (fn [computation]
     (rws/run-rws-t error-rws computation nil env)))
-
-
-(defn component
-  [component-selector & extra-keys]
-  (fn [computation]
-    (local #(-> % component-selector (merge (select-keys % extra-keys)))
-           computation)))
-
-
-(defn >>=
-  [m & mfs]
-  (reduce monad/>>= m mfs))

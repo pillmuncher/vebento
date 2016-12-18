@@ -4,50 +4,37 @@
             [clojure.spec
              :as s]
             [clojure.spec.test
-             :as s-test]
-            [monads.core
-             :refer [mdo return fail ask asks]]
-            [monads.util
-             :refer [sequence-m mwhen]]
-            [juncture.componad
-             :refer [within system >>=]]
-            [juncture.util
-             :refer [ns-alias inst uuid]]))
+             :as s-test])
+  (:import  [java.util UUID Date]))
 
 
-(ns-alias 'ju 'juncture.core)
-(ns-alias 'ju 'juncture.core)
+(def uuid #(UUID/randomUUID))
+(def inst #(Date.))
 
 
 (defprotocol Dispatcher
-  (do-subscribe [this []])
-  (do-unsubscribe [this []])
-  (do-dispatch [this []]))
-
-(defn subscribe
-  [dispatcher & subscriptions]
-  (do-subscribe dispatcher subscriptions))
-
-(defn unsubscribe
-  [dispatcher & subscriptions]
-  (do-unsubscribe dispatcher subscriptions))
-
-(defn dispatch
-  [dispatcher & events]
-  (do-dispatch dispatcher events))
+  (subscribe [this subscriptions])
+  (unsubscribe [this subscriptions])
+  (dispatch [this events]))
 
 
-(defprotocol Log
-  (do-store [this event])
-  (do-fetch [this criteria]))
+(defprotocol Journal
+  (next-version [this])
+  (store [this events])
+  (fetch [this criteria])
+  (fetch-apply [this fun criteria]))
 
-(defn store
-  [event-log & events]
-  (do-store event-log events))
 
-(defn fetch
-  [event-log & {:as criteria}]
-  (do-fetch event-log criteria))
+(s/def ::version integer?)
+(s/def ::id uuid?)
+(s/def ::date inst?)
+(s/def ::type keyword?)
+(s/def ::kind #{::command ::message ::failure})
+(s/def ::spec (s/keys :req [::kind ::type ::date ::id ::version]))
+
+(s/def ::command #(= (::kind %) ::command))
+(s/def ::message #(= (::kind %) ::message))
+(s/def ::failure #(= (::kind %) ::failure))
 
 
 (defmacro def-event
@@ -83,18 +70,27 @@
 (s-test/instrument `validate)
 
 
-(defn- event
-  [event-kind event-type & {:as event-params}]
+(defn create
+  [journal event-kind event-type event-params]
   (validate (assoc event-params
                    ::kind event-kind
                    ::type event-type
                    ::date (inst)
-                   ::id (uuid))))
+                   ::id (uuid)
+                   ::version (next-version journal))))
 
 
-(def command (partial event ::command))
-(def message (partial event ::message))
-(def failure (partial event ::failure))
+(defn command
+  [journal event-type & {:as event-params}]
+  (create journal ::command event-params))
+
+(defn message
+  [journal event-type & {:as event-params}]
+  (create journal ::message event-params))
+
+(defn failure
+  [journal event-type & {:as event-params}]
+  (create journal ::failure event-params))
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))
@@ -102,68 +98,47 @@
 (def failure? #(s/valid? (s/and valid? ::failure) %))
 
 
-(defn raise
-  [event]
-  (mdo
-    (>>= (asks :dispatcher)
-         #(return (dispatch % event)))
-    (mwhen (failure? event)
-           (fail event))
-    (return event)))
+(defn subscribe*
+  [dispatcher & subscriptions]
+  (subscribe dispatcher subscriptions))
+
+(defn unsubscribe*
+  [dispatcher & subscriptions]
+  (unsubscribe dispatcher subscriptions))
+
+(defn dispatch*
+  [dispatcher & events]
+  (dispatch dispatcher events))
+
+(defn dispatch-command
+  [dispatcher & event-params]
+  (dispatch dispatcher (apply command event-params)))
+
+(defn dispatch-message
+  [dispatcher & event-params]
+  (dispatch dispatcher (apply message event-params)))
+
+(defn dispatch-failure
+  [dispatcher & event-params]
+  (dispatch dispatcher (apply failure event-params)))
 
 
-(defn- -raise*
-  [env events]
-  (loop [events events]
-    (when-not (empty? events)
-      (within (system env) (raise (first events)))
-      (recur (rest events)))))
+(defn store*
+  [journal & events]
+  (store journal events))
 
+(defn fetch-chronological
+  [journal & {:as criteria}]
+  (fetch-apply journal #(sort-by ::version %) criteria))
 
-(defn raise*
-  [& events]
-  (mdo
-    (>>= ask #(return (-raise* % events)))
-    (return events)))
+(defn fetch-commands
+  [journal & {:as criteria}]
+  (apply fetch-chronological ::kind ::command criteria))
 
+(defn fetch-messages
+  [journal & {:as criteria}]
+  (apply fetch-chronological ::kind ::message criteria))
 
-(defn execute
-  [& command-params]
-  (mdo
-    (raise (apply command command-params))))
-
-(defn execute-in
-  [env & command-params]
-  (within (system env)
-    (raise (apply command command-params))))
-
-
-(defn publish
-  [& message-params]
-  (raise (apply message message-params)))
-
-(defn publish-in
-  [env & message-params]
-  (within (system env)
-    (raise (apply message message-params))))
-
-
-(defn fail-with
-  [& failure-params]
-  (raise (apply failure failure-params)))
-
-(defn fail-in
-  [env & failure-params]
-  (within (system env)
-    (raise (apply failure failure-params))))
-
-
-(defn get-events
-  [& {:as criteria}]
-  (>>= (asks :event-log)
-       #(-> % (do-fetch criteria) (return))))
-
-
-(def get-commands (partial get-events ::kind ::command))
-(def get-messages (partial get-events ::kind ::message))
-(def get-failures (partial get-events ::kind ::failure))
+(defn fetch-failures
+  [journal & {:as criteria}]
+  (apply fetch-chronological ::kind ::failure criteria))

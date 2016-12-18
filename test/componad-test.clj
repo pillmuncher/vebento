@@ -1,3 +1,3 @@
-(ns juncture.core
+(ns componad-test
   (:require [clojure.future
              :refer :all]))

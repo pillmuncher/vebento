@@ -1,41 +1,39 @@
-(ns juncture.testing
+(ns vebento.testing
   (:require [clojure.future
              :refer :all]
             [clojure.test
              :refer [deftest is]]
-            [clojure.spec
-             :as s]
             [monads.core
-             :as monad
              :refer [mdo return catch-error put-state get-state]]
             [monads.types
              :refer [fst snd either]]
-            [juncture.componad
-             :refer [>>=]]
-            [juncture.event
+            [componad
+             :refer [>>= extract]]
+            [juncture
              :as event
-             :refer [get-events raise raise*]]))
+             :refer [fetch-apply get-events raise raise*]]))
 
 
-(defrecord TestingEventLog
+(defrecord TestingEventJournal
 
   [trail]
 
-  event/Log
+  event/Journal
 
-  (do-store [this events]
-    (swap! trail clojure.set/union events)
-    (print "\n\n---------------\n\n")
-    (clojure.pprint/pprint @trail)
-    (print "\n\n===============\n\n"))
+  (fetch-apply [this fun criteria]
+    (future (->> @trail
+                 (clojure.set/join #{criteria})
+                 (fun))))
 
-  (do-fetch [this criteria]
-    (->> @trail
-         (clojure.set/join #{criteria})
-         (sort-by :event/date))))
+  (fetch [this criteria]
+    (fetch-apply this identity criteria))
 
-(defn testing-event-log []
-  (->TestingEventLog (atom #{})))
+  (store [this events]
+    (swap! trail clojure.set/union events)))
+
+
+(defn testing-journal []
+  (->TestingEventJournal (atom #{})))
 
 
 (defn kind-key
@@ -48,11 +46,11 @@
 
 (defrecord TestingEventDispatcher
 
-  [event-log handler-rel]
+  [journal handler-rel]
 
   event/Dispatcher
 
-  (do-subscribe
+  (subscribe
     [this subscriptions]
     (loop [subscriptions subscriptions]
       (when-not (empty? subscriptions)
@@ -61,14 +59,14 @@
           (recur (rest subscriptions)))))
     subscriptions)
 
-  (do-unsubscribe
+  (unsubscribe
     [this subscriptions]
     (when-not (empty? subscriptions)
       (let [[k v h] (first subscriptions)]
         (swap! handler-rel disj {:key [k v] ::handler h})
         (recur (rest subscriptions)))))
 
-  (do-dispatch
+  (dispatch
     [this events]
     (when-not (empty? events)
       (let [event (first events)]
@@ -91,7 +89,7 @@
   [event]
   (mdo
     (>>= (get-events)
-         #(-> % (conj event) (put-state)))
+         #(-> @% (conj event) (put-state)))
     (catch-error
       (raise event)
       return)))
@@ -101,15 +99,17 @@
   (mdo
     raised <- (get-events)
     result <- (>>= get-state
-                   #(->> % (clojure.set/difference (set raised)) (return)))
-    (return [(->> result (map #(dissoc % ::event/id ::event/date)) (set))
-             (->> events (map #(dissoc % ::event/id ::event/date)) (set))])))
+                   #(->> % (clojure.set/difference (set @raised)) (return)))
+    (return [(->> result
+                  (map #(dissoc % ::event/id ::event/date ::event/version))
+                  (set))
+             (->> events
+                  (map #(dissoc % ::event/id ::event/date ::event/version))
+                  (set))])))
 
 
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-     (let [[events# result#] (fst (either identity
-                                          identity
-                                          ~computation))]
+     (let [[events# result#] ~computation]
        (is (= events# result#)))))

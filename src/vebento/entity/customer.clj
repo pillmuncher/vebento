@@ -7,31 +7,24 @@
              :as s]
             [com.stuartsierra.component
              :as co]
-            [monads.core
-             :refer [return]]
             [monads.util
-             :as m-util
              :refer [mwhen]]
-            [juncture.componad
-             :as componad
+            [componad
              :refer [within]]
-            [juncture.util
-             :as j-util
+            [vebento.util
              :refer [ns-alias not-in?]]
-            [juncture.core
-             :as ju
-             :refer [def-aggregate aggregate fail-if-exists fail-unless-exists
-                     get-entity f-mwhen]]
-            [juncture.event
-             :as event
-             :refer [publish execute fail-with subscribe do-unsubscribe store
-                     def-command def-message def-failure]]
-            [juncture.entity
-             :as entity
-             :refer [create transform def-entity]]
+            [vebento.core
+             :refer [def-aggregate aggregate publish execute fail-with
+                     fail-if-exists fail-unless-exists f-mwhen get-entity]]
+            [juncture
+             :refer [def-command def-message def-failure def-entity
+                     subscribe unsubscribe store create transform]]
             [vebento.specs
              :as specs]))
 
+
+(ns-alias 'event 'juncture.event)
+(ns-alias 'entity 'juncture.entity)
 
 (ns-alias 'retailer 'vebento.entity.retailer)
 (ns-alias 'order 'vebento.entity.order)
@@ -223,7 +216,7 @@
 
 (defrecord Component
 
-  [dispatcher event-log subscriptions]
+  [dispatcher journal subscriptions]
 
   co/Lifecycle
 
@@ -235,10 +228,8 @@
 
         dispatcher
 
-        [::event/kind ::event/message
-         #(do (print "\n\n>>>>>>>>>>>>>>>>\n\n" % "\n\n") (store event-log %))]
-        [::event/kind ::event/failure
-         #(do (print "\n\n>>>>>>>>>>>>>>>>\n\n" % "\n\n") (store event-log %))]
+        [::event/kind ::event/message #(store journal %)]
+        [::event/kind ::event/failure #(store journal %)]
 
         [::event/type ::register
          (fn [{customer-id ::id
@@ -246,7 +237,6 @@
                retailer-id ::retailer/id
                payment-method ::payment-method}]
            (within (aggregate this [::account] customer-id)
-             (return (print "\n\n <<<<<<<<<<<<<<>>>>>>>>>>>>>> " customer-id))
              (fail-if-exists ::id customer-id)
              (publish ::registered
                       ::id customer-id)
@@ -408,5 +398,5 @@
                       ::id customer-id)))])))
 
 (stop [this]
-      (do-unsubscribe dispatcher subscriptions)
+      (unsubscribe dispatcher subscriptions)
       (assoc this :subscriptions nil)))

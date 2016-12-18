@@ -5,12 +5,29 @@
              :as s]
             [clojure.spec.test
              :as s-test]
-            [juncture.util
-             :refer [ns-alias]]))
+            [juncture.event
+             :as event
+             :refer [def-failure]]))
 
 
-(ns-alias 'ju 'juncture.core)
-(ns-alias 'event 'juncture.event)
+(s/def ::version integer?)
+(s/def ::id uuid?)
+(s/def ::type keyword?)
+(s/def ::kind #{::entity})
+(s/def ::spec (s/keys :req [::kind ::type ::id ::version]))
+
+(s/def ::entity #(= (::kind %) ::entity))
+
+
+(s/def ::id-key keyword?)
+
+(def-failure ::already-exists
+  :req [::id-key
+        ::id])
+
+(def-failure ::not-found
+  :req [::id-key
+        ::id])
 
 
 (defmacro def-entity
@@ -36,8 +53,9 @@
 (defn create
   [entity-type & {:as entity-params}]
   (validate (assoc entity-params
-                   ::kind ::ju/entity
-                   ::type entity-type)))
+                   ::kind ::entity
+                   ::type entity-type
+                   ::version 0)))
 
 
 (defn- dispatch-transform
@@ -45,9 +63,14 @@
   [(::type entity) (::event/type evt)])
 
 (s/fdef dispatch-transform
-        :args (s/cat :entity (s/nilable ::ju/entity)
+        :args (s/cat :entity (s/nilable ::entity)
                      :event ::event/spec))
 
 (s-test/instrument `dispatch-transform)
 
 (defmulti transform dispatch-transform)
+
+
+(defn transform
+  [entity event]
+  (update (transform entity event) assoc ::id (::event/id event)))

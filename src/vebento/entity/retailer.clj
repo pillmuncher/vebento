@@ -1,29 +1,30 @@
 (ns vebento.entity.retailer
   (:require [clojure.future
              :refer :all]
+            [clojure.set
+             :refer [union intersection]]
             [clojure.spec
              :as s]
             [com.stuartsierra.component
              :as co]
-            [juncture.componad
-             :as componad
+            [monads.util
+             :refer [mwhen]]
+            [componad
              :refer [within]]
-            [juncture.util
-             :as j-util
-             :refer [ns-alias]]
-            [juncture.core
-             :as ju
-             :refer [def-aggregate aggregate fail-if-exists fail-unless-exists]]
-            [juncture.event
-             :as event
-             :refer [publish def-command def-message subscribe do-unsubscribe
-                     store]]
-            [juncture.entity
-             :as entity
-             :refer [create transform def-entity]]
+            [vebento.util
+             :refer [ns-alias not-in?]]
+            [vebento.core
+             :refer [def-aggregate aggregate publish execute fail-with
+                     fail-if-exists fail-unless-exists f-mwhen get-entity]]
+            [juncture
+             :refer [def-command def-message def-failure def-entity
+                     subscribe unsubscribe store create transform]]
             [vebento.specs
              :as specs]))
 
+
+(ns-alias 'event 'juncture.event)
+(ns-alias 'entity 'juncture.entity)
 
 (ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'order 'vebento.entity.order)
@@ -141,7 +142,7 @@
 
 (defrecord Component
 
-  [dispatcher event-log subscriptions]
+  [dispatcher journal subscriptions]
 
   co/Lifecycle
 
@@ -153,8 +154,8 @@
 
         dispatcher
 
-        [::event/kind ::event/message #(store event-log %)]
-        [::event/kind ::event/failure #(store event-log %)]
+        [::event/kind ::event/message #(store journal %)]
+        [::event/kind ::event/failure #(store journal %)]
 
         [::event/type ::register
          (fn [{retailer-id ::id address ::address}]
@@ -198,5 +199,5 @@
                       ::payment-method payment-method)))])))
 
   (stop [this]
-    (do-unsubscribe dispatcher subscriptions)
+    (unsubscribe dispatcher subscriptions)
     (assoc this :subscriptions nil)))
