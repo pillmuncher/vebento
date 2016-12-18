@@ -123,14 +123,10 @@
   [& m-events]
   (mdo
     before <- get-state
-    (return (print "\n\nbefore:\n\n" (map ::event/type before)))
     events <- (catch-failure (sequence-m m-events))
     events <- (-> events strip-canonicals set return)
-    (return (print "\n\nexpected:\n\n" (map ::event/type events)))
     after <- (>>= (get-events) #(-> @% strip-canonicals set return))
-    (return (print "\n\nafter:\n\n" (map ::event/type after)))
     result <- (return (difference (set after) (set before)))
-    (return (print "\n\nresult:\n\n" (map ::event/type result)))
     (return [events result])))
 
 
