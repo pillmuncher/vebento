@@ -5,18 +5,19 @@
              :refer [mdo return fail ask asks]]
             [monads.util
              :refer [mwhen]]
-            [util
-             :refer [ns-alias]]
-            [juncture
-             :refer [failure? dispatch fetch transform]]
+            [juncture.event
+             :as event
+             :refer [command message failure failure?
+                     dispatch fetch fetch-apply fetch-with]]
+            [juncture.entity
+             :as entity
+             :refer [run-transformer]]
             [componad
-             :refer [within system >>=]]
-            [vebento.util
-             :refer [ns-alias]]))
+             :refer [within system >>=]]))
 
 
-(ns-alias 'event 'juncture.event)
-(ns-alias 'entity 'juncture.entity)
+(def get-journal (asks :journal))
+(def get-dispatcher (asks :dispatcher))
 
 
 (defn raise
@@ -24,48 +25,48 @@
   (mdo
     (>>= get-dispatcher
          #(return (dispatch % event)))
-    (if (failure? event)
-      (fail event)
-      (return event))))
+    (mwhen (failure? event)
+           (fail event))
+    (return event)))
 
 
 (defn execute
-  [& command-params]
-  (>>= get-dispatcher
-       #(return (dispatch-command % command-params))))
+  [command-type & command-params]
+  (>>= get-journal
+       #(raise (apply command % command-type command-params))))
 
 (defn execute-in
-  [env & command-params]
+  [env command-type & command-params]
   (within (system env)
-    (execute command-params)))
+    (apply execute command-type command-params)))
 
 
 (defn publish
-  [& message-params]
-  (>>= get-dispatcher
-       #(return (dispatch-message % message-params))))
+  [message-type & message-params]
+  (>>= get-journal
+       #(raise (apply message % message-type message-params))))
 
 (defn publish-in
-  [env & message-params]
+  [env message-type & message-params]
   (within (system env)
-    (publish message-params)))
+    (apply publish message-type message-params)))
 
 
 (defn fail-with
-  [& failure-params]
-  (>>= get-dispatcher
-       #(fail (dispatch-failure % failure-params))))
+  [failure-type & failure-params]
+  (>>= get-journal
+       #(raise (apply failure % failure-type failure-params))))
 
 (defn fail-in
-  [env & failure-params]
+  [env failure-type & failure-params]
   (within (system env)
-    (fail-with failure-params)))
+    (apply fail-with failure-type failure-params)))
 
 
 (defn get-events
   [& {:as criteria}]
   (>>= get-journal
-       #(return (apply fetch-chronological % criteria))))
+       #(return (fetch % criteria))))
 
 (defn get-commands
   [& {:as criteria}]
@@ -81,6 +82,8 @@
   [& {:as criteria}]
   (>>= get-journal
        #(return (apply get-events % ::event/kind ::event/failure criteria))))
+
+
 (defmacro def-aggregate
   [aggregate]
   `(s/def ~aggregate keyword?))
@@ -111,14 +114,13 @@
                                (vec))]
     `(->> ~possible-failures
           (keep deref)
-          (apply juncture.event/raise))))
+          (apply raise))))
 
 
 (defn is-id-available?
   [id-key id]
-  (>>= (asks :journal)
-       #(-> %
-            (fetch id-key id)
+  (>>= get-journal
+       #(-> (fetch-with % ::event/kind ::event/message id-key id)
             (deref)
             (empty?)
             (return))))
@@ -142,17 +144,17 @@
   ([events]
    (join nil events))
   ([start events]
-   (return (reduce transform start events))))
+   (reduce run-transformer start events)))
 
 (defn get-entity
   [id-key id]
   (mdo
     (fail-unless-exists id-key id)
-    (>>= get-journal
-         #(return (future (-> %
-                              (fetch-messages id-key id)
-                              (deref)
-                              (join)))))))
+    journal <- get-journal
+    (return (fetch-apply journal
+                         join
+                         {::event/kind ::event/message
+                          id-key id}))))
 
 
 (defprotocol QueryStore

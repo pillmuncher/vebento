@@ -2,9 +2,9 @@
   (:import  [java.util UUID Date]))
 
 
-(defmacro pull [ns name-map]
-  `(do ~@(for [[there here] name-map]
-           `(def ~here ~(symbol (str ns "/" there))))))
+(defmacro pull [ns names]
+  `(do ~@(for [n names]
+           `(def ~n ~(symbol (str ns "/" n))))))
 
 
 (defn ns-alias

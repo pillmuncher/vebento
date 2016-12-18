@@ -3,37 +3,51 @@
              :refer :all]
             [clojure.test
              :refer [deftest is]]
+            [clojure.set
+             :refer [union difference]]
+            [com.stuartsierra.component
+             :as co]
             [monads.core
-             :refer [mdo return catch-error put-state get-state]]
+             :refer [mdo return catch-error put-state get-state modify]]
             [monads.types
              :refer [fst snd either]]
-            [componad
-             :refer [>>= extract]]
-            [juncture
+            [monads.util
+             :refer [sequence-m]]
+            [juncture.event
              :as event
-             :refer [fetch-apply get-events raise raise*]]))
+             :refer [fetch-apply dispatch subscribe* unsubscribe* store]]
+            [componad
+             :refer [extract >>=]]
+            [vebento.core
+             :refer [get-events get-dispatcher raise]]))
 
 
 (defrecord TestingEventJournal
 
-  [trail]
+  [trail counter]
 
   event/Journal
 
+  (next-version [this]
+    (swap! counter inc))
+
   (fetch-apply [this fun criteria]
-    (future (->> @trail
-                 (clojure.set/join #{criteria})
-                 (fun))))
+    (future
+      (->> criteria
+           (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
+           (sort-by ::event/version)
+           (fun))))
 
   (fetch [this criteria]
     (fetch-apply this identity criteria))
 
-  (store [this events]
-    (swap! trail clojure.set/union events)))
+  (store [this event]
+    (swap! trail conj event)
+    event))
 
 
 (defn testing-journal []
-  (->TestingEventJournal (atom #{})))
+  (->TestingEventJournal (atom []) (atom 0)))
 
 
 (defn kind-key
@@ -46,70 +60,82 @@
 
 (defrecord TestingEventDispatcher
 
-  [journal handler-rel]
+  [journal handler-rel subscriptions]
 
   event/Dispatcher
 
   (subscribe
-    [this subscriptions]
-    (loop [subscriptions subscriptions]
-      (when-not (empty? subscriptions)
-        (let [[k v h] (first subscriptions)]
-          (swap! handler-rel conj {:key [k v] ::handler h})
-          (recur (rest subscriptions)))))
-    subscriptions)
+    [this [event-kind event-type handler]]
+    (swap! handler-rel conj {:key [event-kind event-type] ::handler handler})
+    [event-kind event-type handler])
 
   (unsubscribe
-    [this subscriptions]
-    (when-not (empty? subscriptions)
-      (let [[k v h] (first subscriptions)]
-        (swap! handler-rel disj {:key [k v] ::handler h})
-        (recur (rest subscriptions)))))
+    [this [event-kind event-type handler]]
+    (swap! handler-rel disj {:key [event-kind event-type] ::handler handler})
+    [event-kind event-type handler])
 
   (dispatch
-    [this events]
-    (when-not (empty? events)
-      (let [event (first events)]
-        (loop [handlers (->> #{(kind-key event) (type-key event)}
-                             (clojure.set/join @handler-rel)
-                             (map ::handler)
-                             (set))]
-          (when-not (empty? handlers)
-            ((first handlers) event)
-            (recur (rest handlers)))))
-      (recur (rest events)))))
+    [this event]
+    (loop [handlers (->> #{(kind-key event) (type-key event)}
+                         (clojure.set/join @handler-rel)
+                         (map ::handler)
+                         (set))]
+      (when-not (empty? handlers)
+        ((first handlers) event)
+        (recur (rest handlers))))
+    event)
+
+  co/Lifecycle
+  (start [this]
+    (assoc this :subscriptions
+           (subscribe* this
+                       [::event/kind ::event/message #(store journal %)]
+                       [::event/kind ::event/failure #(store journal %)])))
+  (stop [this]
+    (apply unsubscribe* this subscriptions)
+    (assoc this :subscriptions nil)))
+
 
 (defn testing-event-dispatcher []
-  (->TestingEventDispatcher nil (atom #{})))
+  (->TestingEventDispatcher nil (atom #{}) nil))
 
 
-(def given raise*)
+(defn strip-canonicals
+  [events]
+  (map #(dissoc % ::event/id ::event/date ::event/version) events))
+
+(defn catch-failure
+  [computation]
+  (catch-error computation #(return #{%})))
+
+
+(defn given
+  [& m-events]
+  (>>= (catch-failure (sequence-m m-events))
+       #(-> % strip-canonicals set put-state)))
 
 (defn after
-  [event]
-  (mdo
-    (>>= (get-events)
-         #(-> @% (conj event) (put-state)))
-    (catch-error
-      (raise event)
-      return)))
+  [& m-events]
+  (>>= (catch-failure (sequence-m m-events))
+       #(->> % strip-canonicals set (modify union))))
 
 (defn expect
-  [& events]
+  [& m-events]
   (mdo
-    raised <- (get-events)
-    result <- (>>= get-state
-                   #(->> % (clojure.set/difference (set @raised)) (return)))
-    (return [(->> result
-                  (map #(dissoc % ::event/id ::event/date ::event/version))
-                  (set))
-             (->> events
-                  (map #(dissoc % ::event/id ::event/date ::event/version))
-                  (set))])))
+    before <- get-state
+    (return (print "\n\nbefore:\n\n" (map ::event/type before)))
+    events <- (catch-failure (sequence-m m-events))
+    events <- (-> events strip-canonicals set return)
+    (return (print "\n\nexpected:\n\n" (map ::event/type events)))
+    after <- (>>= (get-events) #(-> @% strip-canonicals set return))
+    (return (print "\n\nafter:\n\n" (map ::event/type after)))
+    result <- (return (difference (set after) (set before)))
+    (return (print "\n\nresult:\n\n" (map ::event/type result)))
+    (return [events result])))
 
 
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-     (let [[events# result#] ~computation]
-       (is (= events# result#)))))
+     (let [[expected# result#] (extract ~computation)]
+       (is (= expected# result#)))))

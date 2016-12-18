@@ -58,19 +58,19 @@
                    ::version 0)))
 
 
-(defn- dispatch-transform
+(defn- transformer
   [entity evt]
   [(::type entity) (::event/type evt)])
 
-(s/fdef dispatch-transform
+(s/fdef transformer
         :args (s/cat :entity (s/nilable ::entity)
                      :event ::event/spec))
 
-(s-test/instrument `dispatch-transform)
+(s-test/instrument `transformer)
 
-(defmulti transform dispatch-transform)
+(defmulti transform transformer)
 
 
-(defn transform
+(defn run-transformer
   [entity event]
   (update (transform entity event) assoc ::id (::event/id event)))

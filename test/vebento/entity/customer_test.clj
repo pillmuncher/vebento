@@ -5,16 +5,18 @@
              :refer :all]
             [com.stuartsierra.component
              :as co]
-            [juncture
-             :refer [command message failure]]
+            [util
+             :refer [uuid]]
+            [juncture.event
+             :as event]
+            [juncture.entity
+             :as entity]
             [componad
              :as componad
              :refer [within system]]
-            [vebento.util
-             :as util
-             :refer [uuid]]
             [vebento.core
-             :as core]
+             :as core
+             :refer [execute publish fail-with]]
             [vebento.specs
              :as specs]
             [vebento.testing
@@ -74,26 +76,26 @@
   (def-scenario customer-gets-registered
     (within (system (test-bench))
       (after
-        (command
+        (execute
           ::customer/register
           ::customer/id customer-id))
       (expect
-        (message
+        (publish
           ::customer/registered
           ::customer/id customer-id))))
 
   (def-scenario customer-gets-registered-with-address
     (within (system (test-bench))
       (after
-        (command
+        (execute
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address))
       (expect
-        (message
+        (publish
           ::customer/registered
           ::customer/id customer-id)
-        (message
+        (publish
           ::customer/address-changed
           ::customer/id customer-id
           ::customer/address customer-address))))
@@ -101,15 +103,15 @@
   (def-scenario customer-can-register-only-once
     (within (system (test-bench))
       (given
-        (message
+        (publish
           ::customer/registered
           ::customer/id customer-id))
       (after
-        (command
+        (execute
           ::customer/register
           ::customer/id customer-id))
       (expect
-        (failure
+        (fail-with
           ::entity/already-exists
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
@@ -117,26 +119,26 @@
   (def-scenario customer-cart-gets-cleared
     (within (system (test-bench))
       (given
-        (message
+        (publish
           ::customer/registered
           ::customer/id customer-id))
       (after
-        (command
+        (execute
           ::customer/clear-cart
           ::customer/id customer-id))
       (expect
-        (message
+        (publish
           ::customer/cart-cleared
           ::customer/id customer-id))))
 
   (def-scenario customer-cart-can-only-be-cleared-if-customer-exists
     (within (system (test-bench))
       (after
-        (command
+        (execute
           ::customer/clear-cart
           ::customer/id customer-id))
       (expect
-        (failure
+        (fail-with
           ::entity/not-found
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
@@ -144,28 +146,28 @@
   (def-scenario retailer-gets-selected
     (within (system (test-bench))
       (given
-        (message
+        (publish
           ::retailer/registered
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (message
+        (publish
           ::retailer/area-added
           ::retailer/id retailer-id
           ::retailer/zipcode (::customer/zipcode customer-address))
-        (message
+        (publish
           ::customer/registered
           ::customer/id customer-id)
-        (message
+        (publish
           ::customer/address-changed
           ::customer/id customer-id
           ::customer/address customer-address))
       (after
-        (command
+        (execute
           ::customer/select-retailer
           ::customer/id customer-id
           ::retailer/id retailer-id))
       (expect
-        (message
+        (publish
           ::customer/retailer-selected
           ::customer/id customer-id
           ::retailer/id retailer-id)))))
@@ -173,12 +175,12 @@
   ;(def-scenario retailer-can-only-be-selected-if-customer-exists
     ;(within (system (test-bench))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/select-retailer
           ;::customer/id customer-id
           ;::retailer/id retailer-id))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::entity/not-found
           ;::entity/id-key ::customer/id
           ;::entity/id customer-id))))
@@ -186,45 +188,45 @@
   ;(def-scenario select-retailer-fails-unless-address-was-given
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/area-added
           ;::retailer/id retailer-id
           ;::retailer/zipcode (:zipcode customer-address))
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/select-retailer
           ;::customer/id customer-id
           ;::retailer/id retailer-id))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::customer/has-given-no-address
           ;::customer/id customer-id))))
 
   ;(def-scenario select-retailer-fails-unless-he-delivers-in-the-customers-area
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/select-retailer
           ;::customer/id customer-id
           ;::retailer/id retailer-id))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::customer/zipcode-not-in-retailer-areas
           ;::customer/id customer-id
           ;::customer/zipcode (::customer/zipcode customer-address)))))
@@ -232,30 +234,30 @@
   ;(def-scenario item-gets-added-to-customers-cart
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/product-added
           ;::retailer/id retailer-id
           ;::product/id product-id)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address)
-        ;(message
+        ;(publish
           ;::customer/retailer-selected
           ;::customer/id customer-id
           ;::retailer/id retailer-id))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/add-item-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
           ;::product/amount amount))
       ;(expect
-        ;(message
+        ;(publish
           ;::customer/item-added-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
@@ -264,26 +266,26 @@
   ;(def-scenario add-item-fails-unless-retailer-sells-the-selected-product
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address)
-        ;(message
+        ;(publish
           ;::customer/retailer-selected
           ;::customer/id customer-id
           ;::retailer/id retailer-id))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/add-item-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
           ;::product/amount amount))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::customer/product-not-in-retailer-assortment
           ;::customer/id customer-id
           ;::product/id product-id))))
@@ -291,35 +293,35 @@
   ;(def-scenario customer-order-gets-placed
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/schedule-added
           ;::retailer/id retailer-id
           ;::retailer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address
           ;::retailer/id retailer-id)
-        ;(message
+        ;(publish
           ;::customer/schedule-selected
           ;::customer/id customer-id
           ;::customer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/item-added-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
           ;::product/amount amount))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/place-order
           ;::customer/id customer-id
           ;::order/id order-id))
       ;(expect
-        ;(message
+        ;(publish
           ;::customer/order-placed
           ;::customer/id customer-id
           ;::retailer/id retailer-id
@@ -328,141 +330,141 @@
           ;::order/schedule schedule
           ;::order/items {::product/id product-id
                          ;::product/amount amount})
-        ;(message
+        ;(publish
           ;::customer/cart-cleared
           ;::customer/id customer-id)))))
 
   ;(def-scenario place-customer-order-fails-when-cart-is-empty
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/schedule-added
           ;::retailer/id retailer-id
           ;::retailer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address)
-        ;(message
+        ;(publish
           ;::customer/retailer-selected
           ;::customer/id customer-id
           ;::retailer/id retailer-id)
-        ;(message
+        ;(publish
           ;::customer/schedule-selected
           ;::customer/id customer-id
           ;::customer/schedule schedule)
         ;(after
-          ;(command
+          ;(execute
             ;::customer/place-order
             ;::customer/id customer-id
             ;::order/id order-id))
         ;(expect
-          ;(failure
+          ;(fail-with
             ;::customer/cart-is-empty)))))
 
   ;(def-scenario place-customer-order-fails-unless-address-was-provided
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/schedule-added
           ;::retailer/id retailer-id
           ;::retailer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address nil)
-        ;(message
+        ;(publish
           ;::customer/retailer-selected
           ;::customer/id customer-id
           ;::retailer/id retailer-id)
-        ;(message
+        ;(publish
           ;::customer/schedule-selected
           ;::customer/id customer-id
           ;::customer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/item-added-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
           ;::product/amount amount))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/place-order
           ;::customer/id customer-id
           ;::order/id order-id))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::customer/no-address-was-provided))))
 
   ;(def-scenario place-customer-order-fails-unless-retailer-was-selected
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/schedule-added
           ;::retailer/id retailer-id
           ;::retailer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address)
-        ;(message
+        ;(publish
           ;::customer/schedule-selected
           ;::customer/id customer-id
           ;::customer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/item-added-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
           ;::product/amount amount))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/place-order
           ;::customer/id customer-id
           ;::order/id order-id))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::customer/no-retailer-was-selected))))
 
   ;(def-scenario place-customer-order-fails-unless-schedule-was-selected
     ;(within (system (test-bench))
       ;(given
-        ;(message
+        ;(publish
           ;::retailer/registered
           ;::retailer/id retailer-id
           ;::retailer/address retailer-address)
-        ;(message
+        ;(publish
           ;::retailer/schedule-added
           ;::retailer/id retailer-id
           ;::retailer/schedule schedule)
-        ;(message
+        ;(publish
           ;::customer/registered
           ;::customer/id customer-id
           ;::customer/address customer-address)
-        ;(message
+        ;(publish
           ;::customer/retailer-selected
           ;::customer/id customer-id
           ;::retailer/id retailer-id)
-        ;(message
+        ;(publish
           ;::customer/item-added-to-cart
           ;::customer/id customer-id
           ;::product/id product-id
           ;::product/amount amount))
       ;(after
-        ;(command
+        ;(execute
           ;::customer/place-order
           ;::customer/id customer-id
           ;::order/id order-id))
       ;(expect
-        ;(failure
+        ;(fail-with
           ;::customer/no-schedule-was-selected)))))

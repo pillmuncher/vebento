@@ -3,7 +3,7 @@
              :refer :all]
             [clojure.spec
              :as s]
-            [vebento.util
+            [util
              :refer [ns-alias]]))
 
 

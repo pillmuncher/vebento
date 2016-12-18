@@ -9,26 +9,27 @@
              :as co]
             [monads.util
              :refer [mwhen]]
+            [util
+             :refer [ns-alias not-in?]]
+            [juncture.event
+             :as event
+             :refer [def-command def-message def-failure
+                     subscribe unsubscribe store]]
+            [juncture.entity
+             :as entity
+             :refer [def-entity create transform]]
             [componad
              :refer [within]]
-            [vebento.util
-             :refer [ns-alias not-in?]]
             [vebento.core
              :refer [def-aggregate aggregate publish execute fail-with
                      fail-if-exists fail-unless-exists f-mwhen get-entity]]
-            [juncture
-             :refer [def-command def-message def-failure def-entity
-                     subscribe unsubscribe store create transform]]
             [vebento.specs
              :as specs]))
 
 
-(ns-alias 'event 'juncture.event)
-(ns-alias 'entity 'juncture.entity)
-
 (ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'retailer 'vebento.entity.retailer)
 (ns-alias 'product 'vebento.entity.product)
+(ns-alias 'retailer 'vebento.entity.retailer)
 
 
 (s/def ::address ::specs/address)

@@ -3,10 +3,11 @@
              :refer :all]
             [util
              :refer [pull]]
+            [juncture.event]
+            [juncture.entity]
+            [componad]
             [vebento.specs
              :as specs]
-            [vebento.util
-             :as util]
             [vebento.core
              :as core]
             [vebento.entity.product

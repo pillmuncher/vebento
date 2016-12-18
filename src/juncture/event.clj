@@ -4,20 +4,44 @@
             [clojure.spec
              :as s]
             [clojure.spec.test
-             :as s-test]))
+             :as s-test]
+            [util
+             :refer [uuid inst]]))
 
 
 (defprotocol Dispatcher
-  (subscribe [this subscriptions])
-  (unsubscribe [this subscriptions])
-  (dispatch [this events]))
+  (subscribe [this subscription])
+  (unsubscribe [this subscription])
+  (dispatch [this event]))
+
+
+(defn subscribe*
+  [dispatcher & subscriptions]
+  (mapv #(subscribe dispatcher %) subscriptions))
+
+(defn unsubscribe*
+  [dispatcher & subscriptions]
+  (mapv #(unsubscribe dispatcher %) subscriptions))
+
+(defn dispatch*
+  [dispatcher & events]
+  (mapv #(dispatch dispatcher %) events))
 
 
 (defprotocol Journal
   (next-version [this])
-  (store [this events])
+  (store [this event])
   (fetch [this criteria])
   (fetch-apply [this fun criteria]))
+
+
+(defn store*
+  [journal & events]
+  (mapv #(store journal %) events))
+
+(defn fetch-with
+  [journal & {:as criteria}]
+  (fetch journal criteria))
 
 
 (s/def ::version integer?)
@@ -77,63 +101,17 @@
 
 (defn command
   [journal event-type & {:as event-params}]
-  (create journal ::command event-params))
+  (create journal ::command event-type event-params))
 
 (defn message
   [journal event-type & {:as event-params}]
-  (create journal ::message event-params))
+  (create journal ::message event-type event-params))
 
 (defn failure
   [journal event-type & {:as event-params}]
-  (create journal ::failure event-params))
+  (create journal ::failure event-type event-params))
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))
 (def message? #(s/valid? (s/and valid? ::message) %))
 (def failure? #(s/valid? (s/and valid? ::failure) %))
-
-
-(defn subscribe*
-  [dispatcher & subscriptions]
-  (subscribe dispatcher subscriptions))
-
-(defn unsubscribe*
-  [dispatcher & subscriptions]
-  (unsubscribe dispatcher subscriptions))
-
-(defn dispatch*
-  [dispatcher & events]
-  (dispatch dispatcher events))
-
-(defn dispatch-command
-  [dispatcher & event-params]
-  (dispatch dispatcher (apply command event-params)))
-
-(defn dispatch-message
-  [dispatcher & event-params]
-  (dispatch dispatcher (apply message event-params)))
-
-(defn dispatch-failure
-  [dispatcher & event-params]
-  (dispatch dispatcher (apply failure event-params)))
-
-
-(defn store*
-  [journal & events]
-  (store journal events))
-
-(defn fetch-chronological
-  [journal & {:as criteria}]
-  (fetch-apply journal #(sort-by ::version %) criteria))
-
-(defn fetch-commands
-  [journal & {:as criteria}]
-  (apply fetch-chronological ::kind ::command criteria))
-
-(defn fetch-messages
-  [journal & {:as criteria}]
-  (apply fetch-chronological ::kind ::message criteria))
-
-(defn fetch-failures
-  [journal & {:as criteria}]
-  (apply fetch-chronological ::kind ::failure criteria))

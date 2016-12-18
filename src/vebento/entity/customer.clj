@@ -7,28 +7,31 @@
              :as s]
             [com.stuartsierra.component
              :as co]
+            [monads.core
+             :refer [return mdo]]
             [monads.util
              :refer [mwhen]]
+            [util
+             :refer [ns-alias not-in?]]
+            [juncture.event
+             :as event
+             :refer [def-command def-message def-failure
+                     subscribe* unsubscribe* store]]
+            [juncture.entity
+             :as entity
+             :refer [def-entity create transform]]
             [componad
              :refer [within]]
-            [vebento.util
-             :refer [ns-alias not-in?]]
             [vebento.core
              :refer [def-aggregate aggregate publish execute fail-with
                      fail-if-exists fail-unless-exists f-mwhen get-entity]]
-            [juncture
-             :refer [def-command def-message def-failure def-entity
-                     subscribe unsubscribe store create transform]]
             [vebento.specs
              :as specs]))
 
 
-(ns-alias 'event 'juncture.event)
-(ns-alias 'entity 'juncture.entity)
-
-(ns-alias 'retailer 'vebento.entity.retailer)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
+(ns-alias 'retailer 'vebento.entity.retailer)
 
 
 (s/def ::id ::specs/id)
@@ -224,12 +227,9 @@
 
     (assoc
       this :subscriptions
-      (subscribe
+      (subscribe*
 
         dispatcher
-
-        [::event/kind ::event/message #(store journal %)]
-        [::event/kind ::event/failure #(store journal %)]
 
         [::event/type ::register
          (fn [{customer-id ::id
@@ -271,7 +271,7 @@
              (mwhen (-> @customer ::address nil?)
                     (fail-with ::has-given-no-address
                                ::id customer-id))
-             retailer <- (get-entity retailer-id)
+             retailer <- (get-entity ::retailer/id retailer-id)
              (mwhen (->> @customer ::address ::zipcode
                          (not-in? (@retailer ::retailer/areas)))
                     (fail-with ::zipcode-not-in-retailer-areas
@@ -398,5 +398,5 @@
                       ::id customer-id)))])))
 
 (stop [this]
-      (unsubscribe dispatcher subscriptions)
+      (apply unsubscribe* dispatcher subscriptions)
       (assoc this :subscriptions nil)))

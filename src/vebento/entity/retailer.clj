@@ -9,22 +9,23 @@
              :as co]
             [monads.util
              :refer [mwhen]]
+            [util
+             :refer [ns-alias not-in?]]
+            [juncture.event
+             :as event
+             :refer [def-command def-message def-failure def-event
+                     subscribe* unsubscribe* store]]
+            [juncture.entity
+             :as entity
+             :refer [def-entity create transform]]
             [componad
              :refer [within]]
-            [vebento.util
-             :refer [ns-alias not-in?]]
             [vebento.core
              :refer [def-aggregate aggregate publish execute fail-with
                      fail-if-exists fail-unless-exists f-mwhen get-entity]]
-            [juncture
-             :refer [def-command def-message def-failure def-entity
-                     subscribe unsubscribe store create transform]]
             [vebento.specs
              :as specs]))
 
-
-(ns-alias 'event 'juncture.event)
-(ns-alias 'entity 'juncture.entity)
 
 (ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'order 'vebento.entity.order)
@@ -130,6 +131,11 @@
   (update retailer ::payment-methods conj payment-method))
 
 (defmethod transform
+  [::entity ::customer/registered]
+  [retailer _]
+  retailer)
+
+(defmethod transform
   [::entity ::customer/retailer-selected]
   [retailer {customer-id ::customer/id}]
   (update retailer ::customers conj customer-id))
@@ -150,54 +156,51 @@
 
     (assoc
       this :subscriptions
-      (subscribe
+      (subscribe*
 
         dispatcher
 
-        [::event/kind ::event/message #(store journal %)]
-        [::event/kind ::event/failure #(store journal %)]
-
         [::event/type ::register
-         (fn [{retailer-id ::id address ::address}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-if-exists ::id retailer-id)
-             (publish ::registered
-                      ::id retailer-id
-                      ::address address)))]
+          (fn [{retailer-id ::id address ::address}]
+            (within (aggregate this [::account] retailer-id)
+              (fail-if-exists ::id retailer-id)
+              (publish ::registered
+                       ::id retailer-id
+                       ::address address)))]
 
-        [::event/type ::add-area
-         (fn [{retailer-id ::id zipcode ::zipcode}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
-             (publish ::area-added
-                      ::id retailer-id
-                      ::zipcode zipcode)))]
+         [::event/type ::add-area
+          (fn [{retailer-id ::id zipcode ::zipcode}]
+            (within (aggregate this [::account] retailer-id)
+              (fail-unless-exists ::id retailer-id)
+              (publish ::area-added
+                       ::id retailer-id
+                       ::zipcode zipcode)))]
 
-        [::event/type ::add-product
-         (fn [{retailer-id ::id product-id ::product/id}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
-             (fail-unless-exists ::product/id product-id)
-             (publish ::product-added
-                      ::id retailer-id
-                      ::product/id product-id)))]
+         [::event/type ::add-product
+          (fn [{retailer-id ::id product-id ::product/id}]
+            (within (aggregate this [::account] retailer-id)
+              (fail-unless-exists ::id retailer-id)
+              (fail-unless-exists ::product/id product-id)
+              (publish ::product-added
+                       ::id retailer-id
+                       ::product/id product-id)))]
 
-        [::event/type ::add-schedule
-         (fn [{retailer-id ::id schedule ::schedule}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
-             (publish ::schedule-added
-                      ::id retailer-id
-                      ::schedule schedule)))]
+         [::event/type ::add-schedule
+          (fn [{retailer-id ::id schedule ::schedule}]
+            (within (aggregate this [::account] retailer-id)
+              (fail-unless-exists ::id retailer-id)
+              (publish ::schedule-added
+                       ::id retailer-id
+                       ::schedule schedule)))]
 
-        [::event/type ::add-payment-method
-         (fn [{retailer-id ::id payment-method ::payment-method}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
-             (publish ::payment-method-added
-                      ::id retailer-id
-                      ::payment-method payment-method)))])))
+         [::event/type ::add-payment-method
+          (fn [{retailer-id ::id payment-method ::payment-method}]
+            (within (aggregate this [::account] retailer-id)
+              (fail-unless-exists ::id retailer-id)
+              (publish ::payment-method-added
+                       ::id retailer-id
+                       ::payment-method payment-method)))])))
 
   (stop [this]
-    (unsubscribe dispatcher subscriptions)
+    (apply unsubscribe* dispatcher subscriptions)
     (assoc this :subscriptions nil)))
