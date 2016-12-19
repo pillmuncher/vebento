@@ -3,6 +3,8 @@
              :refer :all]
             [clojure.test
              :refer [deftest is]]
+            [clojure.spec
+             :as s]
             [clojure.set
              :refer [union difference]]
             [com.stuartsierra.component

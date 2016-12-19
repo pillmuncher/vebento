@@ -36,10 +36,13 @@
 (s/def ::address ::specs/address)
 (s/def ::areas ::specs/set)
 (s/def ::products ::specs/set)
-(s/def ::schedule ::specs/set)
+(s/def ::schedule ::specs/schedule)
 (s/def ::customers ::specs/set)
 (s/def ::pending-orders ::specs/set)
+(s/def ::payment-method ::specs/payment-method)
 (s/def ::payment-methods ::specs/set)
+(s/def ::schedule-time-of-day string?)
+(s/def ::schedule-is-recurrent string?)
 
 
 (def-command ::register
@@ -92,7 +95,7 @@
         ::areas
         ::products
         ::schedule
-        ::payment-method
+        ::payment-methods
         ::customers
         ::pending-orders])
 
@@ -106,7 +109,7 @@
           ::areas #{}
           ::products #{}
           ::schedule #{}
-          ::payment-method #{}
+          ::payment-methods #{}
           ::customers #{}
           ::pending-orders #{}))
 
@@ -123,7 +126,7 @@
 (defmethod transform
   [::entity ::schedule-added]
   [retailer {schedule ::schedule}]
-  (update retailer ::schedule conj schedule))
+  (update retailer ::schedule union schedule))
 
 (defmethod transform
   [::entity ::payment-method-added]

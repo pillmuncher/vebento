@@ -36,7 +36,7 @@
 
 (s/def ::id ::specs/id)
 (s/def ::address ::specs/address)
-(s/def ::cart ::specs/map)
+(s/def ::cart ::specs/cart)
 (s/def ::pending-orders ::specs/set)
 (s/def ::schedule ::specs/schedule)
 (s/def ::payment-method ::specs/payment-method)
@@ -109,15 +109,6 @@
   :req [::id
         ::product/id])
 
-(def-message ::order-placed
-  :req [::id
-        ::retailer/id
-        ::order/id
-        ::order/items
-        ::order/address
-        ::order/schedule
-        ::order/payment-method])
-
 (def-message ::cart-cleared
   :req [::id])
 
@@ -129,6 +120,9 @@
   :req [::id])
 
 (def-failure ::has-selected-no-schedule
+  :req [::id])
+
+(def-failure ::has-selected-no-payment-method
   :req [::id])
 
 (def-failure ::zipcode-not-in-retailer-areas
@@ -186,8 +180,8 @@
 
 (defmethod transform
   [::entity ::schedule-selected]
-  [customer {schedule :schedule}]
-  (update customer ::schedule union schedule))
+  [customer {schedule ::schedule}]
+  (assoc customer ::schedule schedule))
 
 (defmethod transform
   [::entity ::payment-method-selected]
@@ -199,7 +193,7 @@
   [customer {product-id ::product/id amount ::product/amount}]
   (if (zero? amount)
     (update customer ::cart dissoc product-id)
-    (assoc-in customer [::cart product-id] {::product/amount amount})))
+    (assoc-in customer [::cart product-id] amount)))
 
 (defmethod transform
   [::entity ::item-removed-from-cart]
@@ -207,7 +201,7 @@
   (update customer ::cart dissoc product-id))
 
 (defmethod transform
-  [::entity ::order-placed]
+  [::entity ::order/placed]
   [customer {order-id ::order/id}]
   (update customer ::pending-orders conj order-id))
 
@@ -292,7 +286,7 @@
                          empty?)
                     (fail-with ::schedule-not-in-retailer-schedule
                                ::id customer-id
-                               ::schedule (@customer ::schedule)))
+                               ::schedule schedule))
              (publish ::schedule-selected
                       ::id customer-id
                       ::schedule schedule)))]
@@ -349,10 +343,10 @@
            (within (aggregate this [::shopping] customer-id)
              (fail-if-exists ::order/id order-id)
              customer <- (get-entity ::id customer-id)
-             (f-mwhen (-> @customer ::cart empty?)
-                      (fail-with ::cart-is-empty
-                                 ::id customer-id)
-                      (-> @customer ::address nil?)
+             ;(-> @customer ::cart empty?)
+                      ;(fail-with ::cart-is-empty
+                                 ;::id customer-id))
+             (f-mwhen (-> @customer ::address nil?)
                       (fail-with ::has-given-no-address
                                  ::id customer-id)
                       (-> @customer ::schedule empty?)
@@ -368,25 +362,28 @@
                       (fail-with ::schedule-not-in-retailer-schedule
                                  ::id customer-id
                                  ::schedule (@customer ::schedule))
-                      (->> @customer ::address ::zipcode
-                           (not-in? (@retailer ::retailer/areas)))
-                      (fail-with ::zipcode-not-in-retailer-areas
-                                 ::id customer-id
-                                 ::zipcode (@customer ::zipcode))
                       (->> @customer ::payment-method
                            (not-in? (@retailer ::retailer/payment-methods)))
                       (fail-with ::payment-method-not-supported-by-retailer
                                  ::id customer-id
-                                 ::payment-method (@customer ::payment-method)))
-             (publish ::order-placed
+                                 ::payment-method (@customer ::payment-method))
+                      (->> @customer ::address ::specs/zipcode
+                           (not-in? (@retailer ::retailer/areas)))
+                      (fail-with ::zipcode-not-in-retailer-areas
+                                 ::id customer-id
+                                 ::specs/zipcode (-> @customer
+                                                     ::address
+                                                     ::specs/zipcode)))
+             (publish ::order/placed
                       ::id customer-id
                       ::retailer/id (@customer ::retailer/id)
                       ::order/id order-id
                       ::order/items (@customer ::cart)
                       ::order/address (@customer ::address)
                       ::order/payment-method (@customer ::payment-method)
-                      ::order/schedule (intersection (@customer ::schedule)
-                                                     (@retailer ::schedule)))
+                      ::order/schedule (intersection
+                                         (@customer ::schedule)
+                                         (@retailer ::retailer/schedule)))
              (publish ::cart-cleared
                       ::id customer-id)))]
 

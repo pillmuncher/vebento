@@ -4,7 +4,7 @@
             [monads.core
              :refer [mdo return fail ask asks]]
             [monads.util
-             :refer [mwhen]]
+             :refer [mwhen sequence-m]]
             [juncture.event
              :as event
              :refer [command message failure failure? dispatch fetch fetch*]]
@@ -27,6 +27,10 @@
     (mwhen (failure? event)
            (fail event))
     (return event)))
+
+(defn raise*
+  [& events]
+  (sequence-m (for [event events] (raise event))))
 
 
 (defn execute
@@ -114,7 +118,7 @@
                                (vec))]
     `(->> ~possible-failures
           (keep deref)
-          (apply raise))))
+          (apply raise*))))
 
 
 (defn is-id-available?
