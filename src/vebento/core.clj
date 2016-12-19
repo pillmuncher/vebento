@@ -7,11 +7,10 @@
              :refer [mwhen]]
             [juncture.event
              :as event
-             :refer [command message failure failure?
-                     dispatch fetch fetch-apply fetch*]]
+             :refer [command message failure failure? dispatch fetch fetch*]]
             [juncture.entity
              :as entity
-             :refer [run-transformer]]
+             :refer [run-transformer fetch-entity]]
             [componad
              :refer [within system >>=]]))
 
@@ -141,21 +140,12 @@
                      ::entity/id id)))
 
 
-(defn join
-  ([events]
-   (join nil events))
-  ([start events]
-   (reduce run-transformer start events)))
-
 (defn get-entity
   [id-key id]
   (mdo
     (fail-unless-exists id-key id)
     journal <- get-journal
-    (return (fetch-apply journal
-                         join
-                         {::event/kind ::event/message
-                          id-key id}))))
+    (return (fetch-entity journal id-key id))))
 
 
 (defprotocol QueryStore

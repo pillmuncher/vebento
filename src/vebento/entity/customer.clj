@@ -276,7 +276,7 @@
                          (not-in? (@retailer ::retailer/areas)))
                     (fail-with ::zipcode-not-in-retailer-areas
                                ::id customer-id
-                               ::zipcode (@customer) ::zipcode))
+                               ::zipcode (@customer ::zipcode)))
              (publish ::retailer-selected
                       ::id customer-id
                       ::retailer/id retailer-id)))]

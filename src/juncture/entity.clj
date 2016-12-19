@@ -7,7 +7,7 @@
              :as s-test]
             [juncture.event
              :as event
-             :refer [def-failure]]))
+             :refer [def-failure fetch-apply]]))
 
 
 (s/def ::version integer?)
@@ -74,3 +74,15 @@
 (defn run-transformer
   [entity event]
   (update (transform entity event) assoc ::id (::event/id event)))
+
+
+(defn join
+  ([events]
+   (join nil events))
+  ([start events]
+   (reduce run-transformer start events)))
+
+(defn fetch-entity
+  [journal id-key id]
+  (fetch-apply journal join {::event/kind ::event/message
+                             id-key id}))
