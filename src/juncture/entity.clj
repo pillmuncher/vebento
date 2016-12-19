@@ -10,17 +10,6 @@
              :refer [def-failure fetch-apply]]))
 
 
-(s/def ::version integer?)
-(s/def ::id uuid?)
-(s/def ::type keyword?)
-(s/def ::kind #{::entity})
-(s/def ::spec (s/keys :req [::kind ::type ::id ::version]))
-
-(s/def ::entity #(= (::kind %) ::entity))
-
-
-(s/def ::id-key keyword?)
-
 (def-failure ::already-exists
   :req [::id-key
         ::id])
@@ -28,6 +17,16 @@
 (def-failure ::not-found
   :req [::id-key
         ::id])
+
+
+(s/def ::id-key keyword?)
+(s/def ::version integer?)
+(s/def ::id uuid?)
+(s/def ::type keyword?)
+(s/def ::kind #{::entity})
+(s/def ::spec (s/keys :req [::kind ::type ::id ::version]))
+
+(s/def ::entity #(= (::kind %) ::entity))
 
 
 (defmacro def-entity
@@ -76,13 +75,13 @@
   (update (transform entity event) assoc ::id (::event/id event)))
 
 
-(defn join
+(defn project
   ([events]
-   (join nil events))
+   (project nil events))
   ([start events]
    (reduce run-transformer start events)))
 
 (defn fetch-entity
   [journal id-key id]
-  (fetch-apply journal join {::event/kind ::event/message
+  (fetch-apply journal project {::event/kind ::event/message
                              id-key id}))
