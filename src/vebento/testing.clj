@@ -22,7 +22,7 @@
              :refer [get-events get-dispatcher raise]]))
 
 
-(defrecord MockEventJournal
+(defrecord MockJournal
 
   [trail counter]
 
@@ -47,7 +47,7 @@
 
 
 (defn mock-journal []
-  (->MockEventJournal (atom []) (atom 0)))
+  (->MockJournal (atom []) (atom 0)))
 
 
 (defn kind-key
@@ -59,7 +59,7 @@
   {:key [::event/type value]})
 
 
-(defrecord MockEventDispatcher
+(defrecord MockDispatcher
 
   [journal handler-rel subscriptions]
 
@@ -97,8 +97,8 @@
     (assoc this :subscriptions nil)))
 
 
-(defn mock-event-dispatcher []
-  (->MockEventDispatcher nil (atom #{}) nil))
+(defn mock-dispatcher []
+  (->MockDispatcher nil (atom #{}) nil))
 
 
 (defn strip-canonicals
