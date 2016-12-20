@@ -19,7 +19,7 @@
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store]]
             [componad
-             :refer [extract >>=]]
+             :refer [run-error-rws extract >>=]]
             [vebento.core
              :refer [get-events get-dispatcher raise]]))
 
@@ -138,5 +138,5 @@
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-     (let [[expected# result#] ~computation]
+     (let [[expected# result#] (extract (run-error-rws ~computation nil nil))]
        (is (= expected# result#)))))
