@@ -120,6 +120,9 @@
 (def-failure ::has-given-no-address
   :req [::id])
 
+(def-failure ::has-selected-no-retailer
+  :req [::id])
+
 (def-failure ::has-selected-no-schedule
   :req [::id])
 
@@ -343,6 +346,9 @@
              customer <- (get-entity ::id customer-id)
              (f-mwhen (-> @customer ::cart empty?)
                       (fail-with ::cart-is-empty
+                                 ::id customer-id)
+                      (-> @customer ::retailer/id nil?)
+                      (fail-with ::has-selected-no-retailer
                                  ::id customer-id)
                       (-> @customer ::address nil?)
                       (fail-with ::has-given-no-address

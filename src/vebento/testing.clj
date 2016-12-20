@@ -17,11 +17,11 @@
              :refer [sequence-m]]
             [juncture.event
              :as event
-             :refer [fetch-apply dispatch subscribe* unsubscribe* store]]
+             :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
             [componad
              :refer [run-error-rws extract >>=]]
             [vebento.core
-             :refer [get-events get-dispatcher raise]]))
+             :refer [get-events get-dispatcher raise*]]))
 
 
 (defrecord MockJournal
@@ -92,8 +92,8 @@
   (start [this]
     (assoc this :subscriptions
            (subscribe* this
-                       [::event/kind ::event/message #(store journal %)]
-                       [::event/kind ::event/failure #(store journal %)])))
+                       [::event/kind ::event/message #(store* journal %)]
+                       [::event/kind ::event/failure #(store* journal %)])))
   (stop [this]
     (apply unsubscribe* this subscriptions)
     (assoc this :subscriptions nil)))
@@ -105,33 +105,38 @@
 
 (defn strip-canonicals
   [events]
-  (map #(dissoc % ::event/id ::event/date ::event/version) events))
+  (->> events
+       (map #(dissoc % ::event/id ::event/date ::event/version))
+       (set)
+       (return)))
 
-(defn catch-failure
-  [computation]
-  (catch-error computation #(return #{%})))
 
+(defn keep-events
+  [what m-events]
+  (mdo
+    (>>= (sequence-m m-events)
+         #(catch-error (apply raise* %) return))
+    state <- get-state
+    (>>= (get-events)
+         #(strip-canonicals @%)
+         #(modify assoc what %))))
 
 (defn given
   [& m-events]
-  (put-state m-events))
+  (keep-events ::given m-events))
 
 (defn after
   [& m-events]
-  (modify union m-events))
+  (keep-events ::after m-events))
 
 (defn expect
   [& m-events]
   (mdo
-    before <- (>>= get-state
-                   #(catch-failure (sequence-m %))
-                   #(-> % strip-canonicals set return))
-    events <- (>>= (catch-failure (sequence-m m-events))
-                   #(-> % strip-canonicals set return))
-    after <- (>>= (get-events)
-                  #(-> @% strip-canonicals set return))
-    result <- (return (difference (set after) (set before)))
-    (return [events result])))
+    state <- get-state
+    given <- (return (::given state))
+    after <- (return (::after state))
+    events <- (>>= (sequence-m m-events) strip-canonicals)
+    (return [events (difference after given)])))
 
 
 (defmacro def-scenario

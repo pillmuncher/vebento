@@ -20,17 +20,17 @@
 (def get-journal (asks :journal))
 
 
-(defn m-command
+(defn return-command
   [command-type & command-params]
   (>>= get-journal
        #(return (apply command % command-type command-params))))
 
-(defn m-message
+(defn return-message
   [message-type & message-params]
   (>>= get-journal
        #(return (apply message % message-type message-params))))
 
-(defn m-failure
+(defn return-failure
   [failure-type & failure-params]
   (>>= get-journal
        #(return (apply failure % failure-type failure-params))))
@@ -47,13 +47,13 @@
 
 (defn raise*
   [& events]
-  (sequence-m (for [event events] (raise event))))
+  (sequence-m (for [event events]
+                (raise event))))
 
 
 (defn execute
   [command-type & command-params]
-  (>>= get-journal
-       #(raise (apply command % command-type command-params))))
+  (>>= (apply return-command command-type command-params) raise))
 
 (defn execute-in
   [env command-type & command-params]
@@ -63,8 +63,8 @@
 
 (defn publish
   [message-type & message-params]
-  (>>= get-journal
-       #(raise (apply message % message-type message-params))))
+  (>>= (apply return-message message-type message-params)
+       raise))
 
 (defn publish-in
   [env message-type & message-params]
@@ -74,8 +74,7 @@
 
 (defn fail-with
   [failure-type & failure-params]
-  (>>= get-journal
-       #(raise (apply failure % failure-type failure-params))))
+  (>>= (apply return-failure failure-type failure-params) raise))
 
 (defn fail-in
   [env failure-type & failure-params]
@@ -107,9 +106,10 @@
 (defn aggregate
   [env aggs entity-id]
   (fn [computation]
-    (mdo
-      aggregates <- get-aggegates
-      (run aggregates aggs #(computation)))))
+    (within (system env)
+      computation)))
+;aggregates <- get-aggegates
+;(run aggregates aggs #(computation)))))
 
 (defn aggregate-context
   [a aggs fun]
@@ -119,13 +119,11 @@
 (defmacro f-mwhen
   [& {:as expression-failure-pairs}]
   (let [qs (for [[e f] expression-failure-pairs]
-                      `(mdo-future (if ~e ~f (return nil))))]
-  `(>>= (sequence-m ~qs)
-        #(do (print %) (return %))
-        #(return (keep deref %))
-        #(do (print %) (return %))
-        sequence-m
-        #(do (print %) (return %)))))
+             `(mdo-future (mwhen ~e ~f)))]
+    `(>>= (sequence-m [~@qs])
+          #(sequence-m (map deref %))
+          #(return (filter some? %))
+          #(mwhen (not (empty? %)) (fail nil)))))
 
 
 (defn is-id-available?

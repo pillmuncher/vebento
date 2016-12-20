@@ -89,7 +89,7 @@
 (s-test/instrument `validate)
 
 
-(defn create
+(defn- -create
   [journal event-kind event-type event-params]
   (validate (assoc event-params
                    ::kind event-kind
@@ -98,18 +98,22 @@
                    ::id (uuid)
                    ::version (next-version journal))))
 
+(defn create
+  [journal event-kind event-type & {:as event-params}]
+  (-create journal event-kind event-type event-params))
+
 
 (defn command
   [journal event-type & {:as event-params}]
-  (create journal ::command event-type event-params))
+  (-create journal ::command event-type event-params))
 
 (defn message
   [journal event-type & {:as event-params}]
-  (create journal ::message event-type event-params))
+  (-create journal ::message event-type event-params))
 
 (defn failure
   [journal event-type & {:as event-params}]
-  (create journal ::failure event-type event-params))
+  (-create journal ::failure event-type event-params))
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))
