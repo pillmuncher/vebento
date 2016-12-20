@@ -5,6 +5,8 @@
              :as s]
             [clojure.spec.test
              :as s-test]
+            [clojure.set
+             :refer [union difference]]
             [juncture.event
              :as event
              :refer [def-failure fetch-apply]]))
@@ -27,6 +29,23 @@
 (s/def ::spec (s/keys :req [::kind ::type ::id ::version]))
 
 (s/def ::entity #(= (::kind %) ::entity))
+
+
+(defprotocol Aggregate
+  (register [this aggs])
+  (unregister [this aggs])
+  (run [this aggs fun]))
+
+(defn aggregates
+  [delegate]
+  (let [a (atom #{})]
+    (reify Aggregate
+      (register [this aggs]
+        (swap! a union aggs))
+      (unregister [this aggs]
+        (swap! a #(difference aggs %)))
+      (run [this aggs fun]
+        (delegate @a aggs fun)))))
 
 
 (defmacro def-entity

@@ -138,5 +138,5 @@
 (defmacro def-scenario
   [sym computation]
   `(deftest ~sym
-     (let [[expected# result#] (extract ~computation)]
+     (let [[expected# result#] ~computation]
        (is (= expected# result#)))))

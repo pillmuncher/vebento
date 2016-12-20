@@ -19,11 +19,12 @@
                      subscribe* unsubscribe* store]]
             [juncture.entity
              :as entity
-             :refer [def-entity create transform]]
+             :refer [Aggregate register unregister
+                     def-entity create transform]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [def-aggregate aggregate publish execute fail-with
+             :refer [aggregate publish execute fail-with
                      fail-if-exists fail-unless-exists f-mwhen get-entity]]
             [vebento.specs
              :as specs]))
@@ -146,10 +147,6 @@
         ::product/id])
 
 
-(def-aggregate ::account)
-(def-aggregate ::shopping)
-
-
 (def-entity ::entity
   :req [::cart
         ::schedule
@@ -213,11 +210,13 @@
 
 (defrecord Component
 
-  [dispatcher journal subscriptions]
+  [aggregates dispatcher journal subscriptions]
 
   co/Lifecycle
 
   (start [this]
+
+    (register aggregates [::account ::shopping])
 
     (assoc
       this :subscriptions
@@ -395,5 +394,6 @@
                       ::id customer-id)))])))
 
 (stop [this]
+      (unregister aggregates [::account ::shopping])
       (apply unsubscribe* dispatcher subscriptions)
       (assoc this :subscriptions nil)))

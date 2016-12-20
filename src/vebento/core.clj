@@ -10,13 +10,14 @@
              :refer [command message failure failure? dispatch fetch fetch*]]
             [juncture.entity
              :as entity
-             :refer [run-transformer fetch-entity]]
+             :refer [run run-transformer fetch-entity]]
             [componad
-             :refer [within system >>=]]))
+             :refer [within system extract >>= m-when m-unless]]))
 
 
-(def get-journal (asks :journal))
+(def get-aggegates (asks :aggregates))
 (def get-dispatcher (asks :dispatcher))
+(def get-journal (asks :journal))
 
 
 (defn raise
@@ -87,27 +88,16 @@
        #(return (apply get-events % ::event/kind ::event/failure criteria))))
 
 
-(defmacro def-aggregate
-  [aggregate]
-  `(s/def ~aggregate keyword?))
-
 (defn aggregate
-  [env aggregates entity-id]
+  [env aggs entity-id]
   (fn [computation]
-    (within (system env) computation)))
+    (mdo
+      aggregates <- get-aggegates
+      (run aggregates aggs #(computation)))))
 
-
-(defmacro m-future [& body]
-  `(return (future ~@body)))
-
-
-(defmacro m-when
-  [m-condition computation]
-  `(>>= ~m-condition #(mwhen % ~computation)))
-
-(defmacro m-unless
-  [m-condition computation]
-  `(>>= ~m-condition #(mwhen (not %) ~computation)))
+(defn aggregate-context
+  [a aggs fun]
+  (fun))
 
 
 ;;FIXME: call to raise is bogus, also it is not clear as yet how to multi-fail.
@@ -160,4 +150,4 @@
   [query-key & {:as params}]
   `(>>= ask
         #(get-query % ~query-key)
-        #(m-future (% ~@params))))
+        #(f-return (% ~@params))))

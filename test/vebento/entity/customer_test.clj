@@ -35,19 +35,21 @@
 
 (defn test-bench []
   (-> (co/system-map
-        :customer
-        (customer/->Component nil nil nil)
-        :retailer
-        (retailer/->Component nil nil nil)
-        :order
-        (order/->Component nil nil nil)
+        :aggregates
+        (entity/aggregates core/aggregate-context)
         :dispatcher
         (mock-dispatcher)
         :journal
-        (mock-journal))
+        (mock-journal)
+        :customer
+        (customer/->Component nil nil nil nil)
+        :retailer
+        (retailer/->Component nil nil nil nil)
+        :order
+        (order/->Component nil nil nil nil))
       (co/system-using
-        {:customer [:journal :dispatcher]
-         :retailer [:journal :dispatcher]
+        {:customer [:aggregates :dispatcher :journal]
+         :retailer [:aggregates :dispatcher :journal]
          :dispatcher [:journal]})
       (co/start)))
 
