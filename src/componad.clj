@@ -77,3 +77,20 @@
 
 (defmacro f-return [& body]
   `(return (future ~@body)))
+
+
+(within (system {:foo 123 :bar {:foo 456}})
+  x <- (asks :foo)
+  f <- (mdo-future
+         (within (component :bar)
+           x <- (asks :foo)
+           (fail x)))
+  y <- @f
+  (return (+ x y)))
+
+
+(within (system {:foo 123 :bar {:foo 456}})
+  x <- (asks :foo)
+  y <- (within (component :bar)
+         (asks :foo))
+  (return (+ x y)))

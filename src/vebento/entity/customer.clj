@@ -149,10 +149,10 @@
 
 (def-entity ::entity
   :req [::cart
-        ::schedule
         ::pending-orders]
   :opt [::address
         ::retailer/id
+        ::schedule
         ::payment-method])
 
 
@@ -162,7 +162,6 @@
   (create ::entity
           ::entity/id customer-id
           ::cart {}
-          ::schedule #{}
           ::pending-orders #{}))
 
 (defmethod transform
@@ -342,13 +341,13 @@
            (within (aggregate this [::shopping] customer-id)
              (fail-if-exists ::order/id order-id)
              customer <- (get-entity ::id customer-id)
-             ;(-> @customer ::cart empty?)
-                      ;(fail-with ::cart-is-empty
-                                 ;::id customer-id))
-             (f-mwhen (-> @customer ::address nil?)
+             (f-mwhen (-> @customer ::cart empty?)
+                      (fail-with ::cart-is-empty
+                                 ::id customer-id)
+                      (-> @customer ::address nil?)
                       (fail-with ::has-given-no-address
                                  ::id customer-id)
-                      (-> @customer ::schedule empty?)
+                      (-> @customer ::schedule nil?)
                       (fail-with ::has-selected-no-schedule
                                  ::id customer-id)
                       (-> @customer ::payment-method nil?)

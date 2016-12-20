@@ -114,18 +114,17 @@
 
 (defn given
   [& m-events]
-  (>>= (catch-failure (sequence-m m-events))
-       put-state))
+  (put-state m-events))
 
 (defn after
   [& m-events]
-  (>>= (catch-failure (sequence-m m-events))
-       #(modify union %)))
+  (modify union m-events))
 
 (defn expect
   [& m-events]
   (mdo
     before <- (>>= get-state
+                   #(catch-failure (sequence-m %))
                    #(-> % strip-canonicals set return))
     events <- (>>= (catch-failure (sequence-m m-events))
                    #(-> % strip-canonicals set return))

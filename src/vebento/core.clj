@@ -12,12 +12,28 @@
              :as entity
              :refer [run run-transformer fetch-entity]]
             [componad
-             :refer [within system extract >>= m-when m-unless f-return]]))
+             :refer [within system extract >>= m-when m-unless mdo-future]]))
 
 
 (def get-aggegates (asks :aggregates))
 (def get-dispatcher (asks :dispatcher))
 (def get-journal (asks :journal))
+
+
+(defn m-command
+  [command-type & command-params]
+  (>>= get-journal
+       #(return (apply command % command-type command-params))))
+
+(defn m-message
+  [message-type & message-params]
+  (>>= get-journal
+       #(return (apply message % message-type message-params))))
+
+(defn m-failure
+  [failure-type & failure-params]
+  (>>= get-journal
+       #(return (apply failure % failure-type failure-params))))
 
 
 (defn raise
@@ -100,15 +116,16 @@
   (fun))
 
 
-;;FIXME: call to raise is bogus, also it is not clear as yet how to multi-fail.
 (defmacro f-mwhen
   [& {:as expression-failure-pairs}]
-  (let [possible-failures (->> expression-failure-pairs
-                               (map (fn [pair] `(future (when ~@pair))))
-                               (vec))]
-    `(->> ~possible-failures
-          (keep deref)
-          (apply raise*))))
+  (let [qs (for [[e f] expression-failure-pairs]
+                      `(mdo-future (if ~e ~f (return nil))))]
+  `(>>= (sequence-m ~qs)
+        #(do (print %) (return %))
+        #(return (keep deref %))
+        #(do (print %) (return %))
+        sequence-m
+        #(do (print %) (return %)))))
 
 
 (defn is-id-available?
@@ -150,4 +167,4 @@
   [query-key & {:as params}]
   `(>>= ask
         #(get-query % ~query-key)
-        #(f-return (% ~@params))))
+        #(m-future (% ~@params))))
