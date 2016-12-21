@@ -106,7 +106,7 @@
        (return)))
 
 
-(defn keep-events
+(defn raise-and-keep
   [what m-events]
   (mdo
     (>>= (sequence-m m-events)
@@ -118,11 +118,11 @@
 
 (defn given
   [& m-events]
-  (keep-events ::given m-events))
+  (raise-and-keep ::given m-events))
 
 (defn after
   [& m-events]
-  (keep-events ::after m-events))
+  (raise-and-keep ::after m-events))
 
 (defn expect
   [& m-events]
