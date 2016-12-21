@@ -50,13 +50,10 @@
   (->MockJournal (atom []) (atom 0)))
 
 
-(defn kind-key
-  [{value ::event/kind}]
-  {:key [::event/kind value]})
-
-(defn type-key
-  [{value ::event/type}]
-  {:key [::event/type value]})
+(defn filter-set
+  [{kind ::event/kind type ::event/type}]
+  #{{:key [::event/kind kind]}
+    {:key [::event/type type]}})
 
 
 (defrecord MockDispatcher
@@ -66,18 +63,18 @@
   event/Dispatcher
 
   (subscribe
-    [this [event-kind event-type handler]]
-    (swap! handler-rel conj {:key [event-kind event-type] ::handler handler})
-    [event-kind event-type handler])
+    [this [event-key event-val handler]]
+    (swap! handler-rel conj {:key [event-key event-val] ::handler handler})
+    [event-key event-val handler])
 
   (unsubscribe
-    [this [event-kind event-type handler]]
-    (swap! handler-rel disj {:key [event-kind event-type] ::handler handler})
-    [event-kind event-type handler])
+    [this [event-key event-val handler]]
+    (swap! handler-rel disj {:key [event-key event-val] ::handler handler})
+    [event-key event-val handler])
 
   (dispatch
     [this event]
-    (mapv #(% event) (->> #{(kind-key event) (type-key event)}
+    (mapv #(% event) (->> (filter-set event)
                           (clojure.set/join @handler-rel)
                           (map ::handler)
                           (set)))
@@ -102,7 +99,6 @@
   [events]
   (->> events
        (map #(dissoc % ::event/id ::event/date ::event/version))
-       (set)
        (return)))
 
 
@@ -111,7 +107,6 @@
   (mdo
     (>>= (sequence-m m-events)
          #(catch-error (apply raise* %) return))
-    state <- get-state
     (>>= (get-events)
          #(strip-canonicals @%)
          #(modify assoc what %))))
@@ -131,7 +126,7 @@
     given <- (return (::given state))
     after <- (return (::after state))
     events <- (>>= (sequence-m m-events) strip-canonicals)
-    (return [events (difference after given)])))
+    (return [(set events) (difference (set after) (set given))])))
 
 
 (defmacro def-scenario

@@ -63,8 +63,7 @@
 
 (defn publish
   [message-type & message-params]
-  (>>= (apply return-message message-type message-params)
-       raise))
+  (>>= (apply return-message message-type message-params) raise))
 
 (defn publish-in
   [env message-type & message-params]
