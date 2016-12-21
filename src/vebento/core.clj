@@ -2,7 +2,7 @@
   (:require [clojure.future
              :refer :all]
             [monads.core
-             :refer [mdo return fail ask asks]]
+             :refer [mdo return fail ask asks catch-error]]
             [monads.util
              :refer [mwhen sequence-m]]
             [juncture.event
@@ -114,14 +114,19 @@
   (fun))
 
 
-(defmacro f-mwhen
-  [& {:as expression-failure-pairs}]
-  (let [qs (for [[e f] expression-failure-pairs]
-             `(mdo-future (mwhen ~e ~f)))]
+(defmacro f-munless
+  [& {:as expression-action-pairs}]
+  (let [qs (for [[e a] expression-action-pairs]
+             `(mdo-future (if ~e (return nil) ~a)))]
     `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %))
-          #(return (filter some? %))
-          #(mwhen (not (empty? %)) (fail nil)))))
+          #(sequence-m (map deref %)))))
+
+(defmacro f-mwhen
+  [& {:as expression-action-pairs}]
+  (let [qs (for [[e a] expression-action-pairs]
+             `(mdo-future (if ~e ~a (return nil))))]
+    `(>>= (sequence-m [~@qs])
+          #(sequence-m (map deref %)))))
 
 
 (defn is-id-available?

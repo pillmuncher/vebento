@@ -122,6 +122,23 @@
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
 
+  ;(def-scenario customer-without-addres-but-with-retailer-fails
+    ;(within (system (test-bench))
+      ;(given
+        ;(return-message
+          ;::retailer/registered
+          ;::retailer/id retailer-id
+          ;::retailer/address retailer-address))
+      ;(after
+        ;(return-command
+          ;::customer/register
+          ;::customer/id customer-id
+          ;::retailer/id retailer-id))
+      ;(expect
+        ;(return-failure
+          ;::customer/has-given-no-address
+          ;::customer/id customer-id))))
+
   (def-scenario customer-cart-gets-cleared
     (within (system (test-bench))
       (given
