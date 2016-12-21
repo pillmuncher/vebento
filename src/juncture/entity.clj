@@ -103,4 +103,4 @@
 (defn fetch-entity
   [journal id-key id]
   (fetch-apply journal projection {::event/kind ::event/message
-                             id-key id}))
+                                   id-key id}))

@@ -315,8 +315,8 @@
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
         (return-message ::retailer/payment-method-added
-          ::retailer/id retailer-id
-          ::retailer/payment-method payment-method)
+                        ::retailer/id retailer-id
+                        ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)
@@ -376,8 +376,8 @@
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
         (return-message ::retailer/payment-method-added
-          ::retailer/id retailer-id
-          ::retailer/payment-method payment-method)
+                        ::retailer/id retailer-id
+                        ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)
@@ -423,8 +423,8 @@
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
         (return-message ::retailer/payment-method-added
-          ::retailer/id retailer-id
-          ::retailer/payment-method payment-method)
+                        ::retailer/id retailer-id
+                        ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)
@@ -471,8 +471,8 @@
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
         (return-message ::retailer/payment-method-added
-          ::retailer/id retailer-id
-          ::retailer/payment-method payment-method)
+                        ::retailer/id retailer-id
+                        ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)
@@ -519,8 +519,8 @@
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
         (return-message ::retailer/payment-method-added
-          ::retailer/id retailer-id
-          ::retailer/payment-method payment-method)
+                        ::retailer/id retailer-id
+                        ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)

@@ -395,7 +395,7 @@
              (publish ::cart-cleared
                       ::id customer-id)))])))
 
-(stop [this]
-      (unregister aggregates [::account ::shopping])
-      (apply unsubscribe* dispatcher subscriptions)
-      (assoc this :subscriptions nil)))
+  (stop [this]
+    (unregister aggregates [::account ::shopping])
+    (apply unsubscribe* dispatcher subscriptions)
+    (assoc this :subscriptions nil)))

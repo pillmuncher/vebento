@@ -77,26 +77,26 @@
   `(return (future ~@body)))
 
 ;(within (system {})
-  ;xs <- (sequence-m [(mdo-future (return 1))
-                     ;(mdo-future (return nil))
-                     ;(mdo-future (return 3))])
-  ;ys <- (sequence-m (map deref xs))
-  ;zs <- (return (filter some? ys))
-  ;(return (reduce + zs)))
+;xs <- (sequence-m [(mdo-future (return 1))
+;(mdo-future (return nil))
+;(mdo-future (return 3))])
+;ys <- (sequence-m (map deref xs))
+;zs <- (return (filter some? ys))
+;(return (reduce + zs)))
 
 
 ;(.v (within (system {:foo 123 :bar {:foo 456}})
-  ;x <- (asks :foo)
-  ;f <- (mdo-future
-         ;(within (component :bar)
-           ;x <- (asks :foo)
-           ;(fail x)))
-  ;y <- @f
-  ;(return (+ x y))))
+;x <- (asks :foo)
+;f <- (mdo-future
+;(within (component :bar)
+;x <- (asks :foo)
+;(fail x)))
+;y <- @f
+;(return (+ x y))))
 
 
 ;(within (system {:foo 123 :bar {:foo 456}})
-  ;x <- (asks :foo)
-  ;y <- (within (component :bar)
-         ;(asks :foo))
-  ;(return (+ x y)))
+;x <- (asks :foo)
+;y <- (within (component :bar)
+;(asks :foo))
+;(return (+ x y)))
