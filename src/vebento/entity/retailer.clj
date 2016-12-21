@@ -21,11 +21,10 @@
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with
-                     fail-if-exists fail-unless-exists]]
-            [vebento.specs
-             :as specs]))
+                     fail-if-exists fail-unless-exists]]))
 
 
+(ns-alias 'specs 'vebento.specs)
 (ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
