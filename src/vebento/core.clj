@@ -107,9 +107,8 @@
   [env aggs entity-id]
   (fn [computation]
     (within (system env)
-      computation)))
-;aggregates <- get-aggegates
-;(run aggregates aggs #(computation)))))
+      aggregates <- get-aggegates
+      (run aggregates aggs #(within (system env) computation)))))
 
 (defn aggregate-context
   [a aggs fun]
