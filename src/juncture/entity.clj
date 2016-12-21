@@ -94,13 +94,13 @@
   (update (transform entity event) assoc ::id (::event/id event)))
 
 
-(defn project
+(defn projection
   ([events]
-   (project nil events))
+   (projection nil events))
   ([start events]
    (reduce run-transformer start events)))
 
 (defn fetch-entity
   [journal id-key id]
-  (fetch-apply journal project {::event/kind ::event/message
+  (fetch-apply journal projection {::event/kind ::event/message
                              id-key id}))
