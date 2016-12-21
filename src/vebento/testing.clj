@@ -77,13 +77,10 @@
 
   (dispatch
     [this event]
-    (loop [handlers (->> #{(kind-key event) (type-key event)}
-                         (clojure.set/join @handler-rel)
-                         (map ::handler)
-                         (set))]
-      (when-not (empty? handlers)
-        ((first handlers) event)
-        (recur (rest handlers))))
+    (mapv #(% event) (->> #{(kind-key event) (type-key event)}
+                          (clojure.set/join @handler-rel)
+                          (map ::handler)
+                          (set)))
     event)
 
   co/Lifecycle
