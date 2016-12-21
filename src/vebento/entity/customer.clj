@@ -2,13 +2,11 @@
   (:require [clojure.future
              :refer :all]
             [clojure.set
-             :refer [union intersection]]
+             :refer [intersection]]
             [clojure.spec
              :as s]
             [com.stuartsierra.component
              :as co]
-            [monads.core
-             :refer [return mdo]]
             [monads.util
              :refer [mwhen]]
             [util
@@ -16,10 +14,10 @@
             [juncture.event
              :as event
              :refer [def-command def-message def-failure
-                     subscribe* unsubscribe* store]]
+                     subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [Aggregate register unregister
+             :refer [register unregister
                      def-entity create transform]]
             [componad
              :refer [within]]

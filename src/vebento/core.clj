@@ -10,9 +10,9 @@
              :refer [command message failure failure? dispatch fetch fetch*]]
             [juncture.entity
              :as entity
-             :refer [run run-transformer fetch-entity]]
+             :refer [run fetch-entity]]
             [componad
-             :refer [within system extract >>= m-when m-unless mdo-future]]))
+             :refer [within system >>= m-when m-unless mdo-future]]))
 
 
 (def get-aggegates (asks :aggregates))

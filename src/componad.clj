@@ -8,8 +8,6 @@
              :refer [fst either]]
             [monads.util
              :refer [mwhen sequence-m]]
-            [monads.identity
-             :as ident]
             [monads.rws
              :as rws]
             [monads.error

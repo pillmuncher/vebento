@@ -1,29 +1,25 @@
 (ns vebento.entity.order
   (:require [clojure.future
              :refer :all]
-            [clojure.set
-             :refer [union intersection]]
             [clojure.spec
              :as s]
             [com.stuartsierra.component
              :as co]
-            [monads.util
-             :refer [mwhen]]
             [util
-             :refer [ns-alias not-in?]]
+             :refer [ns-alias]]
             [juncture.event
              :as event
              :refer [def-command def-message def-failure
-                     subscribe* unsubscribe* store]]
+                     subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [Aggregate register unregister
+             :refer [register unregister
                      def-entity create transform]]
             [componad
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with
-                     fail-if-exists fail-unless-exists f-mwhen get-entity]]
+                     fail-if-exists fail-unless-exists]]
             [vebento.specs
              :as specs]))
 

@@ -6,13 +6,11 @@
             [clojure.spec
              :as s]
             [clojure.set
-             :refer [union difference]]
+             :refer [difference]]
             [com.stuartsierra.component
              :as co]
             [monads.core
-             :refer [mdo return catch-error put-state get-state modify]]
-            [monads.types
-             :refer [fst snd either]]
+             :refer [mdo return catch-error get-state modify]]
             [monads.util
              :refer [sequence-m]]
             [juncture.event
@@ -21,7 +19,7 @@
             [componad
              :refer [run-error-rws extract >>=]]
             [vebento.core
-             :refer [get-events get-dispatcher raise*]]))
+             :refer [get-events raise*]]))
 
 
 (defrecord MockJournal
