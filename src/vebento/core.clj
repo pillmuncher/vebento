@@ -22,18 +22,15 @@
 
 (defn return-command
   [command-type & command-params]
-  (>>= get-journal
-       #(return (apply command % command-type command-params))))
+  (return (apply command command-type command-params)))
 
 (defn return-message
   [message-type & message-params]
-  (>>= get-journal
-       #(return (apply message % message-type message-params))))
+  (return (apply message message-type message-params)))
 
 (defn return-failure
   [failure-type & failure-params]
-  (>>= get-journal
-       #(return (apply failure % failure-type failure-params))))
+  (return (apply failure failure-type failure-params)))
 
 
 (defn raise
@@ -41,9 +38,9 @@
   (mdo
     (>>= get-dispatcher
          #(return (dispatch % event)))
-    (mwhen (failure? event)
-           (fail event))
-    (return event)))
+    (if (failure? event)
+      (fail event)
+      (return event))))
 
 (defn raise*
   [& events]

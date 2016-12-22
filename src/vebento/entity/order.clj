@@ -86,6 +86,8 @@
 
   (start [this]
 
+    (register aggregates [::processing])
+
     (assoc
       this :subscriptions
       (subscribe* dispatcher)))

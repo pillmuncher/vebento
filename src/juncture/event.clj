@@ -29,7 +29,6 @@
 
 
 (defprotocol Journal
-  (next-version [this])
   (store [this event])
   (fetch [this criteria])
   (fetch-apply [this fun criteria]))
@@ -49,7 +48,8 @@
 (s/def ::date inst?)
 (s/def ::type keyword?)
 (s/def ::kind #{::command ::message ::failure})
-(s/def ::spec (s/keys :req [::kind ::type ::date ::id ::version]))
+(s/def ::spec (s/keys :req [::kind ::type ::date ::id]
+                      :opt [::version]))
 
 (s/def ::command #(= (::kind %) ::command))
 (s/def ::message #(= (::kind %) ::message))
@@ -90,30 +90,29 @@
 
 
 (defn- -create
-  [journal event-kind event-type event-params]
+  [event-kind event-type event-params]
   (validate (assoc event-params
                    ::kind event-kind
                    ::type event-type
                    ::date (inst)
-                   ::id (uuid)
-                   ::version (next-version journal))))
+                   ::id (uuid))))
 
 (defn create
-  [journal event-kind event-type & {:as event-params}]
-  (-create journal event-kind event-type event-params))
+  [event-kind event-type & {:as event-params}]
+  (-create event-kind event-type event-params))
 
 
 (defn command
-  [journal event-type & {:as event-params}]
-  (-create journal ::command event-type event-params))
+  [event-type & {:as event-params}]
+  (-create ::command event-type event-params))
 
 (defn message
-  [journal event-type & {:as event-params}]
-  (-create journal ::message event-type event-params))
+  [event-type & {:as event-params}]
+  (-create ::message event-type event-params))
 
 (defn failure
-  [journal event-type & {:as event-params}]
-  (-create journal ::failure event-type event-params))
+  [event-type & {:as event-params}]
+  (-create ::failure event-type event-params))
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))

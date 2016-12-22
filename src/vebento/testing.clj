@@ -24,19 +24,21 @@
 
 (defrecord MockJournal
 
-  [trail counter]
+  [trail]
 
   event/Journal
 
-  (next-version [this]
-    (swap! counter inc))
-
   (fetch-apply [this fun criteria]
     (future
-      (->> criteria
-           (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
-           (sort-by ::event/version)
-           (fun))))
+      (let [r (->> criteria
+                   (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
+                   (sort-by ::event/version)
+                   (fun))]
+
+        ;(print "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+        ;(clojure.pprint/pprint  (map ::event/type r))
+        ;(print "\n\n")
+        r)))
 
   (fetch [this criteria]
     (fetch-apply this identity criteria))
@@ -47,7 +49,7 @@
 
 
 (defn mock-journal []
-  (->MockJournal (atom []) (atom 0)))
+  (->MockJournal (atom [])))
 
 
 (defn filter-set
@@ -56,9 +58,11 @@
     {:key [::event/type type]}})
 
 
+
+
 (defrecord MockDispatcher
 
-  [journal handler-rel subscriptions]
+  [journal counter handler-rel subscriptions]
 
   event/Dispatcher
 
@@ -74,11 +78,13 @@
 
   (dispatch
     [this event]
-    (mapv #(% event) (->> (filter-set event)
-                          (clojure.set/join @handler-rel)
-                          (map ::handler)
-                          (set)))
-    event)
+    (let [event (assoc event ::event/version (swap! counter inc))]
+      (mapv #(% event) (->> event
+                            (filter-set)
+                            (clojure.set/join @handler-rel)
+                            (map ::handler)
+                            (set)))
+      event))
 
   co/Lifecycle
   (start [this]
@@ -92,7 +98,7 @@
 
 
 (defn mock-dispatcher []
-  (->MockDispatcher nil (atom #{}) nil))
+  (->MockDispatcher nil (atom 0) (atom #{}) nil))
 
 
 (defn strip-canonicals

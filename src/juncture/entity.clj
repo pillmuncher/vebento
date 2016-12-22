@@ -88,10 +88,14 @@
 
 (defmulti transform transformer)
 
+(defmethod transform
+  :default
+ [entity _]
+ entity)
 
 (defn run-transformer
   [entity event]
-  (update (transform entity event) assoc ::id (::event/id event)))
+  (assoc (transform entity event) ::id (::event/id event)))
 
 
 (defn projection

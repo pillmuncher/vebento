@@ -45,11 +45,15 @@
         (customer/->Component nil nil nil nil)
         :retailer
         (retailer/->Component nil nil nil nil)
+        :product
+        (product/->Component nil nil nil nil)
         :order
         (order/->Component nil nil nil nil))
       (co/system-using
         {:customer [:aggregates :dispatcher :journal]
          :retailer [:aggregates :dispatcher :journal]
+         :order [:aggregates :dispatcher :journal]
+         :product [:aggregates :dispatcher :journal]
          :dispatcher [:journal]})
       (co/start)))
 
@@ -61,6 +65,7 @@
       retailer-id (uuid)
       order-id (uuid)
       product-id (uuid)
+      product-name "schnitzel"
       amount 3
       cart {product-id amount}
       payment-method "PayPal"
@@ -109,8 +114,8 @@
   (def-scenario customer-can-register-only-once
     (within (system (test-bench))
       (given
-        (return-message
-          ::customer/registered
+        (return-command
+          ::customer/register
           ::customer/id customer-id))
       (after
         (return-command
@@ -122,28 +127,11 @@
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
 
-  ;(def-scenario customer-without-addres-but-with-retailer-fails
-    ;(within (system (test-bench))
-      ;(given
-        ;(return-message
-          ;::retailer/registered
-          ;::retailer/id retailer-id
-          ;::retailer/address retailer-address))
-      ;(after
-        ;(return-command
-          ;::customer/register
-          ;::customer/id customer-id
-          ;::retailer/id retailer-id))
-      ;(expect
-        ;(return-failure
-          ;::customer/has-given-no-address
-          ;::customer/id customer-id))))
-
   (def-scenario customer-cart-gets-cleared
     (within (system (test-bench))
       (given
-        (return-message
-          ::customer/registered
+        (return-command
+          ::customer/register
           ::customer/id customer-id))
       (after
         (return-command
@@ -169,19 +157,16 @@
   (def-scenario retailer-gets-selected
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::retailer/area-added
+        (return-command
+          ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::customer/zipcode customer-address))
-        (return-message
-          ::customer/registered
-          ::customer/id customer-id)
-        (return-message
-          ::customer/address-changed
+        (return-command
+          ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address))
       (after
@@ -211,16 +196,16 @@
   (def-scenario select-retailer-fails-unless-address-was-given
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::retailer/area-added
+        (return-command
+          ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (:zipcode customer-address))
-        (return-message
-          ::customer/registered
+        (return-command
+          ::customer/register
           ::customer/id customer-id))
       (after
         (return-command
@@ -235,15 +220,12 @@
   (def-scenario select-retailer-fails-unless-he-delivers-in-the-customers-area
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::customer/registered
-          ::customer/id customer-id)
-        (return-message
-          ::customer/address-changed
+        (return-command
+          ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address))
       (after
@@ -257,24 +239,29 @@
           ::customer/id customer-id
           ::customer/zipcode (::customer/zipcode customer-address)))))
 
-  (def-scenario item-gets-added-to-customers-cart
+  (def-scenario item-gets-added-to-customer-cart
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::product/create
+          ::product/id product-id
+          ::product/name product-name)
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::retailer/product-added
+        (return-command
+          ::retailer/add-product
           ::retailer/id retailer-id
           ::product/id product-id)
-        (return-message
-          ::customer/registered
+        (return-command
+          ::retailer/add-area
+          ::retailer/id retailer-id
+          ::retailer/zipcode (:zipcode customer-address))
+        (return-command
+          ::customer/register
           ::customer/id customer-id
-          ::customer/address customer-address)
-        (return-message
-          ::customer/retailer-selected
-          ::customer/id customer-id
+          ::customer/address customer-address
           ::retailer/id retailer-id))
       (after
         (return-command
@@ -292,17 +279,22 @@
   (def-scenario add-item-fails-unless-retailer-sells-the-selected-product
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::product/create
+          ::product/id product-id
+          ::product/name product-name)
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::customer/registered
+        (return-command
+          ::retailer/add-area
+          ::retailer/id retailer-id
+          ::retailer/zipcode (:zipcode customer-address))
+        (return-command
+          ::customer/register
           ::customer/id customer-id
-          ::customer/address customer-address)
-        (return-message
-          ::customer/retailer-selected
-          ::customer/id customer-id
+          ::customer/address customer-address
           ::retailer/id retailer-id))
       (after
         (return-command
