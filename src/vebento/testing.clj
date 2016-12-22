@@ -6,7 +6,7 @@
             [clojure.spec
              :as s]
             [clojure.set
-             :refer [difference]]
+             :refer [union difference]]
             [com.stuartsierra.component
              :as co]
             [monads.core
@@ -30,15 +30,10 @@
 
   (fetch-apply [this fun criteria]
     (future
-      (let [r (->> criteria
-                   (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
-                   (sort-by ::event/version)
-                   (fun))]
-
-        ;(print "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
-        ;(clojure.pprint/pprint  (map ::event/type r))
-        ;(print "\n\n")
-        r)))
+      (->> criteria
+           (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
+           (sort-by ::event/version)
+           (fun))))
 
   (fetch [this criteria]
     (fetch-apply this identity criteria))
@@ -54,37 +49,36 @@
 
 (defn filter-set
   [{kind ::event/kind type ::event/type}]
-  #{{:key [::event/kind kind]}
-    {:key [::event/type type]}})
+  [[::event/kind kind]
+   [::event/type type]])
 
 
 
 
 (defrecord MockDispatcher
 
-  [journal counter handler-rel subscriptions]
+  [journal counter handler-map subscriptions]
 
   event/Dispatcher
 
   (subscribe
     [this [event-key event-val handler]]
-    (swap! handler-rel conj {:key [event-key event-val] ::handler handler})
+    (swap! handler-map update [event-key event-val] conj handler)
     [event-key event-val handler])
 
   (unsubscribe
     [this [event-key event-val handler]]
-    (swap! handler-rel disj {:key [event-key event-val] ::handler handler})
-    [event-key event-val handler])
+    (swap! handler-map update [event-key event-val] disj handler)
+    nil)
 
   (dispatch
     [this event]
     (let [event (assoc event ::event/version (swap! counter inc))]
-      (mapv #(% event) (->> event
-                            (filter-set)
-                            (clojure.set/join @handler-rel)
-                            (map ::handler)
-                            (set)))
-      event))
+      (mapv #(% event) (->> (select-keys event [::event/kind ::event/type])
+                            (vec)
+                            (map @handler-map)
+                            (apply union))))
+      event)
 
   co/Lifecycle
   (start [this]
@@ -98,7 +92,7 @@
 
 
 (defn mock-dispatcher []
-  (->MockDispatcher nil (atom 0) (atom #{}) nil))
+  (->MockDispatcher nil (atom 0) (atom {}) nil))
 
 
 (defn strip-canonicals
