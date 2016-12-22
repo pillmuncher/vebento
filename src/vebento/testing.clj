@@ -14,7 +14,7 @@
             [monads.util
              :refer [sequence-m]]
             [componad
-             :refer [run-error-rws extract return* >>=]]
+             :refer [run-error-rws within system extract return* >>=]]
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
@@ -84,42 +84,37 @@
   (->MockDispatcher nil (atom 0) (atom {})))
 
 
-(defn strip-canonicals
+(defn- strip-canonicals
   [events]
   (->> events
        (map #(dissoc % ::event/id ::event/date ::event/version))
+       (set)
        (return)))
 
 
-(defn raise-and-keep
-  [what events]
+(defn- raise-events
+  [events]
   (mdo
-    (>>= (return* events)
-         #(catch-error (apply raise* %) return))
-    (>>= (get-events)
-         #(strip-canonicals @%)
-         #(modify assoc what %))))
+    m-events <- (return* events)
+    (catch-error (apply raise* m-events) return)
+    result <- (get-events)
+    (strip-canonicals @result)))
 
-(defn given
-  [& events]
-  (raise-and-keep ::given events))
 
-(defn after
-  [& events]
-  (raise-and-keep ::after events))
-
-(defn expect
-  [& events]
-  (mdo
-    state <- get-state
-    given <- (return (::given state))
-    after <- (return (::after state))
-    events <- (>>= (return* events) strip-canonicals)
-    (return [(set events) (difference (set after) (set given))])))
+(defn scenario
+  [& {:keys [using given after await]}]
+  (within (system using)
+    given-events <- (raise-events given)
+    after-events <- (raise-events after)
+    await-events <- (>>= (return* await) strip-canonicals)
+    (return [await-events (difference after-events
+                                      given-events)])))
 
 
 (defmacro def-scenario
-  [sym computation]
+  [sym & params]
   `(deftest ~sym
-     (let [[expected# result#] (extract (run-error-rws ~computation nil nil))]
+     (let [[expected# result#] (-> (scenario ~@params)
+                                   (run-error-rws nil nil)
+                                   (extract))]
        (is (= expected# result#)))))
