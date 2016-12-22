@@ -14,6 +14,10 @@
              :as error]))
 
 
+(defn return*
+  [values]
+  (->> values (map return) (sequence-m)))
+
 (defn >>=
   [m & mfs]
   (reduce monad/>>= m mfs))

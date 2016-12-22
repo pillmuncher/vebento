@@ -14,9 +14,11 @@
             [componad
              :as componad
              :refer [within system]]
+            [juncture.event
+             :as event
+             :refer [command message failure]]
             [vebento.core
-             :as core
-             :refer [return-command return-message return-failure]]
+             :as core]
             [vebento.specs
              :as specs]
             [vebento.testing
@@ -55,7 +57,8 @@
          :order [:aggregates :dispatcher :journal]
          :product [:aggregates :dispatcher :journal]
          :dispatcher [:journal]})
-      (co/start)))
+      (co/start)
+      (:customer)))
 
 
 ;(clojure.test/run-tests)
@@ -87,26 +90,26 @@
   (def-scenario customer-gets-registered
     (within (system (test-bench))
       (after
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id))
       (expect
-        (return-message
+        (message
           ::customer/registered
           ::customer/id customer-id))))
 
   (def-scenario customer-gets-registered-with-address
     (within (system (test-bench))
       (after
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address))
       (expect
-        (return-message
+        (message
           ::customer/registered
           ::customer/id customer-id)
-        (return-message
+        (message
           ::customer/address-changed
           ::customer/id customer-id
           ::customer/address customer-address))))
@@ -114,15 +117,15 @@
   (def-scenario customer-can-register-only-once
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id))
       (after
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id))
       (expect
-        (return-failure
+        (failure
           ::entity/already-exists
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
@@ -130,26 +133,26 @@
   (def-scenario customer-cart-gets-cleared
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id))
       (after
-        (return-command
+        (command
           ::customer/clear-cart
           ::customer/id customer-id))
       (expect
-        (return-message
+        (message
           ::customer/cart-cleared
           ::customer/id customer-id))))
 
   (def-scenario customer-cart-can-only-be-cleared-if-customer-exists
     (within (system (test-bench))
       (after
-        (return-command
+        (command
           ::customer/clear-cart
           ::customer/id customer-id))
       (expect
-        (return-failure
+        (failure
           ::entity/not-found
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
@@ -157,25 +160,25 @@
   (def-scenario retailer-gets-selected
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address))
       (after
-        (return-command
+        (command
           ::customer/select-retailer
           ::customer/id customer-id
           ::retailer/id retailer-id))
       (expect
-        (return-message
+        (message
           ::customer/retailer-selected
           ::customer/id customer-id
           ::retailer/id retailer-id))))
@@ -183,12 +186,12 @@
   (def-scenario retailer-can-only-be-selected-if-customer-exists
     (within (system (test-bench))
       (after
-        (return-command
+        (command
           ::customer/select-retailer
           ::customer/id customer-id
           ::retailer/id retailer-id))
       (expect
-        (return-failure
+        (failure
           ::entity/not-found
           ::entity/id-key ::customer/id
           ::entity/id customer-id))))
@@ -196,45 +199,45 @@
   (def-scenario select-retailer-fails-unless-address-was-given
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id))
       (after
-        (return-command
+        (command
           ::customer/select-retailer
           ::customer/id customer-id
           ::retailer/id retailer-id))
       (expect
-        (return-failure
+        (failure
           ::customer/has-given-no-address
           ::customer/id customer-id))))
 
   (def-scenario select-retailer-fails-unless-he-delivers-in-the-customers-area
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address))
       (after
-        (return-command
+        (command
           ::customer/select-retailer
           ::customer/id customer-id
           ::retailer/id retailer-id))
       (expect
-        (return-failure
+        (failure
           ::customer/zipcode-not-in-retailer-areas
           ::customer/id customer-id
           ::customer/zipcode (::specs/zipcode customer-address)))))
@@ -242,35 +245,35 @@
   (def-scenario item-gets-added-to-customer-cart
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::product/create
           ::product/id product-id
           ::product/name product-name)
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::retailer/add-product
           ::retailer/id retailer-id
           ::product/id product-id)
-        (return-command
+        (command
           ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address
           ::retailer/id retailer-id))
       (after
-        (return-command
+        (command
           ::customer/add-item-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
       (expect
-        (return-message
+        (message
           ::customer/item-added-to-cart
           ::customer/id customer-id
           ::product/id product-id
@@ -279,31 +282,31 @@
   (def-scenario add-item-fails-unless-retailer-sells-the-selected-product
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::product/create
           ::product/id product-id
           ::product/name product-name)
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address
           ::retailer/id retailer-id))
       (after
-        (return-command
+        (command
           ::customer/add-item-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
       (expect
-        (return-failure
+        (failure
           ::customer/product-not-in-retailer-assortment
           ::customer/id customer-id
           ::product/id product-id))))
@@ -311,55 +314,55 @@
   (def-scenario customer-order-gets-placed
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::product/create
           ::product/id product-id
           ::product/name product-name)
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::retailer/add-product
           ::retailer/id retailer-id
           ::product/id product-id)
-        (return-command
+        (command
           ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-command
+        (command
           ::retailer/add-schedule
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-command
+        (command
           ::retailer/add-payment-method
           ::retailer/id retailer-id
           ::retailer/payment-method payment-method)
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address
           ::retailer/id retailer-id)
-        (return-command
+        (command
           ::customer/select-schedule
           ::customer/id customer-id
           ::customer/schedule schedule)
-        (return-command
+        (command
           ::customer/select-payment-method
           ::customer/id customer-id
           ::customer/payment-method payment-method)
-        (return-command
+        (command
           ::customer/add-item-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
       (after
-        (return-command
+        (command
           ::customer/place-order
           ::customer/id customer-id
           ::order/id order-id))
       (expect
-        (return-message
+        (message
           ::order/placed
           ::order/id order-id
           ::customer/id customer-id
@@ -368,203 +371,203 @@
           ::order/address customer-address
           ::order/schedule schedule
           ::order/payment-method payment-method)
-        (return-message
+        (message
           ::customer/cart-cleared
           ::customer/id customer-id))))
 
   (def-scenario place-customer-order-fails-when-cart-is-empty
     (within (system (test-bench))
       (given
-        (return-command
+        (command
           ::product/create
           ::product/id product-id
           ::product/name product-name)
-        (return-command
+        (command
           ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-command
+        (command
           ::retailer/add-product
           ::retailer/id retailer-id
           ::product/id product-id)
-        (return-command
+        (command
           ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-command
+        (command
           ::retailer/add-schedule
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-command
+        (command
           ::retailer/add-payment-method
           ::retailer/id retailer-id
           ::retailer/payment-method payment-method)
-        (return-command
+        (command
           ::customer/register
           ::customer/id customer-id
           ::customer/address customer-address
           ::retailer/id retailer-id)
-        (return-command
+        (command
           ::customer/select-schedule
           ::customer/id customer-id
           ::customer/schedule schedule)
-        (return-command
+        (command
           ::customer/select-payment-method
           ::customer/id customer-id
           ::customer/payment-method payment-method))
       (after
-        (return-command
+        (command
           ::customer/place-order
           ::customer/id customer-id
           ::order/id order-id))
       (expect
-        (return-failure
+        (failure
           ::customer/cart-is-empty
           ::customer/id customer-id))))
 
   (def-scenario place-customer-order-fails-unless-address-was-provided
     (within (system (test-bench))
       (given
-        (return-message
+        (message
           ::retailer/registered
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
+        (message
           ::retailer/area-added
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-message
+        (message
           ::retailer/schedule-added
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message
+        (message
           ::retailer/payment-method-added
           ::retailer/id retailer-id
           ::retailer/payment-method payment-method)
-        (return-message
+        (message
           ::customer/registered
           ::customer/id customer-id)
-        (return-message
+        (message
           ::customer/retailer-selected
           ::customer/id customer-id
           ::retailer/id retailer-id)
-        (return-message
+        (message
           ::customer/schedule-selected
           ::customer/id customer-id
           ::customer/schedule schedule)
-        (return-message
+        (message
           ::customer/payment-method-selected
           ::customer/id customer-id
           ::customer/payment-method payment-method)
-        (return-message
+        (message
           ::customer/item-added-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
       (after
-        (return-command
+        (command
           ::customer/place-order
           ::customer/id customer-id
           ::order/id order-id))
       (expect
-        (return-failure
+        (failure
           ::customer/has-given-no-address
           ::customer/id customer-id))))
 
   (def-scenario place-customer-order-fails-unless-retailer-was-selected
     (within (system (test-bench))
       (given
-        (return-message
+        (message
           ::retailer/registered
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
+        (message
           ::retailer/area-added
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-message
+        (message
           ::retailer/schedule-added
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message
+        (message
           ::retailer/payment-method-added
           ::retailer/id retailer-id
           ::retailer/payment-method payment-method)
-        (return-message
+        (message
           ::customer/registered
           ::customer/id customer-id)
-        (return-message
+        (message
           ::customer/address-changed
           ::customer/id customer-id
           ::customer/address customer-address)
-        (return-message
+        (message
           ::customer/schedule-selected
           ::customer/id customer-id
           ::customer/schedule schedule)
-        (return-message
+        (message
           ::customer/payment-method-selected
           ::customer/id customer-id
           ::customer/payment-method payment-method)
-        (return-message
+        (message
           ::customer/item-added-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
       (after
-        (return-command
+        (command
           ::customer/place-order
           ::customer/id customer-id
           ::order/id order-id))
       (expect
-        (return-failure
+        (failure
           ::customer/has-selected-no-retailer
           ::customer/id customer-id))))
 
   (def-scenario place-customer-order-fails-unless-schedule-was-selected
     (within (system (test-bench))
       (given
-        (return-message
+        (message
           ::retailer/registered
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
+        (message
           ::retailer/area-added
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-message
+        (message
           ::retailer/schedule-added
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message
+        (message
           ::retailer/payment-method-added
           ::retailer/id retailer-id
           ::retailer/payment-method payment-method)
-        (return-message
+        (message
           ::customer/registered
           ::customer/id customer-id)
-        (return-message
+        (message
           ::customer/address-changed
           ::customer/id customer-id
           ::customer/address customer-address)
-        (return-message
+        (message
           ::customer/retailer-selected
           ::customer/id customer-id
           ::retailer/id retailer-id)
-        (return-message
+        (message
           ::customer/payment-method-selected
           ::customer/id customer-id
           ::customer/payment-method payment-method)
-        (return-message
+        (message
           ::customer/item-added-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
       (after
-        (return-command
+        (command
           ::customer/place-order
           ::customer/id customer-id
           ::order/id order-id))
       (expect
-        (return-failure
+        (failure
           ::customer/has-selected-no-schedule
           ::customer/id customer-id)))))

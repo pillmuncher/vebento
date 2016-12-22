@@ -90,8 +90,8 @@
 
 (defmethod transform
   :default
- [entity _]
- entity)
+  [entity _]
+  entity)
 
 (defn run-transformer
   [entity event]
@@ -106,5 +106,4 @@
 
 (defn fetch-entity
   [journal id-key id]
-  (fetch-apply journal projection {::event/kind ::event/message
-                                   id-key id}))
+  (fetch-apply journal projection {::event/kind ::event/message id-key id}))

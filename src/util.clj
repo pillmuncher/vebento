@@ -17,4 +17,6 @@
 
 (def inst #(Date.))
 (def uuid #(UUID/randomUUID))
+
 (def dummy-uuid #uuid "00000000-0000-0000-0000-000000000000")
+(def epoch (Date. 0))

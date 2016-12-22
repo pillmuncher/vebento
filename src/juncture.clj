@@ -1,18 +1,31 @@
-(ns juncture)
-  ;(:require [clojure.future
-             ;:refer :all]
-            ;[clojure.spec
-             ;:as s]
-            ;[clojure.spec.test
-             ;:as s-test]
-            ;[util
-             ;:refer [ns-alias uuid inst]]
-            ;[clojure.set
-             ;:refer [union difference]]))
+(ns juncture
+  (:require [clojure.future
+             :refer :all]
+            [clojure.spec
+             :as s]
+            [clojure.spec.test
+             :as s-test]
+            [clojure.set
+             :refer [union difference]]
+            [util
+             :refer [uuid inst]]
+            [juncture.event
+             :as event]
+            [juncture.entity
+             :as entity]))
 
 
-;(ns-alias 'event 'juncture.event)
-;(ns-alias 'entity 'juncture.entity)
+;(defmacro def-command
+  ;[command-type & {:as command-keys}]
+  ;`(event/def ::event/command ~command-type ~command-keys))
+
+;(defmacro def-message
+  ;[message-type & {:as message-keys}]
+  ;`(event/def ::event/message ~message-type ~message-keys))
+
+;(defmacro def-failure
+  ;[failure-type & {:as failure-keys}]
+  ;`(event/def ::event/failure ~failure-type ~failure-keys))
 
 
 ;(defprotocol Aggregate

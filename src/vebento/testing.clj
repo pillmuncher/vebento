@@ -13,11 +13,11 @@
              :refer [mdo return catch-error get-state modify]]
             [monads.util
              :refer [sequence-m]]
+            [componad
+             :refer [run-error-rws extract return* >>=]]
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
-            [componad
-             :refer [run-error-rws extract >>=]]
             [vebento.core
              :refer [get-events raise*]]))
 
@@ -47,52 +47,41 @@
   (->MockJournal (atom [])))
 
 
-(defn filter-set
-  [{kind ::event/kind type ::event/type}]
-  [[::event/kind kind]
-   [::event/type type]])
-
-
-
-
 (defrecord MockDispatcher
 
-  [journal counter handler-map subscriptions]
+  [journal counter subscriptions]
 
   event/Dispatcher
 
   (subscribe
     [this [event-key event-val handler]]
-    (swap! handler-map update [event-key event-val] conj handler)
+    (swap! subscriptions update [event-key event-val] conj handler)
     [event-key event-val handler])
 
   (unsubscribe
-    [this [event-key event-val handler]]
-    (swap! handler-map update [event-key event-val] disj handler)
-    nil)
+    [this _])
 
   (dispatch
     [this event]
     (let [event (assoc event ::event/version (swap! counter inc))]
-      (mapv #(% event) (->> (select-keys event [::event/kind ::event/type])
-                            (vec)
-                            (map @handler-map)
-                            (apply union))))
-      event)
+      (->> (select-keys event [::event/kind ::event/type])
+           (map @subscriptions)
+           (apply union)
+           (mapv #(% event)))
+      event))
 
   co/Lifecycle
   (start [this]
-    (assoc this :subscriptions
-           (subscribe* this
-                       [::event/kind ::event/message #(store* journal %)]
-                       [::event/kind ::event/failure #(store* journal %)])))
+    (subscribe* this
+                [::event/kind ::event/message #(store* journal %)]
+                [::event/kind ::event/failure #(store* journal %)])
+    this)
   (stop [this]
-    (apply unsubscribe* this subscriptions)
-    (assoc this :subscriptions nil)))
+    (assoc this subscriptions nil)))
 
 
 (defn mock-dispatcher []
-  (->MockDispatcher nil (atom 0) (atom {}) nil))
+  (->MockDispatcher nil (atom 0) (atom {})))
 
 
 (defn strip-canonicals
@@ -103,29 +92,29 @@
 
 
 (defn raise-and-keep
-  [what m-events]
+  [what events]
   (mdo
-    (>>= (sequence-m m-events)
+    (>>= (return* events)
          #(catch-error (apply raise* %) return))
     (>>= (get-events)
          #(strip-canonicals @%)
          #(modify assoc what %))))
 
 (defn given
-  [& m-events]
-  (raise-and-keep ::given m-events))
+  [& events]
+  (raise-and-keep ::given events))
 
 (defn after
-  [& m-events]
-  (raise-and-keep ::after m-events))
+  [& events]
+  (raise-and-keep ::after events))
 
 (defn expect
-  [& m-events]
+  [& events]
   (mdo
     state <- get-state
     given <- (return (::given state))
     after <- (return (::after state))
-    events <- (>>= (sequence-m m-events) strip-canonicals)
+    events <- (>>= (return* events) strip-canonicals)
     (return [(set events) (difference (set after) (set given))])))
 
 

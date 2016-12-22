@@ -20,19 +20,6 @@
 (def get-journal (asks :journal))
 
 
-(defn return-command
-  [command-type & command-params]
-  (return (apply command command-type command-params)))
-
-(defn return-message
-  [message-type & message-params]
-  (return (apply message message-type message-params)))
-
-(defn return-failure
-  [failure-type & failure-params]
-  (return (apply failure failure-type failure-params)))
-
-
 (defn raise
   [event]
   (mdo
@@ -50,7 +37,7 @@
 
 (defn execute
   [command-type & command-params]
-  (>>= (apply return-command command-type command-params) raise))
+  (raise (apply command command-type command-params)))
 
 (defn execute-in
   [env command-type & command-params]
@@ -60,7 +47,7 @@
 
 (defn publish
   [message-type & message-params]
-  (>>= (apply return-message message-type message-params) raise))
+  (raise (apply message message-type message-params)))
 
 (defn publish-in
   [env message-type & message-params]
@@ -70,7 +57,7 @@
 
 (defn fail-with
   [failure-type & failure-params]
-  (>>= (apply return-failure failure-type failure-params) raise))
+  (raise (apply failure failure-type failure-params)))
 
 (defn fail-in
   [env failure-type & failure-params]
