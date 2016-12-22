@@ -129,17 +129,12 @@
   (update retailer ::payment-methods conj payment-method))
 
 (defmethod transform
-  [::entity ::customer/registered]
-  [retailer _]
-  retailer)
-
-(defmethod transform
   [::entity ::customer/retailer-selected]
   [retailer {customer-id ::customer/id}]
   (update retailer ::customers conj customer-id))
 
 (defmethod transform
-  [::entity ::customer/order-placed]
+  [::entity ::order/placed]
   [retailer {order-id ::order/id}]
   (update retailer ::customer/pending-orders conj order-id))
 
