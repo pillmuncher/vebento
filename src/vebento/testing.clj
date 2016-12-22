@@ -88,7 +88,6 @@
   [events]
   (->> events
        (map #(dissoc % ::event/id ::event/date ::event/version))
-       (set)
        (return)))
 
 
@@ -107,8 +106,8 @@
     given-events <- (raise-events given)
     after-events <- (raise-events after)
     await-events <- (>>= (return* await) strip-canonicals)
-    (return [await-events (difference after-events
-                                      given-events)])))
+    (return [(set await-events) (difference (set after-events)
+                                            (set given-events))])))
 
 
 (defmacro def-scenario
