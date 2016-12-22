@@ -64,15 +64,15 @@
 
 (defmacro def-command
   [command-type & {:as command-keys}]
-  `(juncture.event/def-event ::command ~command-type ~command-keys))
+  `(def-event ::command ~command-type ~command-keys))
 
 (defmacro def-message
   [message-type & {:as message-keys}]
-  `(juncture.event/def-event ::message ~message-type ~message-keys))
+  `(def-event ::message ~message-type ~message-keys))
 
 (defmacro def-failure
   [failure-type & {:as failure-keys}]
-  `(juncture.event/def-event ::failure ~failure-type ~failure-keys))
+  `(def-event ::failure ~failure-type ~failure-keys))
 
 
 (defn valid?

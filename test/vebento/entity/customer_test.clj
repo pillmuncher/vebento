@@ -164,7 +164,7 @@
         (return-command
           ::retailer/add-area
           ::retailer/id retailer-id
-          ::retailer/zipcode (::customer/zipcode customer-address))
+          ::retailer/zipcode (::specs/zipcode customer-address))
         (return-command
           ::customer/register
           ::customer/id customer-id
@@ -203,7 +203,7 @@
         (return-command
           ::retailer/add-area
           ::retailer/id retailer-id
-          ::retailer/zipcode (:zipcode customer-address))
+          ::retailer/zipcode (::specs/zipcode customer-address))
         (return-command
           ::customer/register
           ::customer/id customer-id))
@@ -237,7 +237,7 @@
         (return-failure
           ::customer/zipcode-not-in-retailer-areas
           ::customer/id customer-id
-          ::customer/zipcode (::customer/zipcode customer-address)))))
+          ::customer/zipcode (::specs/zipcode customer-address)))))
 
   (def-scenario item-gets-added-to-customer-cart
     (within (system (test-bench))
@@ -257,7 +257,7 @@
         (return-command
           ::retailer/add-area
           ::retailer/id retailer-id
-          ::retailer/zipcode (:zipcode customer-address))
+          ::retailer/zipcode (::specs/zipcode customer-address))
         (return-command
           ::customer/register
           ::customer/id customer-id
@@ -290,7 +290,7 @@
         (return-command
           ::retailer/add-area
           ::retailer/id retailer-id
-          ::retailer/zipcode (:zipcode customer-address))
+          ::retailer/zipcode (::specs/zipcode customer-address))
         (return-command
           ::customer/register
           ::customer/id customer-id
@@ -311,42 +311,45 @@
   (def-scenario customer-order-gets-placed
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::product/create
+          ::product/id product-id
+          ::product/name product-name)
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::retailer/area-added
+        (return-command
+          ::retailer/add-product
+          ::retailer/id retailer-id
+          ::product/id product-id)
+        (return-command
+          ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-message
-          ::retailer/schedule-added
+        (return-command
+          ::retailer/add-schedule
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message ::retailer/payment-method-added
-                        ::retailer/id retailer-id
-                        ::retailer/payment-method payment-method)
-        (return-message
-          ::customer/registered
-          ::customer/id customer-id)
-        (return-message
-          ::customer/address-changed
+        (return-command
+          ::retailer/add-payment-method
+          ::retailer/id retailer-id
+          ::retailer/payment-method payment-method)
+        (return-command
+          ::customer/register
           ::customer/id customer-id
-          ::customer/address customer-address)
-        (return-message
-          ::customer/retailer-selected
-          ::customer/id customer-id
+          ::customer/address customer-address
           ::retailer/id retailer-id)
-        (return-message
-          ::customer/schedule-selected
+        (return-command
+          ::customer/select-schedule
           ::customer/id customer-id
           ::customer/schedule schedule)
-        (return-message
-          ::customer/payment-method-selected
+        (return-command
+          ::customer/select-payment-method
           ::customer/id customer-id
           ::customer/payment-method payment-method)
-        (return-message
-          ::customer/item-added-to-cart
+        (return-command
+          ::customer/add-item-to-cart
           ::customer/id customer-id
           ::product/id product-id
           ::product/amount amount))
@@ -372,38 +375,41 @@
   (def-scenario place-customer-order-fails-when-cart-is-empty
     (within (system (test-bench))
       (given
-        (return-message
-          ::retailer/registered
+        (return-command
+          ::product/create
+          ::product/id product-id
+          ::product/name product-name)
+        (return-command
+          ::retailer/register
           ::retailer/id retailer-id
           ::retailer/address retailer-address)
-        (return-message
-          ::retailer/area-added
+        (return-command
+          ::retailer/add-product
+          ::retailer/id retailer-id
+          ::product/id product-id)
+        (return-command
+          ::retailer/add-area
           ::retailer/id retailer-id
           ::retailer/zipcode (::specs/zipcode customer-address))
-        (return-message
-          ::retailer/schedule-added
+        (return-command
+          ::retailer/add-schedule
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message ::retailer/payment-method-added
-                        ::retailer/id retailer-id
-                        ::retailer/payment-method payment-method)
-        (return-message
-          ::customer/registered
-          ::customer/id customer-id)
-        (return-message
-          ::customer/address-changed
+        (return-command
+          ::retailer/add-payment-method
+          ::retailer/id retailer-id
+          ::retailer/payment-method payment-method)
+        (return-command
+          ::customer/register
           ::customer/id customer-id
-          ::customer/address customer-address)
-        (return-message
-          ::customer/retailer-selected
-          ::customer/id customer-id
+          ::customer/address customer-address
           ::retailer/id retailer-id)
-        (return-message
-          ::customer/schedule-selected
+        (return-command
+          ::customer/select-schedule
           ::customer/id customer-id
           ::customer/schedule schedule)
-        (return-message
-          ::customer/payment-method-selected
+        (return-command
+          ::customer/select-payment-method
           ::customer/id customer-id
           ::customer/payment-method payment-method))
       (after
@@ -431,9 +437,10 @@
           ::retailer/schedule-added
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message ::retailer/payment-method-added
-                        ::retailer/id retailer-id
-                        ::retailer/payment-method payment-method)
+        (return-message
+          ::retailer/payment-method-added
+          ::retailer/id retailer-id
+          ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)
@@ -479,9 +486,10 @@
           ::retailer/schedule-added
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message ::retailer/payment-method-added
-                        ::retailer/id retailer-id
-                        ::retailer/payment-method payment-method)
+        (return-message
+          ::retailer/payment-method-added
+          ::retailer/id retailer-id
+          ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)
@@ -527,9 +535,10 @@
           ::retailer/schedule-added
           ::retailer/id retailer-id
           ::retailer/schedule schedule)
-        (return-message ::retailer/payment-method-added
-                        ::retailer/id retailer-id
-                        ::retailer/payment-method payment-method)
+        (return-message
+          ::retailer/payment-method-added
+          ::retailer/id retailer-id
+          ::retailer/payment-method payment-method)
         (return-message
           ::customer/registered
           ::customer/id customer-id)

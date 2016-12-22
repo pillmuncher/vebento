@@ -49,7 +49,7 @@
 (s/def ::city ::string)
 (s/def ::email ::string)
 (s/def ::phone ::string)
-(s/def ::schedule (s/nilable ::set))
+(s/def ::schedule ::set)
 (s/def ::payment-method ::string)
 (s/def ::paid ::bool)
 (s/def ::shipped ::bool)

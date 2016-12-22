@@ -126,6 +126,14 @@
           #(sequence-m (map deref %)))))
 
 
+(defmacro m-await-each
+  [& computations]
+  (let [qs (for [c computations]
+             `(mdo-future ~c))]
+    `(>>= (sequence-m [~@qs])
+          #(sequence-m (map deref %)))))
+
+
 (defn is-id-available?
   [id-key id]
   (>>= get-journal

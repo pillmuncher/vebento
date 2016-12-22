@@ -24,7 +24,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish execute fail-with
+             :refer [aggregate publish execute fail-with m-await-each
                      fail-if-exists fail-unless-exists f-mwhen get-entity]]))
 
 
@@ -266,11 +266,13 @@
                     (fail-with ::has-given-no-address
                                ::id customer-id))
              retailer <- (get-entity ::retailer/id retailer-id)
-             (mwhen (->> @customer ::address ::zipcode
+             (mwhen (->> @customer ::address ::specs/zipcode
                          (not-in? (@retailer ::retailer/areas)))
                     (fail-with ::zipcode-not-in-retailer-areas
                                ::id customer-id
-                               ::zipcode (@customer ::zipcode)))
+                               ::zipcode (-> @customer
+                                             ::address
+                                             ::specs/zipcode)))
              (publish ::retailer-selected
                       ::id customer-id
                       ::retailer/id retailer-id)))]
@@ -281,7 +283,7 @@
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
              retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
-             (mwhen (->> @customer ::schedule
+             (mwhen (->> schedule
                          (intersection (@retailer ::retailer/schedule))
                          empty?)
                     (fail-with ::schedule-not-in-retailer-schedule
@@ -297,11 +299,11 @@
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
              retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
-             (mwhen (->> @customer ::payment-method
+             (mwhen (->> payment-method
                          (not-in? (@retailer ::retailer/payment-methods)))
                     (fail-with ::payment-method-not-supported-by-retailer
                                ::id customer-id
-                               ::payment-method (@customer ::payment-method)))
+                               ::payment-method payment-method))
              (publish ::payment-method-selected
                       ::id customer-id
                       ::payment-method payment-method)))]
@@ -343,40 +345,42 @@
            (within (aggregate this [::shopping] customer-id)
              (fail-if-exists ::order/id order-id)
              customer <- (get-entity ::id customer-id)
-             (f-mwhen (-> @customer ::cart empty?)
+             (m-await-each
+               (mwhen (-> @customer ::cart empty?)
                       (fail-with ::cart-is-empty
-                                 ::id customer-id)
-                      (-> @customer ::retailer/id nil?)
-                      (fail-with ::has-selected-no-retailer
-                                 ::id customer-id)
-                      (-> @customer ::address nil?)
-                      (fail-with ::has-given-no-address
-                                 ::id customer-id)
-                      (-> @customer ::schedule nil?)
-                      (fail-with ::has-selected-no-schedule
-                                 ::id customer-id)
-                      (-> @customer ::payment-method nil?)
-                      (fail-with ::has-selected-no-payment-method
                                  ::id customer-id))
+               (mwhen (-> @customer ::retailer/id nil?)
+                      (fail-with ::has-selected-no-retailer
+                                 ::id customer-id))
+               (mwhen (-> @customer ::address nil?)
+                      (fail-with ::has-given-no-address
+                                 ::id customer-id))
+               (mwhen (-> @customer ::schedule nil?)
+                      (fail-with ::has-selected-no-schedule
+                                 ::id customer-id))
+               (mwhen (-> @customer ::payment-method nil?)
+                      (fail-with ::has-selected-no-payment-method
+                                 ::id customer-id)))
              retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
-             (f-mwhen (->> @customer ::schedule
+             (m-await-each
+               (mwhen (->> @customer ::schedule
                            (intersection (@retailer ::retailer/schedule))
                            empty?)
                       (fail-with ::schedule-not-in-retailer-schedule
                                  ::id customer-id
-                                 ::schedule (@customer ::schedule))
-                      (->> @customer ::payment-method
+                                 ::schedule (@customer ::schedule)))
+               (mwhen (->> @customer ::payment-method
                            (not-in? (@retailer ::retailer/payment-methods)))
                       (fail-with ::payment-method-not-supported-by-retailer
                                  ::id customer-id
-                                 ::payment-method (@customer ::payment-method))
-                      (->> @customer ::address ::specs/zipcode
+                                 ::payment-method (@customer ::payment-method)))
+               (mwhen (->> @customer ::address ::specs/zipcode
                            (not-in? (@retailer ::retailer/areas)))
                       (fail-with ::zipcode-not-in-retailer-areas
                                  ::id customer-id
                                  ::specs/zipcode (-> @customer
                                                      ::address
-                                                     ::specs/zipcode)))
+                                                     ::specs/zipcode))))
              (publish ::order/placed
                       ::id customer-id
                       ::retailer/id (@customer ::retailer/id)
