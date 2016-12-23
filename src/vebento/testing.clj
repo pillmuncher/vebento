@@ -100,10 +100,10 @@
 (defn- raise-events
   [events]
   (mdo
-    m-events <- (return* events)
-    (catch-error (apply raise* m-events) return)
-    result <- (get-events)
-    (strip-canonicals @result)))
+    (>>= (return* events)
+         #(apply raise* %))
+    (>>= (get-events)
+         #(strip-canonicals @%))))
 
 
 (defn scenario

@@ -30,7 +30,7 @@
 (s/def ::uuid (s/with-gen uuid? gen/uuid))
 
 (s/def ::pos pos?)
-(s/def ::non-neg (comp neg? not))
+(s/def ::non-neg (comp not neg?))
 (s/def ::pos-int (s/and ::int ::pos))
 (s/def ::non-neg-int (s/and ::int ::non-neg))
 
@@ -38,7 +38,7 @@
 (s/def ::aggregate ::keyword)
 (s/def ::failure ::keyword)
 
-(s/def ::amount ::non-neg-int)
+(s/def ::amount ::pos-int)
 (s/def ::name ::string)
 (s/def ::number-of-persons ::amount)
 (s/def ::number-of-dishes ::amount)

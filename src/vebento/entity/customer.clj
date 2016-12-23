@@ -38,7 +38,7 @@
 (s/def ::address ::specs/address)
 (s/def ::cart ::specs/cart)
 (s/def ::pending-orders ::specs/set)
-(s/def ::schedule ::specs/schedule)
+(s/def ::schedule ::specs/set)
 (s/def ::payment-method ::specs/payment-method)
 
 

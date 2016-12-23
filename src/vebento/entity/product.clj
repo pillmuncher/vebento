@@ -30,6 +30,7 @@
 
 (s/def ::id ::specs/id)
 (s/def ::name ::specs/name)
+(s/def ::amount ::specs/amount)
 
 
 (def-command ::create

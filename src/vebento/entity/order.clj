@@ -29,9 +29,9 @@
 
 
 (s/def ::id ::specs/id)
-(s/def ::items ::specs/items)
+(s/def ::items (s/and ::specs/map (comp not empty?)))
 (s/def ::address ::specs/address)
-(s/def ::schedule ::specs/schedule)
+(s/def ::schedule (s/and ::specs/set (comp not empty?)))
 (s/def ::payment-method ::specs/payment-method)
 (s/def ::paid ::specs/paid)
 (s/def ::shipped ::specs/shipped)
