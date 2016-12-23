@@ -28,6 +28,7 @@
 (ns-alias 'retailer 'vebento.entity.retailer)
 
 
+(s/def ::id ::specs/id)
 (s/def ::items ::specs/items)
 (s/def ::address ::specs/address)
 (s/def ::schedule ::specs/schedule)

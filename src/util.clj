@@ -12,6 +12,7 @@
   (->> n (create-ns) (alias a)))
 
 
+(def zip (partial apply map vector))
 (def not-in? (comp not contains?))
 
 

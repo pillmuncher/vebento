@@ -3,8 +3,10 @@
              :refer :all]
             [clojure.spec
              :as s]
+            [clojure.spec.gen
+             :as gen]
             [util
-             :refer [ns-alias]]))
+             :refer [ns-alias uuid]]))
 
 
 
@@ -25,7 +27,7 @@
 (s/def ::int integer?)
 (s/def ::bool boolean?)
 (s/def ::date inst?)
-(s/def ::uuid uuid?)
+(s/def ::uuid (s/with-gen uuid? gen/uuid))
 
 (s/def ::pos pos?)
 (s/def ::non-neg (comp neg? not))

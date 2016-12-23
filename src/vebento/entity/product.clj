@@ -28,6 +28,7 @@
 (ns-alias 'order 'vebento.entity.order)
 
 
+(s/def ::id ::specs/id)
 (s/def ::name ::specs/name)
 
 

@@ -5,6 +5,10 @@
              :refer [deftest is]]
             [clojure.spec
              :as s]
+            [clojure.spec.test
+             :as stest]
+            [clojure.spec.gen
+             :as gen]
             [clojure.set
              :refer [union difference]]
             [com.stuartsierra.component
@@ -13,6 +17,8 @@
              :refer [mdo return catch-error get-state modify]]
             [monads.util
              :refer [sequence-m]]
+            [util
+             :refer [zip]]
             [componad
              :refer [run-error-rws within system extract return* >>=]]
             [juncture.event
@@ -109,11 +115,28 @@
     (return [(set await-events) (difference (set after-events)
                                             (set given-events))])))
 
+(defn param-spec
+  [& {:as params}]
+  (for [[param-spec param] params]
+    `[~param (~(keyword param) ~param-spec)]))
 
 (defmacro def-scenario
-  [sym & params]
-  `(deftest ~sym
-     (let [[expected# result#] (-> (scenario ~@params)
-                                   (run-error-rws nil nil)
-                                   (extract))]
-       (is (= expected# result#)))))
+  [sym params & body]
+  (let [[sc-params fdef-params] (zip (apply param-spec params))]
+    `(deftest ~sym
+       (vec
+         (for
+           [[_# [expected# result#]]
+            (s/exercise-fn
+              (fn [& a#]
+                (apply
+                  (fn [~@sc-params]
+                    (-> (scenario ~@body)
+                        (run-error-rws nil nil)
+                        (extract)))
+                  a#))
+              10
+              (s/fspec
+                :args
+                (s/cat ~@(flatten fdef-params))))]
+           (is (= expected# result#)))))))

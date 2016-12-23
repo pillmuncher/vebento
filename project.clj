@@ -10,4 +10,5 @@
                  ;[org.clojure/tools.trace "0.7.9"]
                  [com.stuartsierra/component "0.3.2"]
                  [bwo/monads "0.2.2"]
-                 [clojurewerkz/money "1.9.0"]])
+                 [clojurewerkz/money "1.9.0"]]
+  :profiles {:dev {:dependencies [[org.clojure/test.check "0.9.0"]]}})
