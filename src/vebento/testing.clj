@@ -117,26 +117,18 @@
 
 (defn param-spec
   [& {:as params}]
-  (for [[param-spec param] params]
-    `[~param (~(keyword param) ~param-spec)]))
+  (for [[p-spec p] params]
+    `[~p [~(keyword p) ~p-spec]]))
 
 (defmacro def-scenario
   [sym params & body]
   (let [[sc-params fdef-params] (zip (apply param-spec params))]
     `(deftest ~sym
-       (vec
-         (for
-           [[_# [expected# result#]]
-            (s/exercise-fn
-              (fn [& a#]
-                (apply
-                  (fn [~@sc-params]
-                    (-> (scenario ~@body)
-                        (run-error-rws nil nil)
-                        (extract)))
-                  a#))
-              10
-              (s/fspec
-                :args
-                (s/cat ~@(flatten fdef-params))))]
-           (is (= expected# result#)))))))
+       (let [test-fn-spec# (s/fspec :args (s/cat ~@(flatten fdef-params)))
+             test-fn# (fn [~@sc-params]
+                        (-> (scenario ~@body)
+                            (run-error-rws nil nil)
+                            (extract)))]
+         (mapv
+           (fn [[expected# result#]] (is (= expected# result#)))
+           (map second (s/exercise-fn test-fn# 10 test-fn-spec#)))))))
