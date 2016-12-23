@@ -14,6 +14,10 @@
              :as error]))
 
 
+(def componad (error/t rws/m))
+(def run-componad (partial rws/run-rws-t componad))
+
+
 (defn return*
   [values]
   (->> values (map return) (sequence-m)))
@@ -41,16 +45,12 @@
   (either fail return (fst result)))
 
 
-(def error-rws (error/t rws/m))
-(def run-error-rws (partial rws/run-rws-t error-rws))
-
-
 (defn system
   ([co]
    (system co nil))
   ([co st]
    (fn [computation]
-     (m-extract (run-error-rws computation st co)))))
+     (m-extract (run-componad computation st co)))))
 
 
 (defn component
@@ -58,7 +58,7 @@
   (fn [computation]
     (>>= (sequence-m [get-state ask])
          (fn [[st co]]
-           (m-extract (run-error-rws computation st (co-key co)))))))
+           (m-extract (run-componad computation st (co-key co)))))))
 
 
 (defmacro within
@@ -71,7 +71,7 @@
         (fn [[st# co#]]
           (let [result# (future
                           (m-extract
-                            (run-error-rws (mdo ~@computations) st# co#)))]
+                            (run-componad (mdo ~@computations) st# co#)))]
             (return
               (reify clojure.lang.IDeref
                 (deref [me] @result#)))))))
@@ -79,28 +79,3 @@
 
 (defmacro f-return [& body]
   `(return (future ~@body)))
-
-;(within (system {})
-;xs <- (sequence-m [(mdo-future (return 1))
-;(mdo-future (return nil))
-;(mdo-future (return 3))])
-;ys <- (sequence-m (map deref xs))
-;zs <- (return (filter some? ys))
-;(return (reduce + zs)))
-
-
-;(.v (within (system {:foo 123 :bar {:foo 456}})
-;x <- (asks :foo)
-;f <- (mdo-future
-;(within (component :bar)
-;x <- (asks :foo)
-;(fail x)))
-;y <- @f
-;(return (+ x y))))
-
-
-;(within (system {:foo 123 :bar {:foo 456}})
-;x <- (asks :foo)
-;y <- (within (component :bar)
-;(asks :foo))
-;(return (+ x y)))

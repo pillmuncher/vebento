@@ -20,7 +20,7 @@
             [util
              :refer [zip]]
             [componad
-             :refer [run-error-rws within system extract return* >>=]]
+             :refer [run-componad within system extract return* >>=]]
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
@@ -115,10 +115,12 @@
     (return [(set await-events) (difference (set after-events)
                                             (set given-events))])))
 
+
 (defn param-spec
   [& {:as params}]
   (for [[p-spec p] params]
     `[~p [~(keyword p) ~p-spec]]))
+
 
 (defmacro def-scenario
   [sym params & body]
@@ -127,7 +129,7 @@
        (let [test-fn-spec# (s/fspec :args (s/cat ~@(flatten fdef-params)))
              test-fn# (fn [~@sc-params]
                         (-> (scenario ~@body)
-                            (run-error-rws nil nil)
+                            (run-componad nil nil)
                             (extract)))]
          (mapv
            (fn [[expected# result#]] (is (= expected# result#)))
