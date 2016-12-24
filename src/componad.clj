@@ -15,7 +15,11 @@
 
 
 (def componad (error/t rws/m))
-(def run-componad (partial rws/run-rws-t componad))
+
+
+(defn run-componad
+  [computation & {:keys [state component]}]
+  (rws/run-rws-t componad computation state component))
 
 
 (defn return*
@@ -50,15 +54,19 @@
    (system co nil))
   ([co st]
    (fn [computation]
-     (m-extract (run-componad computation st co)))))
+     (m-extract (run-componad computation
+                              :state st
+                              :component co)))))
 
 
 (defn component
   [co-key]
   (fn [computation]
-    (>>= (sequence-m [get-state ask])
-         (fn [[st co]]
-           (m-extract (run-componad computation st (co-key co)))))))
+    (>>= (sequence-m [ask get-state])
+         (fn [[co st]]
+           (m-extract (run-componad computation
+                                    :state st
+                                    :component (co-key co)))))))
 
 
 (defmacro within
@@ -71,17 +79,19 @@
 
 
 (defmacro mdo-future [& computations]
-  `(>>= (sequence-m [get-state ask])
-        (fn [[st# co#]]
+  `(>>= (sequence-m [ask get-state])
+        (fn [[co# st#]]
           (let [result# (future
                           (m-extract
-                            (run-componad (mdo ~@computations) st# co#)))]
+                            (run-componad (mdo ~@computations)
+                                          :state st#
+                                          :component co#)))]
             (return
               (reify clojure.lang.IDeref
                 (deref [me] @result#)))))))
 
 
-(defmacro mdo-futures
+(defmacro mdo-await*
   [& computations]
   (let [qs (for [c computations]
              `(mdo-future ~c))]

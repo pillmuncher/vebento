@@ -14,7 +14,7 @@
             [com.stuartsierra.component
              :as co]
             [monads.core
-             :refer [mdo return catch-error get-state modify]]
+             :refer [mdo return catch-error modify]]
             [monads.util
              :refer [sequence-m]]
             [util
@@ -106,31 +106,31 @@
          #(strip-canonicals @%))))
 
 
-(defn scenario
+(defn run-scenario
   [& {:keys [using given after await]}]
-  (within (system using)
-    given-events <- (raise-events given)
-    after-events <- (raise-events after)
-    await-events <- (>>= (return* await) strip-canonicals)
-    (return [(set await-events) (difference (set after-events)
-                                            (set given-events))])))
+  (extract
+    (run-componad
+      (mdo
+        given-events <- (raise-events given)
+        after-events <- (raise-events after)
+        await-events <- (>>= (return* await) strip-canonicals)
+        (return [(set await-events) (difference (set after-events)
+                                                (set given-events))]))
+      :component using)))
 
 
-(defn param-spec
-  [& {:as params}]
+(defn param-specs
+  [params]
   (for [[p-spec p] params]
-    `[~p [~(keyword p) ~p-spec]]))
+    [`~p `[~(keyword p) ~p-spec]]))
 
 
 (defmacro def-scenario
   [sym params & body]
-  (let [[fn-params fspec-params] (zip (apply param-spec params))]
+  (let [[fn-params fspec-params] (->> params (partition 2) (param-specs) (zip))]
     `(deftest ~sym
        (let [test-fn-spec# (s/fspec :args (s/cat ~@(flatten fspec-params)))
-             test-fn# (fn [~@fn-params]
-                        (-> (scenario ~@body)
-                            (run-componad nil nil)
-                            (extract)))]
+             test-fn# (fn [~@fn-params] (run-scenario ~@body))]
          (mapv
            (fn [[expected# result#]] (is (= expected# result#)))
            (map second (s/exercise-fn test-fn# 10 test-fn-spec#)))))))

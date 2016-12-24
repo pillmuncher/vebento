@@ -12,7 +12,7 @@
              :as entity
              :refer [run fetch-entity]]
             [componad
-             :refer [within system >>= m-when m-unless]]))
+             :refer [within system >>= m-when m-unless mdo-future]]))
 
 
 (def get-aggegates (asks :aggregates))
@@ -133,8 +133,8 @@
   (add-query [this query-key query-fun])
   (get-query [this query-key]))
 
-(defmacro query
-  [query-key & {:as params}]
-  `(>>= ask
-        #(get-query % ~query-key)
-        #(m-future (% ~@params))))
+
+(defn query
+  [query-key & params]
+  (mdo-future
+    (>>= ask #(-> % (get-query query-key) (apply params) (return)))))
