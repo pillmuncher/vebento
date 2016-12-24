@@ -20,7 +20,7 @@
             [util
              :refer [zip]]
             [componad
-             :refer [run-componad within system extract return* >>=]]
+             :refer [within componad return* >>=]]
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
@@ -106,30 +106,32 @@
          #(strip-canonicals @%))))
 
 
-(defn run-scenario
+(defn scenario
   [& {:keys [using given after await]}]
-  (-> (mdo
-        given-events <- (raise-events given)
-        after-events <- (raise-events after)
-        await-events <- (>>= (return* await) strip-canonicals)
-        (return [(set await-events) (difference (set after-events)
-                                                (set given-events))]))
-      (run-componad :component using)
-      (extract)))
+  (within (componad using)
+    given-events <- (raise-events given)
+    after-events <- (raise-events after)
+    await-events <- (>>= (return* await) strip-canonicals)
+    (return [(set await-events) (difference (set after-events)
+                                            (set given-events))])))
 
 
-(defn param-specs
+(defn make-test-params
   [params]
-  (for [[p-spec p] params]
-    [`~p `[~(keyword p) ~p-spec]]))
+  (->> params
+       (partition 2)
+       (map (fn [[p-spec p]] [`~p `[~(keyword p) ~p-spec]]))
+       (zip)))
 
+(defn make-test-fn
+  [params body]
+  (let [[fn-params fspec-params] (make-test-params params)]
+    `(->> (s/fspec :args (s/cat ~@(flatten fspec-params)))
+          (s/exercise-fn (fn [~@fn-params] (scenario ~@body)) 10))))
 
 (defmacro def-scenario
   [sym params & body]
-  (let [[fn-params fspec-params] (->> params (partition 2) (param-specs) (zip))]
-    `(deftest ~sym
-       (let [test-fn-spec# (s/fspec :args (s/cat ~@(flatten fspec-params)))
-             test-fn# (fn [~@fn-params] (run-scenario ~@body))]
-         (mapv
-           (fn [[expected# result#]] (is (= expected# result#)))
-           (map second (s/exercise-fn test-fn# 10 test-fn-spec#)))))))
+  `(deftest ~sym
+     (->> ~(make-test-fn params body)
+          (map second)
+          (mapv (fn [[expected# result#]] (is (= expected# result#)))))))

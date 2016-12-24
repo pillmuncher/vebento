@@ -14,12 +14,12 @@
              :as error]))
 
 
-(def componad (error/t rws/m))
+(def componad-m (error/t rws/m))
 
 
 (defn run-componad
   [computation & {:keys [state component]}]
-  (rws/run-rws-t componad computation state component))
+  (rws/run-rws-t componad-m computation state component))
 
 
 (defn return*
@@ -47,6 +47,16 @@
 (defn m-extract
   [result]
   (either fail return (fst result)))
+
+
+(defn componad
+  ([co]
+   (componad co nil))
+  ([co st]
+   (fn [computation]
+     (extract (run-componad computation
+                            :state st
+                            :component co)))))
 
 
 (defn system
