@@ -108,15 +108,14 @@
 
 (defn run-scenario
   [& {:keys [using given after await]}]
-  (extract
-    (run-componad
-      (mdo
+  (-> (mdo
         given-events <- (raise-events given)
         after-events <- (raise-events after)
         await-events <- (>>= (return* await) strip-canonicals)
         (return [(set await-events) (difference (set after-events)
                                                 (set given-events))]))
-      :component using)))
+      (run-componad :component using)
+      (extract)))
 
 
 (defn param-specs
