@@ -120,7 +120,7 @@
   [params]
   (->> params
        (partition 2)
-       (map (fn [[p-spec p]] [`~p `[~(keyword p) ~p-spec]]))
+       (map (fn [[p p-spec]] [`~p `[~(keyword p) ~p-spec]]))
        (zip)))
 
 (defn make-test-fn-call
