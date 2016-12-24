@@ -22,10 +22,10 @@
              :refer [register unregister
                      def-entity create transform]]
             [componad
-             :refer [within]]
+             :refer [within mdo-futures]]
             [vebento.core
-             :refer [aggregate publish execute fail-with m-await-each
-                     fail-if-exists fail-unless-exists f-mwhen get-entity]]))
+             :refer [aggregate publish execute fail-with
+                     fail-if-exists fail-unless-exists get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -345,7 +345,7 @@
            (within (aggregate this [::shopping] customer-id)
              (fail-if-exists ::order/id order-id)
              customer <- (get-entity ::id customer-id)
-             (m-await-each
+             (mdo-futures
                (mwhen (-> @customer ::cart empty?)
                       (fail-with ::cart-is-empty
                                  ::id customer-id))
@@ -362,7 +362,7 @@
                       (fail-with ::has-selected-no-payment-method
                                  ::id customer-id)))
              retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
-             (m-await-each
+             (mdo-futures
                (mwhen (->> @customer ::schedule
                            (intersection (@retailer ::retailer/schedule))
                            empty?)

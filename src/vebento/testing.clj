@@ -124,10 +124,10 @@
 
 (defmacro def-scenario
   [sym params & body]
-  (let [[sc-params fdef-params] (zip (apply param-spec params))]
+  (let [[fn-params fspec-params] (zip (apply param-spec params))]
     `(deftest ~sym
-       (let [test-fn-spec# (s/fspec :args (s/cat ~@(flatten fdef-params)))
-             test-fn# (fn [~@sc-params]
+       (let [test-fn-spec# (s/fspec :args (s/cat ~@(flatten fspec-params)))
+             test-fn# (fn [~@fn-params]
                         (-> (scenario ~@body)
                             (run-componad nil nil)
                             (extract)))]

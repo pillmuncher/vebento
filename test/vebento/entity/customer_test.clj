@@ -289,7 +289,7 @@
             ::customer/id customer-id
             ::product/id product-id)])
 
-(def-scenario customer-order-gets-placed
+(def-scenario customer-places-order
   [::customer/id customer-id
    ::customer/address customer-address
    ::retailer/id retailer-id
@@ -360,7 +360,7 @@
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
-(def-scenario place-customer-order-fails-when-cart-is-empty
+(def-scenario customer-order-cannot-be-placed-when-cart-is-empty
   [::customer/id customer-id
    ::customer/address customer-address
    ::retailer/id retailer-id
@@ -417,7 +417,7 @@
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
-(def-scenario place-customer-order-fails-unless-schedule-was-selected
+(def-scenario customer-order-cannot-be-placed-unless-schedule-was-selected
   [::customer/id customer-id
    ::customer/address customer-address
    ::retailer/id retailer-id

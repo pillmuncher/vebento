@@ -12,7 +12,7 @@
              :as entity
              :refer [run fetch-entity]]
             [componad
-             :refer [within system >>= m-when m-unless mdo-future]]))
+             :refer [within system >>= m-when m-unless]]))
 
 
 (def get-aggegates (asks :aggregates))
@@ -96,29 +96,6 @@
 (defn aggregate-context
   [a aggs fun]
   (fun))
-
-
-(defmacro f-munless
-  [& {:as expression-action-pairs}]
-  (let [qs (for [[e a] expression-action-pairs]
-             `(mdo-future (if ~e (return nil) ~a)))]
-    `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %)))))
-
-(defmacro f-mwhen
-  [& {:as expression-action-pairs}]
-  (let [qs (for [[e a] expression-action-pairs]
-             `(mdo-future (if ~e ~a (return nil))))]
-    `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %)))))
-
-
-(defmacro m-await-each
-  [& computations]
-  (let [qs (for [c computations]
-             `(mdo-future ~c))]
-    `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %)))))
 
 
 (defn is-id-available?

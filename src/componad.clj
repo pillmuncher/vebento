@@ -66,6 +66,10 @@
   `(~environment (mdo ~@computations)))
 
 
+(defmacro f-return [& body]
+  `(return (future ~@body)))
+
+
 (defmacro mdo-future [& computations]
   `(>>= (sequence-m [get-state ask])
         (fn [[st# co#]]
@@ -77,5 +81,24 @@
                 (deref [me] @result#)))))))
 
 
-(defmacro f-return [& body]
-  `(return (future ~@body)))
+(defmacro mdo-futures
+  [& computations]
+  (let [qs (for [c computations]
+             `(mdo-future ~c))]
+    `(>>= (sequence-m [~@qs])
+          #(sequence-m (map deref %)))))
+
+
+(defmacro f-munless
+  [& {:as expression-action-pairs}]
+  (let [qs (for [[e a] expression-action-pairs]
+             `(mdo-future (if ~e (return nil) ~a)))]
+    `(>>= (sequence-m [~@qs])
+          #(sequence-m (map deref %)))))
+
+(defmacro f-mwhen
+  [& {:as expression-action-pairs}]
+  (let [qs (for [[e a] expression-action-pairs]
+             `(mdo-future (if ~e ~a (return nil))))]
+    `(>>= (sequence-m [~@qs])
+          #(sequence-m (map deref %)))))
