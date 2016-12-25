@@ -102,9 +102,11 @@
 
 
 (defn project
-  [fun start]
+  ([fun]
+   (project fun nil))
+  ([fun start]
   (fn projection [events]
-    (reduce fun start events)))
+    (reduce fun start events))))
 
 (defn fetch-entity
   [journal id-key id]
