@@ -102,12 +102,12 @@
 
 
 (defn project
-  [start fun]
+  [fun start]
   (fn projection [events]
     (reduce fun start events)))
 
 (defn fetch-entity
   [journal id-key id]
   (fetch-apply journal
-               (project nil do-transform)
+               (project do-transform nil)
                {::event/kind ::event/message id-key id}))
