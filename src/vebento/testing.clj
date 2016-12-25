@@ -116,22 +116,22 @@
                                             (set given-events))])))
 
 
-(defn make-test-fn-params
+(defn test-fn-params
   [params]
   (->> params
        (partition 2)
        (map (fn [[p p-spec]] [`~p `[~(keyword p) ~p-spec]]))
        (zip)))
 
-(defn make-test-fn-call
+(defn test-fn-call
   [params body]
-  (let [[fn-params fspec-params] (make-test-fn-params params)]
+  (let [[fn-params fspec-params] (test-fn-params params)]
     `(->> (s/fspec :args (s/cat ~@(flatten fspec-params)))
           (s/exercise-fn (fn [~@fn-params] (scenario ~@body)) 10))))
 
 (defmacro def-scenario
   [sym params & body]
   `(deftest ~sym
-     (->> ~(make-test-fn-call params body)
+     (->> ~(test-fn-call params body)
           (map second)
           (mapv (fn [[expected# result#]] (is (= expected# result#)))))))

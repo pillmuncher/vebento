@@ -102,7 +102,7 @@
             ::entity/id customer-id)])
 
 
-(def-scenario customer-cart-gets-cleared
+(def-scenario customer-clears-cart
   [customer-id ::customer/id]
   :using (test-bench)
   :given [(command
@@ -116,7 +116,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-cart-can-only-be-cleared-if-customer-exists
+(def-scenario only-an-existing-customer-can-clear-cart
   [customer-id ::customer/id]
   :using (test-bench)
   :after [(command
@@ -128,7 +128,7 @@
             ::entity/id customer-id)])
 
 
-(def-scenario retailer-gets-selected
+(def-scenario customer-selects-retailer
   [customer-id ::customer/id
    retailer-id ::retailer/id
    customer-address ::customer/address
@@ -156,7 +156,7 @@
             ::retailer/id retailer-id)])
 
 
-(def-scenario retailer-can-only-be-selected-if-customer-exists
+(def-scenario only-an-existing-customer-can-select-retailer
   [customer-id ::customer/id
    retailer-id ::retailer/id]
   :using (test-bench)
@@ -170,7 +170,7 @@
             ::entity/id customer-id)])
 
 
-(def-scenario select-retailer-fails-unless-address-was-given
+(def-scenario customer-cannot-select-retailer-unless-customer-address-was-given
   [customer-id ::customer/id
    retailer-id ::retailer/id
    customer-address ::customer/address
@@ -196,7 +196,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario select-retailer-fails-unless-he-delivers-in-the-customers-area
+(def-scenario customer-can-only-select-retailer-who-delivers-in-customer-area
   [customer-id ::customer/id
    retailer-id ::retailer/id
    customer-address ::customer/address
@@ -220,7 +220,7 @@
             ::customer/zipcode (::specs/zipcode customer-address))])
 
 
-(def-scenario item-gets-added-to-customer-cart
+(def-scenario customer-adds-item-to-cart
   [customer-id ::customer/id
    retailer-id ::retailer/id
    customer-address ::customer/address
@@ -262,7 +262,7 @@
             ::product/amount amount)])
 
 
-(def-scenario add-item-fails-unless-retailer-sells-the-selected-product
+(def-scenario customer-can-only-add-product-to-cart-if-retailer-sells-it
   [customer-id ::customer/id
    retailer-id ::retailer/id
    customer-address ::customer/address
@@ -371,7 +371,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-order-cannot-be-placed-when-cart-is-empty
+(def-scenario customer-cannot-place-order-when-cart-is-empty
   [customer-id ::customer/id
    customer-address ::customer/address
    retailer-id ::retailer/id
@@ -429,7 +429,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-order-cannot-be-placed-unless-schedule-was-selected
+(def-scenario customer-cannot-place-order-unless-schedule-was-selected
   [customer-id ::customer/id
    customer-address ::customer/address
    retailer-id ::retailer/id
