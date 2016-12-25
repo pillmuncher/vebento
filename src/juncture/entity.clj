@@ -105,13 +105,8 @@
   ([fun]
    (project fun nil))
   ([fun start]
-<<<<<<< HEAD
    (fn projection [events]
      (reduce fun start events))))
-=======
-  (fn projection [events]
-    (reduce fun start events))))
->>>>>>> 395ecae288162865d535c89455fb9f40c5f4e0f8
 
 (defn fetch-entity
   [journal id-key id]
