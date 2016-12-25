@@ -93,17 +93,15 @@
   [entity _]
   entity)
 
-(defn run-transformer
-  [entity event]
-  (assoc (transform entity event) ::id (::event/id event)))
 
-
-(defn projection
-  ([events]
-   (projection nil events))
-  ([start events]
-   (reduce run-transformer start events)))
+(defn project
+  [start fun]
+  (fn projection [events]
+    (reduce fun start events)))
 
 (defn fetch-entity
   [journal id-key id]
-  (fetch-apply journal projection {::event/kind ::event/message id-key id}))
+  (fetch-apply journal
+               (project nil #(-> (transform %1 %2)
+                                 (assoc ::id (::event/id %2))))
+               {::event/kind ::event/message id-key id}))
