@@ -2,7 +2,7 @@
   (:require [clojure.future
              :refer :all]
             [clojure.set
-             :refer [intersection]]
+             :refer [union intersection]]
             [clojure.spec
              :as s]
             [com.stuartsierra.component
@@ -38,7 +38,7 @@
 (s/def ::address ::specs/address)
 (s/def ::cart ::specs/cart)
 (s/def ::pending-orders ::specs/set)
-(s/def ::schedule ::specs/set)
+(s/def ::schedule ::specs/schedule)
 (s/def ::payment-method ::specs/payment-method)
 
 
@@ -56,7 +56,7 @@
   :req [::id
         ::retailer/id])
 
-(def-command ::select-schedule
+(def-command ::add-schedule
   :req [::id
         ::schedule])
 
@@ -151,10 +151,10 @@
 
 (def-entity ::entity
   :req [::cart
+        ::schedule
         ::pending-orders]
   :opt [::address
         ::retailer/id
-        ::schedule
         ::payment-method])
 
 
@@ -164,6 +164,7 @@
   (create ::entity
           ::entity/id customer-id
           ::cart {}
+          ::schedule #{}
           ::pending-orders #{}))
 
 (defmethod transform
@@ -179,7 +180,7 @@
 (defmethod transform
   [::entity ::schedule-selected]
   [customer {schedule ::schedule}]
-  (assoc customer ::schedule schedule))
+  (update customer ::schedule union schedule))
 
 (defmethod transform
   [::entity ::payment-method-selected]
@@ -277,15 +278,14 @@
                       ::id customer-id
                       ::retailer/id retailer-id)))]
 
-        [::event/type ::select-schedule
+        [::event/type ::add-schedule
          (fn [{customer-id ::id
                schedule ::schedule}]
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
              retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
-             (mwhen (->> schedule
-                         (intersection (@retailer ::retailer/schedule))
-                         empty?)
+             (mwhen (empty? (intersection schedule
+                                          (@retailer ::retailer/schedule)))
                     (fail-with ::schedule-not-in-retailer-schedule
                                ::id customer-id
                                ::schedule schedule))
@@ -355,7 +355,7 @@
                (mwhen (-> @customer ::address nil?)
                       (fail-with ::has-given-no-address
                                  ::id customer-id))
-               (mwhen (-> @customer ::schedule nil?)
+               (mwhen (-> @customer ::schedule empty?)
                       (fail-with ::has-selected-no-schedule
                                  ::id customer-id))
                (mwhen (-> @customer ::payment-method nil?)
@@ -363,9 +363,8 @@
                                  ::id customer-id)))
              retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
              (mdo-await*
-               (mwhen (->> @customer ::schedule
-                           (intersection (@retailer ::retailer/schedule))
-                           empty?)
+               (mwhen (empty? (intersection (@customer ::schedule)
+                                            (@retailer ::retailer/schedule)))
                       (fail-with ::schedule-not-in-retailer-schedule
                                  ::id customer-id
                                  ::schedule (@customer ::schedule)))

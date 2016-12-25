@@ -341,7 +341,7 @@
             ::customer/address customer-address
             ::retailer/id retailer-id)
           (command
-            ::customer/select-schedule
+            ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)
           (command
@@ -413,7 +413,7 @@
             ::customer/address customer-address
             ::retailer/id retailer-id)
           (command
-            ::customer/select-schedule
+            ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)
           (command
