@@ -101,15 +101,15 @@
       (assoc ::id (::event/id event))))
 
 
-(defn project
+(defn projection
   ([fun]
-   (project fun nil))
+   (projection fun nil))
   ([fun start]
-   (fn projection [events]
+   (fn [events]
      (reduce fun start events))))
 
 (defn fetch-entity
   [journal id-key id]
   (fetch-apply journal
-               (project do-transform)
+               (projection do-transform)
                {::event/kind ::event/message id-key id}))
