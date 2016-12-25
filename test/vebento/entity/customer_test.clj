@@ -65,7 +65,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :await [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -78,7 +78,7 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :await [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -96,7 +96,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :await [(failure
+  :yield [(failure
             ::entity/already-exists
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -111,7 +111,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :await [(message
+  :yield [(message
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
@@ -122,7 +122,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :await [(failure
+  :yield [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -150,7 +150,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :await [(message
+  :yield [(message
             ::customer/retailer-selected
             ::customer/id customer-id
             ::retailer/id retailer-id)])
@@ -164,7 +164,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :await [(failure
+  :yield [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -191,7 +191,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :await [(failure
+  :yield [(failure
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
@@ -214,7 +214,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :await [(failure
+  :yield [(failure
             ::customer/zipcode-not-in-retailer-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])
@@ -255,7 +255,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :await [(message
+  :yield [(message
             ::customer/item-added-to-cart
             ::customer/id customer-id
             ::product/id product-id
@@ -293,7 +293,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :await [(failure
+  :yield [(failure
             ::customer/product-not-in-retailer-assortment
             ::customer/id customer-id
             ::product/id product-id)])
@@ -357,7 +357,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :await [(message
+  :yield [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -424,7 +424,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :await [(failure
+  :yield [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -483,6 +483,6 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :await [(failure
+  :yield [(failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])

@@ -107,12 +107,12 @@
 
 
 (defn scenario
-  [& {:keys [using given after await]}]
+  [& {:keys [using given after yield]}]
   (within (componad using)
     given-events <- (raise-events given)
     after-events <- (raise-events after)
-    await-events <- (>>= (return* await) strip-canonicals)
-    (return [(set await-events) (difference (set after-events)
+    yield-events <- (>>= (return* yield) strip-canonicals)
+    (return [(set yield-events) (difference (set after-events)
                                             (set given-events))])))
 
 
