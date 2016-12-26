@@ -126,8 +126,9 @@
 (defn test-fn-call
   [params body]
   (let [[fn-params fspec-params] (test-fn-params params)]
-    `(->> (s/fspec :args (s/cat ~@(flatten fspec-params)))
-          (s/exercise-fn (fn [~@fn-params] (scenario ~@body)) 10))))
+    `(s/exercise-fn (fn [~@fn-params] (scenario ~@body))
+                    10
+                    (s/fspec :args (s/cat ~@(flatten fspec-params))))))
 
 (defmacro def-scenario
   [sym params & body]
