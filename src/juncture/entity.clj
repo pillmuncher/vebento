@@ -94,22 +94,23 @@
   entity)
 
 
-(defn do-transform
-  [entity event]
-  (-> entity
-      (transform event)
-      (assoc ::id (::event/id event))))
-
+(defn attach-event-id
+  [fun]
+  (fn [entity event]
+    (-> entity
+        (fun event)
+        (assoc ::event/id (::event/id event)))))
 
 (defn projection
   ([fun]
    (projection fun nil))
   ([fun start]
    (fn [events]
-     (reduce fun start events))))
+     (reduce (attach-event-id fun) start events))))
+
 
 (defn fetch-entity
   [journal id-key id]
   (fetch-apply journal
-               (projection do-transform)
+               (projection transform)
                {::event/kind ::event/message id-key id}))
