@@ -155,11 +155,26 @@
 
         dispatcher
 
-        [::event/type ::registered (upgrade-entity entity-store ::id)]
-        [::event/type ::area-added (upgrade-entity entity-store ::id)]
-        [::event/type ::product-added (upgrade-entity entity-store ::id)]
-        [::event/type ::schedule-added (upgrade-entity entity-store ::id)]
-        [::event/type ::payment-method-added (upgrade-entity entity-store ::id)]
+        [::event/type ::registered
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::area-added
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::product-added
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::schedule-added
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::payment-method-added
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::customer/retailer-selected
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::order/placed
+         (upgrade-entity entity-store ::id)]
 
         [::event/type ::register
          (fn [{retailer-id ::id address ::address}]

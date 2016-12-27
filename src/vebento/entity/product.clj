@@ -71,7 +71,8 @@
       (subscribe*
         dispatcher
 
-        [::event/type ::created (upgrade-entity entity-store ::id)]
+        [::event/type ::created
+         (upgrade-entity entity-store ::id)]
 
         [::event/type ::create
          (fn [{product-id ::id name ::name}]

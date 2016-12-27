@@ -93,7 +93,8 @@
       this :subscriptions
       (subscribe*
         dispatcher
-        [::event/type ::placed (upgrade-entity entity-store ::id)])))
+        [::event/type ::placed
+         (upgrade-entity entity-store ::id)])))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)

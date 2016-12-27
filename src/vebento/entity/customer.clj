@@ -226,14 +226,32 @@
 
         dispatcher
 
-        [::event/type ::registered (upgrade-entity entity-store ::id)]
-        [::event/type ::address-changed (upgrade-entity entity-store ::id)]
-        [::event/type ::retailer-selected (upgrade-entity entity-store ::id)]
-        [::event/type ::schedule-selected (upgrade-entity entity-store ::id)]
-        [::event/type ::payment-method-selected (upgrade-entity entity-store ::id)]
-        [::event/type ::item-added-to-cart (upgrade-entity entity-store ::id)]
-        [::event/type ::item-removed-from-cart (upgrade-entity entity-store ::id)]
-        [::event/type ::cart-cleared (upgrade-entity entity-store ::id)]
+        [::event/type ::registered
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::address-changed
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::retailer-selected
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::schedule-selected
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::payment-method-selected
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::item-added-to-cart
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::item-removed-from-cart
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::cart-cleared
+         (upgrade-entity entity-store ::id)]
+
+        [::event/type ::order/placed
+         (upgrade-entity entity-store ::id)]
 
         [::event/type ::register
          (fn [{customer-id ::id
