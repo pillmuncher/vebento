@@ -18,14 +18,19 @@
             [monads.util
              :refer [map-m]]
             [util
-             :refer [zip]]
+             :refer [ns-alias zip]]
             [componad
              :refer [within componad return* >>=]]
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
+            [juncture.entity
+             :refer [EntityStore store-entity fetch-entity exists-entity?]]
             [vebento.core
              :refer [get-events raise]]))
+
+
+(ns-alias 'entity 'juncture.entity)
 
 
 (defrecord MockJournal
@@ -88,6 +93,21 @@
 
 (defn mock-dispatcher []
   (->MockDispatcher nil (atom 0) (atom {})))
+
+
+(defrecord MockEntityStore
+  [entities]
+  entity/EntityStore
+  (store-entity [this {id ::entity/id :as entity}]
+    (swap! entities assoc id entity))
+  (fetch-entity [this id]
+    (future (@entities id)))
+  (exists-entity? [this id]
+    (some? (@entities id))))
+
+
+(defn mock-entity-store []
+  (->MockEntityStore (atom {})))
 
 
 (defn- strip-canonicals

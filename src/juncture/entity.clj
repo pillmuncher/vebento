@@ -109,8 +109,14 @@
      (reduce (attach-event-id fun) start events))))
 
 
-(defn fetch-entity
-  [journal id-key id]
-  (fetch-apply journal
-               (projection transform)
-               {::event/kind ::event/message id-key id}))
+(defprotocol EntityStore
+  (store-entity [this entity])
+  (fetch-entity [this id])
+  (exists-entity? [this id]))
+
+
+(defn upgrade-entity
+  [entity-store id-key]
+  (fn [event]
+    (let [entity (fetch-entity entity-store (id-key event))]
+      (store-entity entity-store (transform @entity event)))))

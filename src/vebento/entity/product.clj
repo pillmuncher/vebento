@@ -13,13 +13,13 @@
                      subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister
+             :refer [register unregister upgrade-entity
                      def-entity create transform]]
             [componad
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with
-                     fail-if-exists fail-unless-exists]]))
+                     fail-if-exists fail-unless-exists get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -58,7 +58,7 @@
 
 (defrecord Component
 
-  [aggregates dispatcher journal subscriptions]
+  [aggregates dispatcher journal entity-store subscriptions]
 
   co/Lifecycle
 
@@ -68,7 +68,10 @@
 
     (assoc
       this :subscriptions
-      (subscribe* dispatcher
+      (subscribe*
+        dispatcher
+
+        [::event/type ::created (upgrade-entity entity-store ::id)]
 
         [::event/type ::create
          (fn [{product-id ::id name ::name}]

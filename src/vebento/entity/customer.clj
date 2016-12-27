@@ -19,7 +19,7 @@
                      subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister
+             :refer [register unregister upgrade-entity
                      def-entity create transform]]
             [componad
              :refer [within mdo-await*]]
@@ -212,7 +212,7 @@
 
 (defrecord Component
 
-  [aggregates dispatcher journal subscriptions]
+  [aggregates dispatcher journal entity-store subscriptions]
 
   co/Lifecycle
 
@@ -225,6 +225,15 @@
       (subscribe*
 
         dispatcher
+
+        [::event/type ::registered (upgrade-entity entity-store ::id)]
+        [::event/type ::address-changed (upgrade-entity entity-store ::id)]
+        [::event/type ::retailer-selected (upgrade-entity entity-store ::id)]
+        [::event/type ::schedule-selected (upgrade-entity entity-store ::id)]
+        [::event/type ::payment-method-selected (upgrade-entity entity-store ::id)]
+        [::event/type ::item-added-to-cart (upgrade-entity entity-store ::id)]
+        [::event/type ::item-removed-from-cart (upgrade-entity entity-store ::id)]
+        [::event/type ::cart-cleared (upgrade-entity entity-store ::id)]
 
         [::event/type ::register
          (fn [{customer-id ::id

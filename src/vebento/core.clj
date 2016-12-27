@@ -10,14 +10,15 @@
              :refer [command message failure failure? dispatch fetch fetch*]]
             [juncture.entity
              :as entity
-             :refer [run fetch-entity]]
+             :refer [run fetch-entity exists-entity? transform]]
             [componad
-             :refer [within system >>= m-when m-unless mdo-future]]))
+             :refer [within system >>= mdo-future]]))
 
 
 (def get-aggegates (asks :aggregates))
 (def get-dispatcher (asks :dispatcher))
 (def get-journal (asks :journal))
+(def get-entity-store (asks :entity-store))
 
 
 (defn raise
@@ -93,35 +94,22 @@
   (fun))
 
 
-(defn is-id-available?
-  [id-key id]
-  (>>= get-journal
-       #(-> (fetch* % ::event/kind ::event/message id-key id)
-            (deref)
-            (empty?)
-            (return))))
 
 (defn fail-if-exists
   [id-key id]
-  (m-unless (is-id-available? id-key id)
-            (fail-with ::entity/already-exists
-                       ::entity/id-key id-key
-                       ::entity/id id)))
+  (>>= get-entity-store
+       #(mwhen (exists-entity? % id)
+               (fail-with ::entity/already-exists
+                          ::entity/id-key id-key
+                          ::entity/id id))))
 
 (defn fail-unless-exists
   [id-key id]
-  (m-when (is-id-available? id-key id)
-          (fail-with ::entity/not-found
-                     ::entity/id-key id-key
-                     ::entity/id id)))
-
-
-(defn get-entity
-  [id-key id]
-  (mdo
-    (fail-unless-exists id-key id)
-    journal <- get-journal
-    (return (fetch-entity journal id-key id))))
+  (>>= get-entity-store
+       #(mwhen (not (exists-entity? % id))
+               (fail-with ::entity/not-found
+                          ::entity/id-key id-key
+                          ::entity/id id))))
 
 
 (defprotocol QueryStore
@@ -133,3 +121,11 @@
   [query-key & params]
   (mdo-future
     (>>= ask #(-> % (get-query query-key) (apply params) (return)))))
+
+
+(defn get-entity
+  [id-key id]
+  (mdo
+    (fail-unless-exists id-key id)
+    entity-store <- get-entity-store
+    (return (fetch-entity entity-store id))))

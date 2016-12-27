@@ -22,7 +22,8 @@
              :as specs]
             [vebento.testing
              :as testing
-             :refer [def-scenario mock-journal mock-dispatcher]]
+             :refer [def-scenario mock-journal mock-dispatcher
+                     mock-entity-store]]
             [vebento.entity.product
              :as product]
             [vebento.entity.order
@@ -37,23 +38,25 @@
   (-> (co/system-map
         :aggregates
         (entity/aggregates core/aggregate-context)
+        :entity-store
+        (mock-entity-store)
         :dispatcher
         (mock-dispatcher)
         :journal
         (mock-journal)
         :customer
-        (customer/->Component nil nil nil nil)
+        (customer/->Component nil nil nil nil nil)
         :retailer
-        (retailer/->Component nil nil nil nil)
+        (retailer/->Component nil nil nil nil nil)
         :product
-        (product/->Component nil nil nil nil)
+        (product/->Component nil nil nil nil nil)
         :order
-        (order/->Component nil nil nil nil))
+        (order/->Component nil nil nil nil nil))
       (co/system-using
-        {:customer [:aggregates :dispatcher :journal]
-         :retailer [:aggregates :dispatcher :journal]
-         :order [:aggregates :dispatcher :journal]
-         :product [:aggregates :dispatcher :journal]
+        {:customer [:aggregates :dispatcher :journal :entity-store]
+         :retailer [:aggregates :dispatcher :journal :entity-store]
+         :order [:aggregates :dispatcher :journal :entity-store]
+         :product [:aggregates :dispatcher :journal :entity-store]
          :dispatcher [:journal]})
       (co/start)
       (:customer)))

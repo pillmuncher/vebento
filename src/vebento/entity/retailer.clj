@@ -15,7 +15,7 @@
                      subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister
+             :refer [register unregister upgrade-entity
                      def-entity create transform]]
             [componad
              :refer [within]]
@@ -141,7 +141,7 @@
 
 (defrecord Component
 
-  [aggregates dispatcher journal subscriptions]
+  [aggregates dispatcher journal entity-store subscriptions]
 
   co/Lifecycle
 
@@ -154,6 +154,12 @@
       (subscribe*
 
         dispatcher
+
+        [::event/type ::registered (upgrade-entity entity-store ::id)]
+        [::event/type ::area-added (upgrade-entity entity-store ::id)]
+        [::event/type ::product-added (upgrade-entity entity-store ::id)]
+        [::event/type ::schedule-added (upgrade-entity entity-store ::id)]
+        [::event/type ::payment-method-added (upgrade-entity entity-store ::id)]
 
         [::event/type ::register
          (fn [{retailer-id ::id address ::address}]
