@@ -7,7 +7,7 @@
             [monads.types
              :refer [fst either]]
             [monads.util
-             :refer [mwhen sequence-m]]
+             :refer [mwhen map-m sequence-m]]
             [monads.rws
              :as rws]
             [monads.error
@@ -24,7 +24,7 @@
 
 (defn return*
   [values]
-  (->> values (map return) (sequence-m)))
+  (map-m return values))
 
 (defn >>=
   [m & mfs]
@@ -106,7 +106,7 @@
   (let [qs (for [c computations]
              `(mdo-future ~c))]
     `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %)))))
+          #(map-m deref %))))
 
 
 (defmacro f-munless
@@ -114,11 +114,11 @@
   (let [qs (for [[e a] expression-action-pairs]
              `(mdo-future (if ~e (return nil) ~a)))]
     `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %)))))
+          #(map-m deref %))))
 
 (defmacro f-mwhen
   [& {:as expression-action-pairs}]
   (let [qs (for [[e a] expression-action-pairs]
              `(mdo-future (if ~e ~a (return nil))))]
     `(>>= (sequence-m [~@qs])
-          #(sequence-m (map deref %)))))
+          #(map-m deref %))))

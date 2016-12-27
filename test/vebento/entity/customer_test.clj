@@ -65,7 +65,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :yield [(message
+  :raise [(message
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -78,7 +78,7 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :yield [(message
+  :raise [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -96,7 +96,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :yield [(failure
+  :raise [(failure
             ::entity/already-exists
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -111,7 +111,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :yield [(message
+  :raise [(message
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
@@ -122,7 +122,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :yield [(failure
+  :raise [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -150,7 +150,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :yield [(message
+  :raise [(message
             ::customer/retailer-selected
             ::customer/id customer-id
             ::retailer/id retailer-id)])
@@ -164,7 +164,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :yield [(failure
+  :raise [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -191,7 +191,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :yield [(failure
+  :raise [(failure
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
@@ -214,7 +214,7 @@
             ::customer/select-retailer
             ::customer/id customer-id
             ::retailer/id retailer-id)]
-  :yield [(failure
+  :raise [(failure
             ::customer/zipcode-not-in-retailer-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])
@@ -255,7 +255,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :yield [(message
+  :raise [(message
             ::customer/item-added-to-cart
             ::customer/id customer-id
             ::product/id product-id
@@ -293,7 +293,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :yield [(failure
+  :raise [(failure
             ::customer/product-not-in-retailer-assortment
             ::customer/id customer-id
             ::product/id product-id)])
@@ -357,7 +357,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(message
+  :raise [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -424,7 +424,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(failure
+  :raise [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -483,6 +483,66 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(failure
+  :raise [(failure
+            ::customer/has-selected-no-schedule
+            ::customer/id customer-id)])
+
+
+(def-scenario customer-cannot-place-order
+  [customer-id ::customer/id
+   customer-address ::customer/address
+   retailer-id ::retailer/id
+   retailer-address ::retailer/address
+   product-id ::product/id
+   product-name ::product/name
+   amount ::product/amount
+   order-id ::order/id
+   payment-method ::order/payment-method
+   schedule ::order/schedule]
+  :using (test-bench)
+  :given [(command
+            ::product/create
+            ::product/id product-id
+            ::product/name product-name)
+          (command
+            ::retailer/register
+            ::retailer/id retailer-id
+            ::retailer/address retailer-address)
+          (command
+            ::retailer/add-product
+            ::retailer/id retailer-id
+            ::product/id product-id)
+          (command
+            ::retailer/add-area
+            ::retailer/id retailer-id
+            ::retailer/zipcode (::specs/zipcode customer-address))
+          (command
+            ::retailer/add-schedule
+            ::retailer/id retailer-id
+            ::retailer/schedule schedule)
+          (command
+            ::retailer/add-payment-method
+            ::retailer/id retailer-id
+            ::retailer/payment-method payment-method)
+          (command
+            ::customer/register
+            ::customer/id customer-id)]
+  :after [(command
+            ::customer/place-order
+            ::customer/id customer-id
+            ::order/id order-id)]
+  :raise [(failure
+            ::customer/cart-is-empty
+            ::customer/id customer-id)
+          (failure
+            ::customer/has-given-no-address
+            ::customer/id customer-id)
+          (failure
+            ::customer/has-selected-no-payment-method
+            ::customer/id customer-id)
+          (failure
+            ::customer/has-selected-no-retailer
+            ::customer/id customer-id)
+          (failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])

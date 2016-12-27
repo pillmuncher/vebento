@@ -16,7 +16,7 @@
             [monads.core
              :refer [mdo return catch-error modify]]
             [monads.util
-             :refer [sequence-m]]
+             :refer [map-m]]
             [util
              :refer [zip]]
             [componad
@@ -25,7 +25,7 @@
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
             [vebento.core
-             :refer [get-events raise*]]))
+             :refer [get-events raise]]))
 
 
 (defrecord MockJournal
@@ -100,19 +100,18 @@
 (defn- raise-events
   [events]
   (mdo
-    (>>= (return* events)
-         #(apply raise* %))
+    (map-m raise events)
     (>>= (get-events)
          #(strip-canonicals @%))))
 
 
 (defn scenario
-  [& {:keys [using given after yield]}]
+  [& {:keys [using given after raise]}]
   (within (componad using)
     given-events <- (raise-events given)
     after-events <- (raise-events after)
-    yield-events <- (>>= (return* yield) strip-canonicals)
-    (return [(set yield-events) (difference (set after-events)
+    raise-events <- (>>= (return* raise) strip-canonicals)
+    (return [(set raise-events) (difference (set after-events)
                                             (set given-events))])))
 
 

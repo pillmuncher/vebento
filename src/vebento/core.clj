@@ -4,7 +4,7 @@
             [monads.core
              :refer [mdo return fail ask asks catch-error]]
             [monads.util
-             :refer [mwhen sequence-m]]
+             :refer [mwhen map-m]]
             [juncture.event
              :as event
              :refer [command message failure failure? dispatch fetch fetch*]]
@@ -28,11 +28,6 @@
     (if (failure? event)
       (fail event)
       (return event))))
-
-(defn raise*
-  [& events]
-  (sequence-m (for [event events]
-                (raise event))))
 
 
 (defn execute
