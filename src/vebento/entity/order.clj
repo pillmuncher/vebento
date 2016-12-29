@@ -13,13 +13,12 @@
                      subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister upgrade-entity
-                     def-entity create transform]]
+             :refer [register unregister def-entity create transform]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish execute fail-with
-                     fail-if-exists fail-unless-exists get-entity]]))
+             :refer [aggregate publish execute fail-with fail-if-exists
+                     fail-unless-exists update-entity get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -94,7 +93,7 @@
       (subscribe*
         dispatcher
         [::event/type ::placed
-         (upgrade-entity entity-store ::id)])))
+         (update-entity entity-store ::id)])))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)

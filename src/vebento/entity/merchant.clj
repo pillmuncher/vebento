@@ -15,13 +15,12 @@
                      subscribe* unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister upgrade-entity
-                     def-entity create transform]]
+             :refer [register unregister def-entity create transform]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish execute fail-with
-                     fail-if-exists fail-unless-exists]]))
+             :refer [aggregate publish execute fail-with fail-if-exists
+                     fail-unless-exists update-entity get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -161,25 +160,25 @@
         dispatcher
 
         [::event/type ::registered
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::area-added
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::product-added
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::schedule-added
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::payment-method-added
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::customer/merchant-selected
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::order/placed
-         (upgrade-entity entity-store ::id)]
+         (update-entity entity-store ::id)]
 
         [::event/type ::register
          (fn [{merchant-id ::id address ::address}]

@@ -107,16 +107,3 @@
   ([fun start]
    (fn [events]
      (reduce (attach-event-id fun) start events))))
-
-
-(defprotocol EntityStore
-  (store-entity [this id-key entity])
-  (fetch-entity [this id-key id])
-  (exists-entity? [this id-key id]))
-
-
-(defn upgrade-entity
-  [entity-store id-key]
-  (fn [event]
-    (let [entity (fetch-entity entity-store id-key (id-key event))]
-      (store-entity entity-store id-key (transform @entity event)))))

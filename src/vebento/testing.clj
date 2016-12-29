@@ -24,10 +24,9 @@
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
-            [juncture.entity
-             :refer [EntityStore store-entity fetch-entity exists-entity?]]
             [vebento.core
-             :refer [get-events raise]]))
+             :refer [raise EntityStore store-entity fetch-entity exists-entity?
+                     get-events]]))
 
 
 (ns-alias 'entity 'juncture.entity)
@@ -97,7 +96,7 @@
 
 (defrecord MockEntityStore
   [entities]
-  entity/EntityStore
+  EntityStore
   (store-entity [this id-key {id ::entity/id :as entity}]
     (swap! entities assoc-in [id-key id] entity))
   (fetch-entity [this id-key id]

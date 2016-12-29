@@ -10,7 +10,7 @@
              :refer [command message failure failure? dispatch fetch fetch*]]
             [juncture.entity
              :as entity
-             :refer [run fetch-entity exists-entity? transform]]
+             :refer [run transform]]
             [componad
              :refer [within system >>= mdo-future]]))
 
@@ -94,6 +94,18 @@
   (fun))
 
 
+(defprotocol EntityStore
+  (store-entity [this id-key entity])
+  (fetch-entity [this id-key id])
+  (exists-entity? [this id-key id]))
+
+
+(defn update-entity
+  [entity-store id-key]
+  (fn [event]
+    (let [entity (fetch-entity entity-store id-key (id-key event))]
+      (store-entity entity-store id-key (transform @entity event)))))
+
 
 (defn fail-if-exists
   [id-key id]
@@ -112,6 +124,14 @@
                           ::entity/id id))))
 
 
+(defn get-entity
+  [id-key id]
+  (mdo
+    (fail-unless-exists id-key id)
+    entity-store <- get-entity-store
+    (return (fetch-entity entity-store id-key id))))
+
+
 (defprotocol QueryStore
   (add-query [this query-key query-fun])
   (get-query [this query-key]))
@@ -121,11 +141,3 @@
   [query-key & params]
   (mdo-future
     (>>= ask #(-> % (get-query query-key) (apply params) (return)))))
-
-
-(defn get-entity
-  [id-key id]
-  (mdo
-    (fail-unless-exists id-key id)
-    entity-store <- get-entity-store
-    (return (fetch-entity entity-store id-key id))))
