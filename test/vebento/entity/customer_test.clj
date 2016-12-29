@@ -73,6 +73,21 @@
             ::customer/id customer-id)])
 
 
+(def-scenario customer-can-register-only-once
+  [customer-id ::customer/id]
+  :using (test-bench)
+  :given [(command
+            ::customer/register
+            ::customer/id customer-id)]
+  :after [(command
+            ::customer/register
+            ::customer/id customer-id)]
+  :raise [(failure
+            ::entity/already-exists
+            ::entity/id-key ::customer/id
+            ::entity/id customer-id)])
+
+
 (def-scenario customer-gets-registered-with-address
   [customer-id ::customer/id
    customer-address ::customer/address]
@@ -90,19 +105,78 @@
             ::customer/address customer-address)])
 
 
-(def-scenario customer-can-register-only-once
-  [customer-id ::customer/id]
+(def-scenario customer-gets-registered-with-merchant
+  [customer-id ::customer/id
+   customer-address ::customer/address
+   merchant-id ::merchant/id
+   merchant-address ::merchant/address]
   :using (test-bench)
   :given [(command
-            ::customer/register
-            ::customer/id customer-id)]
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
+          (command
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))]
   :after [(command
             ::customer/register
-            ::customer/id customer-id)]
-  :raise [(failure
-            ::entity/already-exists
-            ::entity/id-key ::customer/id
-            ::entity/id customer-id)])
+            ::customer/id customer-id
+            ::customer/address customer-address
+            ::merchant/id merchant-id)]
+  :raise [(message
+            ::customer/registered
+            ::customer/id customer-id)
+          (message
+            ::customer/address-changed
+            ::customer/id customer-id
+            ::customer/address customer-address)
+          (message
+            ::customer/merchant-selected
+            ::customer/id customer-id
+            ::merchant/id merchant-id)])
+
+
+(def-scenario customer-gets-registered-with-payment-method
+  [customer-id ::customer/id
+   customer-address ::customer/address
+   merchant-id ::merchant/id
+   merchant-address ::merchant/address
+   payment-method ::customer/payment-method]
+  :using (test-bench)
+  :given [(command
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
+          (command
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
+          (command
+            ::merchant/add-payment-method
+            ::merchant/id merchant-id
+            ::merchant/payment-method payment-method)]
+  :after [(command
+            ::customer/register
+            ::customer/id customer-id
+            ::customer/address customer-address
+            ::merchant/id merchant-id
+            ::customer/payment-method payment-method)]
+  :raise [(message
+            ::customer/registered
+            ::customer/id customer-id)
+          (message
+            ::customer/address-changed
+            ::customer/id customer-id
+            ::customer/address customer-address)
+          (message
+            ::customer/merchant-selected
+            ::customer/id customer-id
+            ::merchant/id merchant-id)
+          (message
+            ::customer/payment-method-selected
+            ::customer/id customer-id
+            ::customer/payment-method payment-method)])
 
 
 (def-scenario customer-clears-cart
@@ -414,15 +488,12 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::merchant/id merchant-id)
+            ::merchant/id merchant-id
+            ::customer/payment-method payment-method)
           (command
             ::customer/add-schedule
             ::customer/id customer-id
-            ::customer/schedule schedule)
-          (command
-            ::customer/select-payment-method
-            ::customer/id customer-id
-            ::customer/payment-method payment-method)]
+            ::customer/schedule schedule)]
   :after [(command
             ::customer/place-order
             ::customer/id customer-id
@@ -472,10 +543,7 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::merchant/id merchant-id)
-          (command
-            ::customer/select-payment-method
-            ::customer/id customer-id
+            ::merchant/id merchant-id
             ::customer/payment-method payment-method)
           (command
             ::customer/add-item-to-cart

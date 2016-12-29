@@ -324,9 +324,9 @@
              merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
              (mwhen (->> payment-method
                          (not-in? (@merchant ::merchant/payment-methods)))
-                    (fail-with ::does-not-support-payment-method
-                               ::id customer-id
-                               ::payment-method payment-method))
+                    (fail-with ::merchant/does-not-support-payment-method
+                               ::merchant/id (@merchant ::merchant/id)
+                               ::merchant/payment-method payment-method))
              (publish ::payment-method-selected
                       ::id customer-id
                       ::payment-method payment-method)))]
@@ -394,8 +394,9 @@
                (mwhen (->> @customer ::payment-method
                            (not-in? (@merchant ::merchant/payment-methods)))
                       (fail-with ::merchant/does-not-support-payment-method
-                                 ::id customer-id
-                                 ::payment-method (@customer ::payment-method)))
+                                 ::merchant/id (@merchant ::merchant/id)
+                                 ::merchant/payment-method (@customer
+                                                             ::payment-method)))
                (mwhen (->> @customer ::address ::specs/zipcode
                            (not-in? (@merchant ::merchant/areas)))
                       (fail-with ::zipcode-not-in-merchant-areas
