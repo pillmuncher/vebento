@@ -1,0 +1,79 @@
+Events:
+
+
+Kommunikation ist ausschließlich event-basiert.
+
+Events sind reine Daten (Hash-Maps), keine Objekte.
+
+Sie können damit unmittelbar und ohne spezielle Parser serialisiert werden.
+
+Sie werden über einen Event-Bus geleitet, den man abonnieren kann.
+
+Auslöser und Handler eines Events brauchen sich nicht zu kennen.
+
+Zu jedem Event kann es mehrere Händler geben, die alle ausgeführt werden.
+
+Jede Abarbeitung eines Events kann weitere Events zur Folge haben.
+
+Die Reihenfolge der Events im Event-Bus erhält Kausalität.
+
+Alle Events werden ohne Zeitlimit gespreichert und sind jederzeit vollständig
+verfügbar.
+
+Events müssen idempotent sein, damit sie bei mehrfachem Empfang nicht zu
+inkonsistentem Systemzustand führen.
+
+Man benötigt ein Versionierungssystem, um Lücken in der Kausalkette erkennen
+zu können.
+
+Semantisch gibt es drei Arten von Events:
+- Command: beschreibt, dass etwas geschehen soll
+- Message: beschreibt, dass ein Befehl erfolgreich war
+- Failure: beschreibt, dass ein Befehl gescheitert ist.
+
+Events beinhalten als Felder:
+- Event-Art (Command, Message oder Failure)
+- Event-Typ (Kunde hat sich angemeldet, Bestellung wurde ausgelöst, ...)
+- Timestamp, wann der Event ausgelöst wurde
+- Id, eine UUID
+- zusätzliche Daten, je nach Event-Typ.
+
+
+Entities:
+
+Ein Entity beschreibt ein Business-Objekt, zB. einen Kunden, eine Bestellung,
+ein Produkt, etc.
+
+Entities sind ebenfalls nur Daten, keine Objekte.
+
+Für jeden Entity-Typ gibt es eine Menge von Event-Typen zusammen mit einer
+kanonischen Transformationsfunktion:
+
+    entity' := transform(entity, event).
+
+Zusätzliche, nicht-kanonische Transformationsfunktionen sind ebenfalls möglich.
+
+Dadurch kann man aus einer kausal konsistenten (chronologisch geordneten und
+vollständigen) Menge von Events jederzeit ein Entity mit (relativ zum letzten
+Event der Menge) gültigem Zustand erzeugen:
+
+    entity := fold_left(transform, init(), events).
+
+Den Prozess, durch wiederholtes anwenden einer Transformationsfunktion ein
+Entity zu erzeugen, nennt man eine Projektion.
+
+Andere Arten der Manipulation von Entities gibt es nicht.
+
+Entities sind transient, können aber aus Performance-Gründen in einem Cache
+gespeichert werden. Deswegen brauchen Entities ein Versionierungs-System zur
+Cache-Invalidation.
+
+
+Konsequenzen und weitere Forderungen:
+
+Die zentrale Quelle der Wahrheit in System ist das Event-Log, AKA Journal.
+Damit muss das Journal unveränderbar sein.
+
+Kommunikation via Events ist immer asynchron. Command-Handler benötigen deshalb
+in ihrer Laufzeitumgebung einen Back-Channel zum Auslöser des Commands, damit
+diesem das Ergebnis mitgeteilt werden kann.
