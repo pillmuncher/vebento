@@ -98,12 +98,12 @@
 (defrecord MockEntityStore
   [entities]
   entity/EntityStore
-  (store-entity [this {id ::entity/id :as entity}]
-    (swap! entities assoc id entity))
-  (fetch-entity [this id]
-    (future (@entities id)))
-  (exists-entity? [this id]
-    (some? (@entities id))))
+  (store-entity [this id-key {id ::entity/id :as entity}]
+    (swap! entities assoc-in [id-key id] entity))
+  (fetch-entity [this id-key id]
+    (future (get-in @entities [id-key id])))
+  (exists-entity? [this id-key id]
+    (some? (get-in @entities [id-key id]))))
 
 
 (defn mock-entity-store []

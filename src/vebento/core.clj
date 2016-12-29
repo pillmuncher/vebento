@@ -98,7 +98,7 @@
 (defn fail-if-exists
   [id-key id]
   (>>= get-entity-store
-       #(mwhen (exists-entity? % id)
+       #(mwhen (exists-entity? % id-key id)
                (fail-with ::entity/already-exists
                           ::entity/id-key id-key
                           ::entity/id id))))
@@ -106,7 +106,7 @@
 (defn fail-unless-exists
   [id-key id]
   (>>= get-entity-store
-       #(mwhen (not (exists-entity? % id))
+       #(mwhen (not (exists-entity? % id-key id))
                (fail-with ::entity/not-found
                           ::entity/id-key id-key
                           ::entity/id id))))
@@ -128,4 +128,4 @@
   (mdo
     (fail-unless-exists id-key id)
     entity-store <- get-entity-store
-    (return (fetch-entity entity-store id))))
+    (return (fetch-entity entity-store id-key id))))
