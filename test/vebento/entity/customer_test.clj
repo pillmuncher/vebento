@@ -142,7 +142,7 @@
    customer-address ::customer/address
    merchant-id ::merchant/id
    merchant-address ::merchant/address
-   payment-method ::customer/payment-method]
+   payment-method ::order/payment-method]
   :using (test-bench)
   :given [(command
             ::merchant/register
