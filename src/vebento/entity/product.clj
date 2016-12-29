@@ -24,7 +24,7 @@
 
 (ns-alias 'specs 'vebento.specs)
 (ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'retailer 'vebento.entity.retailer)
+(ns-alias 'merchant 'vebento.entity.merchant)
 (ns-alias 'order 'vebento.entity.order)
 
 

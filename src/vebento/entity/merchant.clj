@@ -1,4 +1,4 @@
-(ns vebento.entity.retailer
+(ns vebento.entity.merchant
   (:require [clojure.future
              :refer :all]
             [clojure.set
@@ -85,6 +85,11 @@
         ::payment-method])
 
 
+(def-failure ::does-not-support-payment-method
+  :req [::id
+        ::payment-method])
+
+
 (def-entity ::entity
   :req [::address
         ::areas
@@ -97,9 +102,9 @@
 
 (defmethod transform
   [nil ::registered]
-  [_   {retailer-id ::id address ::address}]
+  [_   {merchant-id ::id address ::address}]
   (create ::entity
-          ::entity/id retailer-id
+          ::entity/id merchant-id
           ::address address
           ::areas #{}
           ::products #{}
@@ -110,33 +115,33 @@
 
 (defmethod transform
   [::entity ::area-added]
-  [retailer {zipcode ::zipcode}]
-  (update retailer ::areas conj zipcode))
+  [merchant {zipcode ::zipcode}]
+  (update merchant ::areas conj zipcode))
 
 (defmethod transform
   [::entity ::product-added]
-  [retailer {product-id ::product/id}]
-  (update retailer ::products conj product-id))
+  [merchant {product-id ::product/id}]
+  (update merchant ::products conj product-id))
 
 (defmethod transform
   [::entity ::schedule-added]
-  [retailer {schedule ::schedule}]
-  (update retailer ::schedule union schedule))
+  [merchant {schedule ::schedule}]
+  (update merchant ::schedule union schedule))
 
 (defmethod transform
   [::entity ::payment-method-added]
-  [retailer {payment-method ::payment-method}]
-  (update retailer ::payment-methods conj payment-method))
+  [merchant {payment-method ::payment-method}]
+  (update merchant ::payment-methods conj payment-method))
 
 (defmethod transform
-  [::entity ::customer/retailer-selected]
-  [retailer {customer-id ::customer/id}]
-  (update retailer ::customers conj customer-id))
+  [::entity ::customer/merchant-selected]
+  [merchant {customer-id ::customer/id}]
+  (update merchant ::customers conj customer-id))
 
 (defmethod transform
   [::entity ::order/placed]
-  [retailer {order-id ::order/id}]
-  (update retailer ::customer/pending-orders conj order-id))
+  [merchant {order-id ::order/id}]
+  (update merchant ::customer/pending-orders conj order-id))
 
 
 (defrecord Component
@@ -170,51 +175,51 @@
         [::event/type ::payment-method-added
          (upgrade-entity entity-store ::id)]
 
-        [::event/type ::customer/retailer-selected
+        [::event/type ::customer/merchant-selected
          (upgrade-entity entity-store ::id)]
 
         [::event/type ::order/placed
          (upgrade-entity entity-store ::id)]
 
         [::event/type ::register
-         (fn [{retailer-id ::id address ::address}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-if-exists ::id retailer-id)
+         (fn [{merchant-id ::id address ::address}]
+           (within (aggregate this [::account] merchant-id)
+             (fail-if-exists ::id merchant-id)
              (publish ::registered
-                      ::id retailer-id
+                      ::id merchant-id
                       ::address address)))]
 
         [::event/type ::add-area
-         (fn [{retailer-id ::id zipcode ::zipcode}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
+         (fn [{merchant-id ::id zipcode ::zipcode}]
+           (within (aggregate this [::account] merchant-id)
+             (fail-unless-exists ::id merchant-id)
              (publish ::area-added
-                      ::id retailer-id
+                      ::id merchant-id
                       ::zipcode zipcode)))]
 
         [::event/type ::add-product
-         (fn [{retailer-id ::id product-id ::product/id}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
+         (fn [{merchant-id ::id product-id ::product/id}]
+           (within (aggregate this [::account] merchant-id)
+             (fail-unless-exists ::id merchant-id)
              (fail-unless-exists ::product/id product-id)
              (publish ::product-added
-                      ::id retailer-id
+                      ::id merchant-id
                       ::product/id product-id)))]
 
         [::event/type ::add-schedule
-         (fn [{retailer-id ::id schedule ::schedule}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
+         (fn [{merchant-id ::id schedule ::schedule}]
+           (within (aggregate this [::account] merchant-id)
+             (fail-unless-exists ::id merchant-id)
              (publish ::schedule-added
-                      ::id retailer-id
+                      ::id merchant-id
                       ::schedule schedule)))]
 
         [::event/type ::add-payment-method
-         (fn [{retailer-id ::id payment-method ::payment-method}]
-           (within (aggregate this [::account] retailer-id)
-             (fail-unless-exists ::id retailer-id)
+         (fn [{merchant-id ::id payment-method ::payment-method}]
+           (within (aggregate this [::account] merchant-id)
+             (fail-unless-exists ::id merchant-id)
              (publish ::payment-method-added
-                      ::id retailer-id
+                      ::id merchant-id
                       ::payment-method payment-method)))])))
 
   (stop [this]

@@ -13,7 +13,7 @@
 (ns-alias 'event 'juncture.event)
 
 (ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'retailer 'vebento.entity.retailer)
+(ns-alias 'merchant 'vebento.entity.merchant)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
 
@@ -58,11 +58,11 @@
                   assoc-in [:customer ::customer/address]
                   address))]
 
-        [::event/type ::customer/retailer-selected
-         (fn [{retailer-id ::retailer/id}]
+        [::event/type ::customer/merchant-selected
+         (fn [{merchant-id ::merchant/id}]
            (swap! root
-                  assoc-in [:customer ::retailer/id]
-                  retailer-id))]
+                  assoc-in [:customer ::merchant/id]
+                  merchant-id))]
 
         [::event/type ::customer/schedule-selected
          (fn [{schedule ::customer/schedule}]
@@ -96,7 +96,7 @@
                   dissoc product-id))]
 
         [::event/type ::order/placed
-         (fn [{retailer-id ::retailer/id
+         (fn [{merchant-id ::merchant/id
                order-id ::order/id
                items ::order/items
                address ::order/address
@@ -124,16 +124,16 @@
         [::event/type ::customer/has-selected-no-payment-method
          (fn [_])]
 
-        [::event/type ::customer/schedule-not-in-retailer-schedule
+        [::event/type ::customer/schedule-not-in-merchant-schedule
          (fn [_])]
 
-        [::event/type ::customer/zipcode-not-in-retailer-areas
+        [::event/type ::customer/zipcode-not-in-merchant-areas
          (fn [_])]
 
-        [::event/type ::customer/payment-method-not-supported-by-retailer
+        [::event/type ::merchant/does-not-support-payment-method
          (fn [_])]
 
-        [::event/type ::product/not-in-retailer-assortment
+        [::event/type ::product/not-in-merchant-assortment
          (fn [_])]
 
         [::event/type ::product/not-in-cart

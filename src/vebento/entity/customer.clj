@@ -31,7 +31,7 @@
 (ns-alias 'specs 'vebento.specs)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
-(ns-alias 'retailer 'vebento.entity.retailer)
+(ns-alias 'merchant 'vebento.entity.merchant)
 
 
 (s/def ::id ::specs/id)
@@ -45,16 +45,16 @@
 (def-command ::register
   :req [::id]
   :opt [::address
-        ::retailer/id
+        ::merchant/id
         ::payment-method])
 
 (def-command ::change-address
   :req [::id
         ::address])
 
-(def-command ::select-retailer
+(def-command ::select-merchant
   :req [::id
-        ::retailer/id])
+        ::merchant/id])
 
 (def-command ::add-schedule
   :req [::id
@@ -88,9 +88,9 @@
   :req [::id
         ::address])
 
-(def-message ::retailer-selected
+(def-message ::merchant-selected
   :req [::id
-        ::retailer/id])
+        ::merchant/id])
 
 (def-message ::schedule-selected
   :req [::id
@@ -119,7 +119,7 @@
 (def-failure ::has-given-no-address
   :req [::id])
 
-(def-failure ::has-selected-no-retailer
+(def-failure ::has-selected-no-merchant
   :req [::id])
 
 (def-failure ::has-selected-no-schedule
@@ -128,19 +128,15 @@
 (def-failure ::has-selected-no-payment-method
   :req [::id])
 
-(def-failure ::zipcode-not-in-retailer-areas
+(def-failure ::zipcode-not-in-merchant-areas
   :req [::id
         ::zipcode])
 
-(def-failure ::schedule-not-in-retailer-schedule
+(def-failure ::schedule-not-in-merchant-schedule
   :req [::id
         ::schedule])
 
-(def-failure ::payment-method-not-supported-by-retailer
-  :req [::id
-        ::payment-method])
-
-(def-failure ::product-not-in-retailer-assortment
+(def-failure ::product-not-in-merchant-assortment
   :req [::id
         ::product/id])
 
@@ -154,7 +150,7 @@
         ::schedule
         ::pending-orders]
   :opt [::address
-        ::retailer/id
+        ::merchant/id
         ::payment-method])
 
 
@@ -173,9 +169,9 @@
   (assoc customer ::address address))
 
 (defmethod transform
-  [::entity ::retailer-selected]
-  [customer {retailer-id ::retailer/id}]
-  (assoc customer ::retailer/id retailer-id))
+  [::entity ::merchant-selected]
+  [customer {merchant-id ::merchant/id}]
+  (assoc customer ::merchant/id merchant-id))
 
 (defmethod transform
   [::entity ::schedule-selected]
@@ -232,7 +228,7 @@
         [::event/type ::address-changed
          (upgrade-entity entity-store ::id)]
 
-        [::event/type ::retailer-selected
+        [::event/type ::merchant-selected
          (upgrade-entity entity-store ::id)]
 
         [::event/type ::schedule-selected
@@ -256,7 +252,7 @@
         [::event/type ::register
          (fn [{customer-id ::id
                address ::address
-               retailer-id ::retailer/id
+               merchant-id ::merchant/id
                payment-method ::payment-method}]
            (within (aggregate this [::account] customer-id)
              (fail-if-exists ::id customer-id)
@@ -267,10 +263,10 @@
                     (execute ::change-address
                              ::id customer-id
                              ::address address))
-             (mwhen (some? retailer-id)
-                    (execute ::select-retailer
+             (mwhen (some? merchant-id)
+                    (execute ::select-merchant
                              ::id customer-id
-                             ::retailer/id retailer-id))
+                             ::merchant/id merchant-id))
              (mwhen (some? payment-method)
                     (execute ::select-payment-method
                              ::id customer-id
@@ -285,35 +281,35 @@
                       ::id customer-id
                       ::address address)))]
 
-        [::event/type ::select-retailer
+        [::event/type ::select-merchant
          (fn [{customer-id ::id
-               retailer-id ::retailer/id}]
+               merchant-id ::merchant/id}]
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
              (mwhen (-> @customer ::address nil?)
                     (fail-with ::has-given-no-address
                                ::id customer-id))
-             retailer <- (get-entity ::retailer/id retailer-id)
+             merchant <- (get-entity ::merchant/id merchant-id)
              (mwhen (->> @customer ::address ::specs/zipcode
-                         (not-in? (@retailer ::retailer/areas)))
-                    (fail-with ::zipcode-not-in-retailer-areas
+                         (not-in? (@merchant ::merchant/areas)))
+                    (fail-with ::zipcode-not-in-merchant-areas
                                ::id customer-id
                                ::zipcode (-> @customer
                                              ::address
                                              ::specs/zipcode)))
-             (publish ::retailer-selected
+             (publish ::merchant-selected
                       ::id customer-id
-                      ::retailer/id retailer-id)))]
+                      ::merchant/id merchant-id)))]
 
         [::event/type ::add-schedule
          (fn [{customer-id ::id
                schedule ::schedule}]
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
-             retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
+             merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
              (mwhen (empty? (intersection schedule
-                                          (@retailer ::retailer/schedule)))
-                    (fail-with ::schedule-not-in-retailer-schedule
+                                          (@merchant ::merchant/schedule)))
+                    (fail-with ::schedule-not-in-merchant-schedule
                                ::id customer-id
                                ::schedule schedule))
              (publish ::schedule-selected
@@ -325,10 +321,10 @@
                payment-method ::payment-method}]
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
-             retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
+             merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
              (mwhen (->> payment-method
-                         (not-in? (@retailer ::retailer/payment-methods)))
-                    (fail-with ::payment-method-not-supported-by-retailer
+                         (not-in? (@merchant ::merchant/payment-methods)))
+                    (fail-with ::does-not-support-payment-method
                                ::id customer-id
                                ::payment-method payment-method))
              (publish ::payment-method-selected
@@ -341,10 +337,10 @@
                amount ::product/amount}]
            (within (aggregate this [::shopping] customer-id)
              customer <- (get-entity ::id customer-id)
-             retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
+             merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
              (mwhen (->> product-id
-                         (not-in? (@retailer ::retailer/products)))
-                    (fail-with ::product-not-in-retailer-assortment
+                         (not-in? (@merchant ::merchant/products)))
+                    (fail-with ::product-not-in-merchant-assortment
                                ::id customer-id
                                ::product/id product-id))
              (publish ::item-added-to-cart
@@ -376,8 +372,8 @@
                (mwhen (-> @customer ::cart empty?)
                       (fail-with ::cart-is-empty
                                  ::id customer-id))
-               (mwhen (-> @customer ::retailer/id nil?)
-                      (fail-with ::has-selected-no-retailer
+               (mwhen (-> @customer ::merchant/id nil?)
+                      (fail-with ::has-selected-no-merchant
                                  ::id customer-id))
                (mwhen (-> @customer ::address nil?)
                       (fail-with ::has-given-no-address
@@ -388,35 +384,35 @@
                (mwhen (-> @customer ::payment-method nil?)
                       (fail-with ::has-selected-no-payment-method
                                  ::id customer-id)))
-             retailer <- (get-entity ::retailer/id (@customer ::retailer/id))
+             merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
              (mdo-await*
                (mwhen (empty? (intersection (@customer ::schedule)
-                                            (@retailer ::retailer/schedule)))
-                      (fail-with ::schedule-not-in-retailer-schedule
+                                            (@merchant ::merchant/schedule)))
+                      (fail-with ::schedule-not-in-merchant-schedule
                                  ::id customer-id
                                  ::schedule (@customer ::schedule)))
                (mwhen (->> @customer ::payment-method
-                           (not-in? (@retailer ::retailer/payment-methods)))
-                      (fail-with ::payment-method-not-supported-by-retailer
+                           (not-in? (@merchant ::merchant/payment-methods)))
+                      (fail-with ::merchant/does-not-support-payment-method
                                  ::id customer-id
                                  ::payment-method (@customer ::payment-method)))
                (mwhen (->> @customer ::address ::specs/zipcode
-                           (not-in? (@retailer ::retailer/areas)))
-                      (fail-with ::zipcode-not-in-retailer-areas
+                           (not-in? (@merchant ::merchant/areas)))
+                      (fail-with ::zipcode-not-in-merchant-areas
                                  ::id customer-id
                                  ::specs/zipcode (-> @customer
                                                      ::address
                                                      ::specs/zipcode))))
              (publish ::order/placed
                       ::id customer-id
-                      ::retailer/id (@customer ::retailer/id)
+                      ::merchant/id (@customer ::merchant/id)
                       ::order/id order-id
                       ::order/items (@customer ::cart)
                       ::order/address (@customer ::address)
                       ::order/payment-method (@customer ::payment-method)
                       ::order/schedule (intersection
                                          (@customer ::schedule)
-                                         (@retailer ::retailer/schedule)))
+                                         (@merchant ::merchant/schedule)))
              (publish ::cart-cleared
                       ::id customer-id)))]
 

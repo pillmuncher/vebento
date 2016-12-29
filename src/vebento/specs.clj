@@ -13,7 +13,7 @@
 (ns-alias 'entity 'juncture.entity)
 
 (ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'retailer 'vebento.entity.retailer)
+(ns-alias 'merchant 'vebento.entity.merchant)
 (ns-alias 'order 'vebento.entity.order)
 (ns-alias 'product 'vebento.entity.product)
 

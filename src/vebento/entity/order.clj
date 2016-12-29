@@ -25,7 +25,7 @@
 (ns-alias 'specs 'vebento.specs)
 (ns-alias 'customer 'vebento.entity.customer)
 (ns-alias 'product 'vebento.entity.product)
-(ns-alias 'retailer 'vebento.entity.retailer)
+(ns-alias 'merchant 'vebento.entity.merchant)
 
 
 (s/def ::id ::specs/id)
@@ -40,7 +40,7 @@
 (def-message ::placed
   :req [::id
         ::customer/id
-        ::retailer/id
+        ::merchant/id
         ::items
         ::address
         ::schedule
@@ -49,7 +49,7 @@
 
 (def-entity ::entity
   :req [::customer/id
-        ::retailer/id
+        ::merchant/id
         ::items
         ::address
         ::schedule
@@ -61,7 +61,7 @@
 (defmethod transform
   [nil ::placed]
   [_ {order-id ::id
-      retailer-id ::retailer/id
+      merchant-id ::merchant/id
       customer-id ::customer/id
       items ::items
       address ::address
@@ -69,7 +69,7 @@
       payment-method ::payment-method}]
   (create ::entity
           ::entity/id order-id
-          ::retailer/id retailer-id
+          ::merchant/id merchant-id
           ::customer/id customer-id
           ::items items
           ::address address

@@ -14,7 +14,7 @@
              :as product]
             [vebento.entity.order
              :as order]
-            [vebento.entity.retailer
-             :as retailer]
+            [vebento.entity.merchant
+             :as merchant]
             [vebento.entity.customer
              :as customer]))

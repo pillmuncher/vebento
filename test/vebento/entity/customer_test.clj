@@ -28,8 +28,8 @@
              :as product]
             [vebento.entity.order
              :as order]
-            [vebento.entity.retailer
-             :as retailer]
+            [vebento.entity.merchant
+             :as merchant]
             [vebento.entity.customer
              :as customer]))
 
@@ -46,15 +46,15 @@
         (mock-journal)
         :customer
         (customer/->Component nil nil nil nil nil)
-        :retailer
-        (retailer/->Component nil nil nil nil nil)
+        :merchant
+        (merchant/->Component nil nil nil nil nil)
         :product
         (product/->Component nil nil nil nil nil)
         :order
         (order/->Component nil nil nil nil nil))
       (co/system-using
         {:customer [:aggregates :dispatcher :journal :entity-store]
-         :retailer [:aggregates :dispatcher :journal :entity-store]
+         :merchant [:aggregates :dispatcher :journal :entity-store]
          :order [:aggregates :dispatcher :journal :entity-store]
          :product [:aggregates :dispatcher :journal :entity-store]
          :dispatcher [:journal]})
@@ -131,103 +131,103 @@
             ::entity/id customer-id)])
 
 
-(def-scenario customer-selects-retailer
+(def-scenario customer-selects-merchant
   [customer-id ::customer/id
-   retailer-id ::retailer/id
+   merchant-id ::merchant/id
    customer-address ::customer/address
-   retailer-address ::retailer/address]
+   merchant-address ::merchant/address]
   :using (test-bench)
   :given [(command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
   :after [(command
-            ::customer/select-retailer
+            ::customer/select-merchant
             ::customer/id customer-id
-            ::retailer/id retailer-id)]
+            ::merchant/id merchant-id)]
   :raise [(message
-            ::customer/retailer-selected
+            ::customer/merchant-selected
             ::customer/id customer-id
-            ::retailer/id retailer-id)])
+            ::merchant/id merchant-id)])
 
 
-(def-scenario only-an-existing-customer-can-select-retailer
+(def-scenario only-an-existing-customer-can-select-merchant
   [customer-id ::customer/id
-   retailer-id ::retailer/id]
+   merchant-id ::merchant/id]
   :using (test-bench)
   :after [(command
-            ::customer/select-retailer
+            ::customer/select-merchant
             ::customer/id customer-id
-            ::retailer/id retailer-id)]
+            ::merchant/id merchant-id)]
   :raise [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
 
 
-(def-scenario customer-cannot-select-retailer-unless-customer-address-was-given
+(def-scenario customer-cannot-select-merchant-unless-customer-address-was-given
   [customer-id ::customer/id
-   retailer-id ::retailer/id
+   merchant-id ::merchant/id
    customer-address ::customer/address
-   retailer-address ::retailer/address]
+   merchant-address ::merchant/address]
   :using (test-bench)
   :given [(command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
             ::customer/register
             ::customer/id customer-id)]
   :after [(command
-            ::customer/select-retailer
+            ::customer/select-merchant
             ::customer/id customer-id
-            ::retailer/id retailer-id)]
+            ::merchant/id merchant-id)]
   :raise [(failure
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
 
-(def-scenario customer-can-only-select-retailer-who-delivers-in-customer-area
+(def-scenario customer-can-only-select-merchant-who-delivers-in-customer-area
   [customer-id ::customer/id
-   retailer-id ::retailer/id
+   merchant-id ::merchant/id
    customer-address ::customer/address
-   retailer-address ::retailer/address]
+   merchant-address ::merchant/address]
   :using (test-bench)
   :given [(command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
   :after [(command
-            ::customer/select-retailer
+            ::customer/select-merchant
             ::customer/id customer-id
-            ::retailer/id retailer-id)]
+            ::merchant/id merchant-id)]
   :raise [(failure
-            ::customer/zipcode-not-in-retailer-areas
+            ::customer/zipcode-not-in-merchant-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])
 
 
 (def-scenario customer-adds-item-to-cart
   [customer-id ::customer/id
-   retailer-id ::retailer/id
+   merchant-id ::merchant/id
    customer-address ::customer/address
-   retailer-address ::retailer/address
+   merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount]
@@ -237,22 +237,22 @@
             ::product/id product-id
             ::product/name product-name)
           (command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-product
-            ::retailer/id retailer-id
+            ::merchant/add-product
+            ::merchant/id merchant-id
             ::product/id product-id)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::retailer/id retailer-id)]
+            ::merchant/id merchant-id)]
   :after [(command
             ::customer/add-item-to-cart
             ::customer/id customer-id
@@ -265,11 +265,11 @@
             ::product/amount amount)])
 
 
-(def-scenario customer-can-only-add-product-to-cart-if-retailer-sells-it
+(def-scenario customer-can-only-add-product-to-cart-if-merchant-sells-it
   [customer-id ::customer/id
-   retailer-id ::retailer/id
+   merchant-id ::merchant/id
    customer-address ::customer/address
-   retailer-address ::retailer/address
+   merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount]
@@ -279,25 +279,25 @@
             ::product/id product-id
             ::product/name product-name)
           (command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::retailer/id retailer-id)]
+            ::merchant/id merchant-id)]
   :after [(command
             ::customer/add-item-to-cart
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
   :raise [(failure
-            ::customer/product-not-in-retailer-assortment
+            ::customer/product-not-in-merchant-assortment
             ::customer/id customer-id
             ::product/id product-id)])
 
@@ -305,8 +305,8 @@
 (def-scenario customer-places-order
   [customer-id ::customer/id
    customer-address ::customer/address
-   retailer-id ::retailer/id
-   retailer-address ::retailer/address
+   merchant-id ::merchant/id
+   merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount
@@ -319,30 +319,30 @@
             ::product/id product-id
             ::product/name product-name)
           (command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-product
-            ::retailer/id retailer-id
+            ::merchant/add-product
+            ::merchant/id merchant-id
             ::product/id product-id)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
-            ::retailer/add-schedule
-            ::retailer/id retailer-id
-            ::retailer/schedule schedule)
+            ::merchant/add-schedule
+            ::merchant/id merchant-id
+            ::merchant/schedule schedule)
           (command
-            ::retailer/add-payment-method
-            ::retailer/id retailer-id
-            ::retailer/payment-method payment-method)
+            ::merchant/add-payment-method
+            ::merchant/id merchant-id
+            ::merchant/payment-method payment-method)
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::retailer/id retailer-id)
+            ::merchant/id merchant-id)
           (command
             ::customer/add-schedule
             ::customer/id customer-id
@@ -364,7 +364,7 @@
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
-            ::retailer/id retailer-id
+            ::merchant/id merchant-id
             ::order/items {product-id amount}
             ::order/address customer-address
             ::order/schedule schedule
@@ -377,8 +377,8 @@
 (def-scenario customer-cannot-place-order-when-cart-is-empty
   [customer-id ::customer/id
    customer-address ::customer/address
-   retailer-id ::retailer/id
-   retailer-address ::retailer/address
+   merchant-id ::merchant/id
+   merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount
@@ -391,30 +391,30 @@
             ::product/id product-id
             ::product/name product-name)
           (command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-product
-            ::retailer/id retailer-id
+            ::merchant/add-product
+            ::merchant/id merchant-id
             ::product/id product-id)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
-            ::retailer/add-schedule
-            ::retailer/id retailer-id
-            ::retailer/schedule schedule)
+            ::merchant/add-schedule
+            ::merchant/id merchant-id
+            ::merchant/schedule schedule)
           (command
-            ::retailer/add-payment-method
-            ::retailer/id retailer-id
-            ::retailer/payment-method payment-method)
+            ::merchant/add-payment-method
+            ::merchant/id merchant-id
+            ::merchant/payment-method payment-method)
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::retailer/id retailer-id)
+            ::merchant/id merchant-id)
           (command
             ::customer/add-schedule
             ::customer/id customer-id
@@ -435,8 +435,8 @@
 (def-scenario customer-cannot-place-order-unless-schedule-was-selected
   [customer-id ::customer/id
    customer-address ::customer/address
-   retailer-id ::retailer/id
-   retailer-address ::retailer/address
+   merchant-id ::merchant/id
+   merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount
@@ -449,30 +449,30 @@
             ::product/id product-id
             ::product/name product-name)
           (command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-product
-            ::retailer/id retailer-id
+            ::merchant/add-product
+            ::merchant/id merchant-id
             ::product/id product-id)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
-            ::retailer/add-schedule
-            ::retailer/id retailer-id
-            ::retailer/schedule schedule)
+            ::merchant/add-schedule
+            ::merchant/id merchant-id
+            ::merchant/schedule schedule)
           (command
-            ::retailer/add-payment-method
-            ::retailer/id retailer-id
-            ::retailer/payment-method payment-method)
+            ::merchant/add-payment-method
+            ::merchant/id merchant-id
+            ::merchant/payment-method payment-method)
           (command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::retailer/id retailer-id)
+            ::merchant/id merchant-id)
           (command
             ::customer/select-payment-method
             ::customer/id customer-id
@@ -494,8 +494,8 @@
 (def-scenario customer-cannot-place-order
   [customer-id ::customer/id
    customer-address ::customer/address
-   retailer-id ::retailer/id
-   retailer-address ::retailer/address
+   merchant-id ::merchant/id
+   merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount
@@ -508,25 +508,25 @@
             ::product/id product-id
             ::product/name product-name)
           (command
-            ::retailer/register
-            ::retailer/id retailer-id
-            ::retailer/address retailer-address)
+            ::merchant/register
+            ::merchant/id merchant-id
+            ::merchant/address merchant-address)
           (command
-            ::retailer/add-product
-            ::retailer/id retailer-id
+            ::merchant/add-product
+            ::merchant/id merchant-id
             ::product/id product-id)
           (command
-            ::retailer/add-area
-            ::retailer/id retailer-id
-            ::retailer/zipcode (::specs/zipcode customer-address))
+            ::merchant/add-area
+            ::merchant/id merchant-id
+            ::merchant/zipcode (::specs/zipcode customer-address))
           (command
-            ::retailer/add-schedule
-            ::retailer/id retailer-id
-            ::retailer/schedule schedule)
+            ::merchant/add-schedule
+            ::merchant/id merchant-id
+            ::merchant/schedule schedule)
           (command
-            ::retailer/add-payment-method
-            ::retailer/id retailer-id
-            ::retailer/payment-method payment-method)
+            ::merchant/add-payment-method
+            ::merchant/id merchant-id
+            ::merchant/payment-method payment-method)
           (command
             ::customer/register
             ::customer/id customer-id)]
@@ -544,7 +544,7 @@
             ::customer/has-selected-no-payment-method
             ::customer/id customer-id)
           (failure
-            ::customer/has-selected-no-retailer
+            ::customer/has-selected-no-merchant
             ::customer/id customer-id)
           (failure
             ::customer/has-selected-no-schedule
