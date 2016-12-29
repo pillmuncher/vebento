@@ -76,17 +76,17 @@
                    ::version 0)))
 
 
-(defn- transformer
+(defn- dispatch-transformer
   [entity evt]
   [(::type entity) (::event/type evt)])
 
-(s/fdef transformer
+(s/fdef dispatch-transformer
         :args (s/cat :entity (s/nilable ::entity)
                      :event ::event/spec))
 
-(s-test/instrument `transformer)
+(s-test/instrument `dispatch-transformer)
 
-(defmulti transform transformer)
+(defmulti transform dispatch-transformer)
 
 (defmethod transform
   :default
