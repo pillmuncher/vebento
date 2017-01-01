@@ -109,16 +109,24 @@
           #(map-m deref %))))
 
 
-(defmacro f-munless
-  [& {:as expression-action-pairs}]
-  (let [qs (for [[e a] expression-action-pairs]
-             `(mdo-future (if ~e (return nil) ~a)))]
-    `(>>= (sequence-m [~@qs])
-          #(map-m deref %))))
+(defmacro munless
+  "Execute the computation acc if p is falsy."
+  [p acc]
+  `(if ~p
+     ~(return nil)
+     ~acc))
+
 
 (defmacro f-mwhen
   [& {:as expression-action-pairs}]
   (let [qs (for [[e a] expression-action-pairs]
-             `(mdo-future (if ~e ~a (return nil))))]
+             `(mdo-future (mwhen ~e ~a)))]
+    `(>>= (sequence-m [~@qs])
+          #(map-m deref %))))
+
+(defmacro f-munless
+  [& {:as expression-action-pairs}]
+  (let [qs (for [[e a] expression-action-pairs]
+             `(mdo-future (munless ~e ~a)))]
     `(>>= (sequence-m [~@qs])
           #(map-m deref %))))
