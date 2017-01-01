@@ -100,7 +100,7 @@
   (exists-entity? [this id-key id]))
 
 
-(defn update-entity
+(defn transform-in
   [entity-store id-key]
   (fn [event]
     (let [entity (fetch-entity entity-store id-key (id-key event))]

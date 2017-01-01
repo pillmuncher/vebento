@@ -24,7 +24,7 @@
              :refer [within mdo-await*]]
             [vebento.core
              :refer [aggregate publish execute fail-with fail-if-exists
-                     fail-unless-exists update-entity get-entity]]))
+                     fail-unless-exists transform-in get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -222,31 +222,31 @@
         dispatcher
 
         [::event/type ::registered
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::address-changed
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::merchant-selected
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::schedule-selected
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::payment-method-selected
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::item-added-to-cart
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::item-removed-from-cart
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::cart-cleared
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::order/placed
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::register
          (fn [{customer-id ::id

@@ -18,7 +18,7 @@
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with fail-if-exists
-                     fail-unless-exists update-entity get-entity]]))
+                     fail-unless-exists transform-in get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -93,7 +93,7 @@
       (subscribe*
         dispatcher
         [::event/type ::placed
-         (update-entity entity-store ::id)])))
+         (transform-in entity-store ::id)])))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)

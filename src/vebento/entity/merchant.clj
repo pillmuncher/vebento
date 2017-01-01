@@ -20,7 +20,7 @@
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with fail-if-exists
-                     fail-unless-exists update-entity get-entity]]))
+                     fail-unless-exists transform-in get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -160,25 +160,25 @@
         dispatcher
 
         [::event/type ::registered
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::area-added
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::product-added
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::schedule-added
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::payment-method-added
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::customer/merchant-selected
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::order/placed
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::register
          (fn [{merchant-id ::id address ::address}]

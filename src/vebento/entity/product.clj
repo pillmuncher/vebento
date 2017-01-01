@@ -18,7 +18,7 @@
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with fail-if-exists
-                     fail-unless-exists update-entity get-entity]]))
+                     fail-unless-exists transform-in get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -71,7 +71,7 @@
         dispatcher
 
         [::event/type ::created
-         (update-entity entity-store ::id)]
+         (transform-in entity-store ::id)]
 
         [::event/type ::create
          (fn [{product-id ::id name ::name}]
