@@ -94,16 +94,14 @@
   entity)
 
 
-(defn attach-event-id
+(defn- run-and-attach-event-id
   [fun]
   (fn [entity event]
-    (-> entity
-        (fun event)
-        (assoc ::event/id (::event/id event)))))
+    (assoc (fun entity event) ::event/id (::event/id event))))
 
 (defn projection
   ([fun]
    (projection fun nil))
   ([fun start]
    (fn [events]
-     (reduce (attach-event-id fun) start events))))
+     (reduce (run-and-attach-event-id fun) start events))))
