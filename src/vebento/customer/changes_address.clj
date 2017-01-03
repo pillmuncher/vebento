@@ -47,8 +47,8 @@
    [::event/type ::customer/change-address
     (fn [{customer-id ::customer/id
           address ::customer/address}]
-      (within
-        (aggregate component [::customer/account ::customer/shopping] customer-id)
+      (within (aggregate component
+                         [::customer/account ::customer/shopping] customer-id)
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/address-changed
                  ::customer/id customer-id
