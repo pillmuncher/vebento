@@ -121,7 +121,7 @@
   (mdo
     (map-m raise events)
     (>>= (get-events)
-         #(strip-canonicals @%))))
+         #(return @%))))
 
 
 (defn scenario
@@ -130,8 +130,9 @@
     given-events <- (raise-events given)
     after-events <- (raise-events after)
     raise-events <- (>>= (return* raise) strip-canonicals)
-    (return [(set raise-events) (difference (set after-events)
-                                            (set given-events))])))
+    clean-events <- (strip-canonicals (difference (set after-events)
+                                                  (set given-events)))
+    (return [(set raise-events) (set clean-events)])))
 
 
 (defn test-fn-params

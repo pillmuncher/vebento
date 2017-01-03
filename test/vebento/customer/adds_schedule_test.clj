@@ -43,7 +43,11 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::merchant/id merchant-id)]
+            ::merchant/id merchant-id)
+          (command
+            ::customer/add-schedule
+            ::customer/id customer-id
+            ::customer/schedule schedule)]
   :after [(command
             ::customer/add-schedule
             ::customer/id customer-id
