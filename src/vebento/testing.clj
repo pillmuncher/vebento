@@ -129,10 +129,10 @@
   (within (componad using)
     given-events <- (raise-events given)
     after-events <- (raise-events after)
-    raise-events <- (>>= (return* raise) strip-canonicals)
-    clean-events <- (strip-canonicals (difference (set after-events)
-                                                  (set given-events)))
-    (return [(set raise-events) (set clean-events)])))
+    expected <- (>>= (return* raise) strip-canonicals)
+    received <- (strip-canonicals (difference (set after-events)
+                                              (set given-events)))
+    (return [(set expected) (set received)])))
 
 
 (defn test-fn-params
