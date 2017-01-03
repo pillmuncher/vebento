@@ -1,8 +1,6 @@
-(ns vebento.entity.merchant
+(ns vebento.merchant
   (:require [clojure.future
              :refer :all]
-            [clojure.set
-             :refer [union]]
             [clojure.spec
              :as s]
             [com.stuartsierra.component
@@ -11,22 +9,27 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure def-event
-                     subscribe* unsubscribe*]]
+             :refer [subscribe* unsubscribe*]]
             [juncture.entity
-             :as entity
-             :refer [register unregister def-entity create transform]]
-            [componad
-             :refer [within]]
+             :refer [register unregister def-entity transform]]
             [vebento.core
-             :refer [aggregate publish execute fail-with fail-if-exists
-                     fail-unless-exists transform-in get-entity]]))
+             :refer [transform-in]]
+            [vebento.specs
+             :as specs]
+            [vebento.merchant.registers
+             :as registers]
+            [vebento.merchant.adds-area
+             :as adds-area]
+            [vebento.merchant.adds-product
+             :as adds-product]
+            [vebento.merchant.adds-schedule
+             :as adds-schedule]
+            [vebento.merchant.adds-payment-method
+             :as adds-payment-method]))
 
 
-(ns-alias 'specs 'vebento.specs)
-(ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'order 'vebento.entity.order)
-(ns-alias 'product 'vebento.entity.product)
+(ns-alias 'customer 'vebento.customer)
+(ns-alias 'order 'vebento.order)
 
 
 (s/def ::id ::specs/id)
@@ -42,53 +45,6 @@
 (s/def ::schedule-is-recurrent string?)
 
 
-(def-command ::register
-  :req [::id
-        ::address])
-
-(def-command ::add-area
-  :req [::id
-        ::zipcode])
-
-(def-command ::add-product
-  :req [::id
-        ::product/id])
-
-(def-command ::add-schedule
-  :req [::id
-        ::schedule])
-
-(def-command ::add-payment-method
-  :req [::id
-        ::payment-method])
-
-
-(def-message ::registered
-  :req [::id
-        ::address])
-
-(def-message ::area-added
-  :req [::id
-        ::zipcode])
-
-(def-message ::product-added
-  :req [::id
-        ::product/id])
-
-(def-message ::schedule-added
-  :req [::id
-        ::schedule])
-
-(def-message ::payment-method-added
-  :req [::id
-        ::payment-method])
-
-
-(def-failure ::does-not-support-payment-method
-  :req [::id
-        ::payment-method])
-
-
 (def-entity ::entity
   :req [::address
         ::areas
@@ -98,39 +54,6 @@
         ::customers
         ::pending-orders])
 
-
-(defmethod transform
-  [nil ::registered]
-  [_   {merchant-id ::id address ::address}]
-  (create ::entity
-          ::entity/id merchant-id
-          ::address address
-          ::areas #{}
-          ::products #{}
-          ::schedule #{}
-          ::payment-methods #{}
-          ::customers #{}
-          ::pending-orders #{}))
-
-(defmethod transform
-  [::entity ::area-added]
-  [merchant {zipcode ::zipcode}]
-  (update merchant ::areas conj zipcode))
-
-(defmethod transform
-  [::entity ::product-added]
-  [merchant {product-id ::product/id}]
-  (update merchant ::products conj product-id))
-
-(defmethod transform
-  [::entity ::schedule-added]
-  [merchant {schedule ::schedule}]
-  (update merchant ::schedule union schedule))
-
-(defmethod transform
-  [::entity ::payment-method-added]
-  [merchant {payment-method ::payment-method}]
-  (update merchant ::payment-methods conj payment-method))
 
 (defmethod transform
   [::entity ::customer/merchant-selected]
@@ -144,84 +67,22 @@
 
 
 (defrecord Component
-
   [aggregates dispatcher journal entity-store subscriptions]
-
   co/Lifecycle
-
   (start [this]
-
     (register aggregates [::account])
-
-    (assoc
-      this :subscriptions
-      (subscribe*
-
-        dispatcher
-
-        [::event/type ::registered
-         (transform-in entity-store ::id)]
-
-        [::event/type ::area-added
-         (transform-in entity-store ::id)]
-
-        [::event/type ::product-added
-         (transform-in entity-store ::id)]
-
-        [::event/type ::schedule-added
-         (transform-in entity-store ::id)]
-
-        [::event/type ::payment-method-added
-         (transform-in entity-store ::id)]
-
-        [::event/type ::customer/merchant-selected
-         (transform-in entity-store ::id)]
-
-        [::event/type ::order/placed
-         (transform-in entity-store ::id)]
-
-        [::event/type ::register
-         (fn [{merchant-id ::id address ::address}]
-           (within (aggregate this [::account] merchant-id)
-             (fail-if-exists ::id merchant-id)
-             (publish ::registered
-                      ::id merchant-id
-                      ::address address)))]
-
-        [::event/type ::add-area
-         (fn [{merchant-id ::id zipcode ::zipcode}]
-           (within (aggregate this [::account] merchant-id)
-             (fail-unless-exists ::id merchant-id)
-             (publish ::area-added
-                      ::id merchant-id
-                      ::zipcode zipcode)))]
-
-        [::event/type ::add-product
-         (fn [{merchant-id ::id product-id ::product/id}]
-           (within (aggregate this [::account] merchant-id)
-             (fail-unless-exists ::id merchant-id)
-             (fail-unless-exists ::product/id product-id)
-             (publish ::product-added
-                      ::id merchant-id
-                      ::product/id product-id)))]
-
-        [::event/type ::add-schedule
-         (fn [{merchant-id ::id schedule ::schedule}]
-           (within (aggregate this [::account] merchant-id)
-             (fail-unless-exists ::id merchant-id)
-             (publish ::schedule-added
-                      ::id merchant-id
-                      ::schedule schedule)))]
-
-        [::event/type ::add-payment-method
-         (fn [{merchant-id ::id payment-method ::payment-method}]
-           (within (aggregate this [::account] merchant-id)
-             (fail-unless-exists ::id merchant-id)
-             (publish ::payment-method-added
-                      ::id merchant-id
-                      ::payment-method payment-method)))])))
-
+    (assoc this :subscriptions
+           (apply subscribe* dispatcher
+                  [::event/type ::customer/merchant-selected
+                   (transform-in entity-store ::id)]
+                  [::event/type ::order/placed
+                   (transform-in entity-store ::id)]
+                  (concat (registers/subscriptions this)
+                          (adds-area/subscriptions this)
+                          (adds-product/subscriptions this)
+                          (adds-schedule/subscriptions this)
+                          (adds-payment-method/subscriptions this)))))
   (stop [this]
-    (unregister aggregates [::account])
     (apply unsubscribe* dispatcher subscriptions)
+    (unregister aggregates [::account])
     (assoc this :subscriptions nil)))

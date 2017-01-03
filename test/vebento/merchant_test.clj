@@ -1,4 +1,4 @@
-(ns vebento.entity.merchant-test
+(ns vebento.merchant-test
   (:require [clojure.future
              :refer :all]
             [clojure.test

@@ -1,4 +1,4 @@
-(ns vebento.entity.product
+(ns vebento.product
   (:require [clojure.future
              :refer :all]
             [clojure.spec
@@ -18,13 +18,14 @@
              :refer [within]]
             [vebento.core
              :refer [aggregate publish execute fail-with fail-if-exists
-                     fail-unless-exists transform-in get-entity]]))
+                     fail-unless-exists transform-in get-entity]]
+            [vebento.specs
+             :as specs]))
 
 
-(ns-alias 'specs 'vebento.specs)
-(ns-alias 'customer 'vebento.entity.customer)
-(ns-alias 'merchant 'vebento.entity.merchant)
-(ns-alias 'order 'vebento.entity.order)
+(ns-alias 'customer 'vebento.customer)
+(ns-alias 'merchant 'vebento.merchant)
+(ns-alias 'order 'vebento.order)
 
 
 (s/def ::id ::specs/id)

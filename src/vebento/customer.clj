@@ -13,6 +13,8 @@
             [juncture.entity
              :as entity
              :refer [register unregister def-entity]]
+            [vebento.specs
+             :as specs]
             [vebento.customer.registers
              :as registers]
             [vebento.customer.changes-address
@@ -33,7 +35,6 @@
              :as clears-cart]))
 
 
-(ns-alias 'specs 'vebento.specs)
 (ns-alias 'merchant 'vebento.merchant)
 
 

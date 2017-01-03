@@ -1,4 +1,4 @@
-(ns vebento.entity.order-test
+(ns vebento.order-test
   (:require [clojure.future
              :refer :all]
             [clojure.test

@@ -17,6 +17,7 @@
              :refer [aggregate publish fail-with transform-in get-entity]]))
 
 
+(ns-alias 'specs 'vebento.specs)
 (ns-alias 'merchant 'vebento.merchant)
 (ns-alias 'customer 'vebento.customer)
 

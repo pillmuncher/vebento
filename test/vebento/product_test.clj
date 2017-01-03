@@ -1,4 +1,4 @@
-(ns vebento.entity.product-test
+(ns vebento.product-test
   (:require [clojure.future
              :refer :all]
             [clojure.test

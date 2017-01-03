@@ -3,6 +3,8 @@
              :refer :all]
             [clojure.test
              :refer :all]
+            [util
+             :refer [ns-alias]]
             [juncture.event
              :refer [command message failure]]
             [vebento.testing

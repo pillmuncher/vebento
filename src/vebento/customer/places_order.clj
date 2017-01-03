@@ -1,6 +1,8 @@
 (ns vebento.customer.places-order
   (:require [clojure.future
              :refer :all]
+            [clojure.set
+             :refer [intersection]]
             [monads.util
              :refer [mwhen]]
             [util
@@ -18,6 +20,7 @@
                      fail-if-exists]]))
 
 
+(ns-alias 'specs 'vebento.specs)
 (ns-alias 'order 'vebento.order)
 (ns-alias 'merchant 'vebento.merchant)
 (ns-alias 'customer 'vebento.customer)

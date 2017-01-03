@@ -3,12 +3,20 @@
              :refer :all]
             [clojure.test
              :refer :all]
+            [util
+             :refer [ns-alias]]
             [juncture.event
              :refer [command message failure]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
              :refer [test-bench]]))
+
+
+(ns-alias 'specs 'vebento.specs)
+(ns-alias 'product 'vebento.product)
+(ns-alias 'merchant 'vebento.merchant)
+(ns-alias 'customer 'vebento.customer)
 
 
 (def-scenario customer-adds-item-to-cart
