@@ -36,13 +36,13 @@
 (defn subscriptions
   [component]
 
-        [[::event/type ::merchant/schedule-added
-         (transform-in (:entity-store component) ::merchant/id)]
+  [[::event/type ::merchant/schedule-added
+    (transform-in (:entity-store component) ::merchant/id)]
 
-        [::event/type ::merchant/add-schedule
-         (fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]
-           (within (aggregate component [::merchant/account] merchant-id)
-             (fail-unless-exists ::merchant/id merchant-id)
-             (publish ::merchant/schedule-added
-                      ::merchant/id merchant-id
-                      ::merchant/schedule schedule)))]])
+   [::event/type ::merchant/add-schedule
+    (fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]
+      (within (aggregate component [::merchant/account] merchant-id)
+        (fail-unless-exists ::merchant/id merchant-id)
+        (publish ::merchant/schedule-added
+                 ::merchant/id merchant-id
+                 ::merchant/schedule schedule)))]])

@@ -34,13 +34,13 @@
 (defn subscriptions
   [component]
 
-        [[::event/type ::merchant/area-added
-         (transform-in (:entity-store component) ::merchant/id)]
+  [[::event/type ::merchant/area-added
+    (transform-in (:entity-store component) ::merchant/id)]
 
-        [::event/type ::merchant/add-area
-         (fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
-           (within (aggregate component [::merchant/account] merchant-id)
-             (fail-unless-exists ::merchant/id merchant-id)
-             (publish ::merchant/area-added
-                      ::merchant/id merchant-id
-                      ::merchant/zipcode zipcode)))]])
+   [::event/type ::merchant/add-area
+    (fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
+      (within (aggregate component [::merchant/account] merchant-id)
+        (fail-unless-exists ::merchant/id merchant-id)
+        (publish ::merchant/area-added
+                 ::merchant/id merchant-id
+                 ::merchant/zipcode zipcode)))]])

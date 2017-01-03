@@ -35,14 +35,14 @@
 (defn subscriptions
   [component]
 
-        [[::event/type ::merchant/product-added
-         (transform-in (:entity-store component) ::merchant/id)]
+  [[::event/type ::merchant/product-added
+    (transform-in (:entity-store component) ::merchant/id)]
 
-        [::event/type ::merchant/add-product
-         (fn [{merchant-id ::merchant/id product-id ::product/id}]
-           (within (aggregate component [::merchant/account] merchant-id)
-             (fail-unless-exists ::merchant/id merchant-id)
-             (fail-unless-exists ::product/id product-id)
-             (publish ::merchant/product-added
-                      ::merchant/id merchant-id
-                      ::product/id product-id)))]])
+   [::event/type ::merchant/add-product
+    (fn [{merchant-id ::merchant/id product-id ::product/id}]
+      (within (aggregate component [::merchant/account] merchant-id)
+        (fail-unless-exists ::merchant/id merchant-id)
+        (fail-unless-exists ::product/id product-id)
+        (publish ::merchant/product-added
+                 ::merchant/id merchant-id
+                 ::product/id product-id)))]])

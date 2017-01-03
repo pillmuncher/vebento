@@ -42,13 +42,13 @@
 (defn subscriptions
   [component]
 
-        [[::event/type ::merchant/payment-method-added
-         (transform-in (:entity-store component) ::merchant/id)]
+  [[::event/type ::merchant/payment-method-added
+    (transform-in (:entity-store component) ::merchant/id)]
 
-        [::event/type ::merchant/add-payment-method
-         (fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
-           (within (aggregate component [::merchant/account] merchant-id)
-             (fail-unless-exists ::merchant/id merchant-id)
-             (publish ::merchant/payment-method-added
-                      ::merchant/id merchant-id
-                      ::merchant/payment-method payment-method)))]])
+   [::event/type ::merchant/add-payment-method
+    (fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
+      (within (aggregate component [::merchant/account] merchant-id)
+        (fail-unless-exists ::merchant/id merchant-id)
+        (publish ::merchant/payment-method-added
+                 ::merchant/id merchant-id
+                 ::merchant/payment-method payment-method)))]])

@@ -42,13 +42,13 @@
 (defn subscriptions
   [component]
 
-        [[::event/type ::merchant/registered
-         (transform-in (:entity-store component) ::merchant/id)]
+  [[::event/type ::merchant/registered
+    (transform-in (:entity-store component) ::merchant/id)]
 
-        [::event/type ::merchant/register
-         (fn [{merchant-id ::merchant/id address ::merchant/address}]
-           (within (aggregate component [::merchant/account] merchant-id)
-             (fail-if-exists ::merchant/id merchant-id)
-             (publish ::merchant/registered
-                      ::merchant/id merchant-id
-                      ::merchant/address address)))]])
+   [::event/type ::merchant/register
+    (fn [{merchant-id ::merchant/id address ::merchant/address}]
+      (within (aggregate component [::merchant/account] merchant-id)
+        (fail-if-exists ::merchant/id merchant-id)
+        (publish ::merchant/registered
+                 ::merchant/id merchant-id
+                 ::merchant/address address)))]])
