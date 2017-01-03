@@ -136,6 +136,3 @@
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
-
-
-
