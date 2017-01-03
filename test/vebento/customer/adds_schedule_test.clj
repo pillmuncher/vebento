@@ -14,7 +14,6 @@
 
 
 (ns-alias 'specs 'vebento.specs)
-(ns-alias 'product 'vebento.product)
 (ns-alias 'order 'vebento.order)
 (ns-alias 'merchant 'vebento.merchant)
 (ns-alias 'customer 'vebento.customer)
@@ -43,11 +42,7 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
-            ::merchant/id merchant-id)
-          (command
-            ::customer/add-schedule
-            ::customer/id customer-id
-            ::customer/schedule schedule)]
+            ::merchant/id merchant-id)]
   :after [(command
             ::customer/add-schedule
             ::customer/id customer-id

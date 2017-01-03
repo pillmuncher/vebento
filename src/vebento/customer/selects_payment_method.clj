@@ -1,6 +1,8 @@
 (ns vebento.customer.selects-payment-method
   (:require [clojure.future
              :refer :all]
+            [monads.core
+             :refer [return]]
             [monads.util
              :refer [mwhen]]
             [util
@@ -52,7 +54,7 @@
         (mwhen (->> payment-method
                     (not-in? (@merchant ::merchant/payment-methods)))
                (fail-with ::merchant/does-not-support-payment-method
-                          ::merchant/id (@merchant ::merchant/id)
+                          ::merchant/id (@merchant ::entity/id)
                           ::merchant/payment-method payment-method))
         (publish ::customer/payment-method-selected
                  ::customer/id customer-id
