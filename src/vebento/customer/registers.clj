@@ -54,11 +54,11 @@
           address ::customer/address
           merchant-id ::merchant/id
           payment-method ::customer/payment-method}]
-      (within (aggregate component [::customer/account] customer-id)
+      (within (aggregate component
+                         [::customer/account ::customer/shopping] customer-id)
         (fail-if-exists ::customer/id customer-id)
         (publish ::customer/registered
                  ::customer/id customer-id)
-        (fail-unless-exists ::customer/id customer-id)
         (mwhen (some? address)
                (execute ::customer/change-address
                         ::customer/id customer-id
