@@ -26,7 +26,7 @@
 (defn test-bench []
   (-> (co/system-map
         :boundaries
-        (entity/boundaries core/aggregate-context)
+        (entity/boundaries core/boundary-context)
         :entity-store
         (mock-entity-store)
         :dispatcher

@@ -89,7 +89,7 @@
       boundaries <- get-aggegates
       (run boundaries aggs #(within (system env) computation)))))
 
-(defn aggregate-context
+(defn boundary-context
   [a aggs fun]
   (fun))
 
