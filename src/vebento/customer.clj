@@ -56,10 +56,10 @@
 
 
 (defrecord Component
-  [aggregates dispatcher journal entity-store subscriptions]
+  [boundaries dispatcher journal entity-store subscriptions]
   co/Lifecycle
   (start [this]
-    (register aggregates [::account ::shopping])
+    (register boundaries [::account ::shopping])
     (assoc this :subscriptions
            (apply subscribe* dispatcher
                   (concat (registers/subscriptions this)
@@ -73,5 +73,5 @@
                           (clears-cart/subscriptions this)))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
-    (unregister aggregates [::account ::shopping])
+    (unregister boundaries [::account ::shopping])
     (assoc this :subscriptions nil)))

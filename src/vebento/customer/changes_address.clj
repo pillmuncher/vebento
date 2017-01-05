@@ -12,7 +12,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish fail-unless-exists transform-in]]))
+             :refer [boundary publish fail-unless-exists transform-in]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -47,7 +47,7 @@
    [::event/type ::customer/change-address
     (fn [{customer-id ::customer/id
           address ::customer/address}]
-      (within (aggregate component
+      (within (boundary component
                          [::customer/account ::customer/shopping] customer-id)
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/address-changed

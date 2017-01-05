@@ -14,7 +14,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish fail-with transform-in get-entity]]))
+             :refer [boundary publish fail-with transform-in get-entity]]))
 
 
 (ns-alias 'product 'vebento.product)
@@ -51,7 +51,7 @@
    [::event/type ::customer/remove-item-from-cart
     (fn [{customer-id ::customer/id
           product-id ::product/id}]
-      (within (aggregate component [::customer/shopping] customer-id)
+      (within (boundary component [::customer/shopping] customer-id)
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (->> product-id
                     (not-in? (@customer ::customer/cart)))

@@ -14,7 +14,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish execute fail-if-exists
+             :refer [boundary publish execute fail-if-exists
                      fail-unless-exists transform-in]]))
 
 
@@ -54,7 +54,7 @@
           address ::customer/address
           merchant-id ::merchant/id
           payment-method ::customer/payment-method}]
-      (within (aggregate component
+      (within (boundary component
                          [::customer/account ::customer/shopping] customer-id)
         (fail-if-exists ::customer/id customer-id)
         (publish ::customer/registered

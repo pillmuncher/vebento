@@ -17,7 +17,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish execute fail-with fail-if-exists
+             :refer [boundary publish execute fail-with fail-if-exists
                      fail-unless-exists transform-in get-entity]]
             [vebento.specs
              :as specs]))
@@ -81,13 +81,13 @@
 
 (defrecord Component
 
-  [aggregates dispatcher journal entity-store subscriptions]
+  [boundaries dispatcher journal entity-store subscriptions]
 
   co/Lifecycle
 
   (start [this]
 
-    (register aggregates [::processing])
+    (register boundaries [::processing])
 
     (assoc
       this :subscriptions

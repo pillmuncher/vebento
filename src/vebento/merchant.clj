@@ -67,10 +67,10 @@
 
 
 (defrecord Component
-  [aggregates dispatcher journal entity-store subscriptions]
+  [boundaries dispatcher journal entity-store subscriptions]
   co/Lifecycle
   (start [this]
-    (register aggregates [::account])
+    (register boundaries [::account])
     (assoc this :subscriptions
            (apply subscribe* dispatcher
                   [::event/type ::customer/merchant-selected
@@ -84,5 +84,5 @@
                           (adds-payment-method/subscriptions this)))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
-    (unregister aggregates [::account])
+    (unregister boundaries [::account])
     (assoc this :subscriptions nil)))

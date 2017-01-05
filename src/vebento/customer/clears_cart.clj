@@ -12,7 +12,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish transform-in get-entity
+             :refer [boundary publish transform-in get-entity
                      fail-unless-exists]]))
 
 
@@ -41,7 +41,7 @@
 
    [::event/type ::customer/clear-cart
     (fn [{customer-id ::customer/id}]
-      (within (aggregate component [::customer/shopping] customer-id)
+      (within (boundary component [::customer/shopping] customer-id)
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/cart-cleared
                  ::customer/id customer-id)))]])

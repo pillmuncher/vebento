@@ -28,16 +28,16 @@
   ;`(event/def ::event/failure ~failure-type ~failure-keys))
 
 
-;(defprotocol Aggregate
+;(defprotocol boundary
   ;(register [this aggs])
   ;(unregister [this aggs])
   ;(run [this aggs fun]))
 
 
-;(defn aggregates
+;(defn boundaries
   ;[delegate]
   ;(let [a (atom #{})]
-    ;(reify Aggregate
+    ;(reify boundary
       ;(register [this aggs]
         ;(swap! a union aggs))
       ;(unregister [this aggs]

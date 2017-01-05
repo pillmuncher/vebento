@@ -15,7 +15,7 @@
              :refer [within system >>= mdo-future]]))
 
 
-(def get-aggegates (asks :aggregates))
+(def get-aggegates (asks :boundaries))
 (def get-dispatcher (asks :dispatcher))
 (def get-journal (asks :journal))
 (def get-entity-store (asks :entity-store))
@@ -82,12 +82,12 @@
        #(return (apply get-events % ::event/kind ::event/failure criteria))))
 
 
-(defn aggregate
+(defn boundary
   [env aggs entity-id]
   (fn [computation]
     (within (system env)
-      aggregates <- get-aggegates
-      (run aggregates aggs #(within (system env) computation)))))
+      boundaries <- get-aggegates
+      (run boundaries aggs #(within (system env) computation)))))
 
 (defn aggregate-context
   [a aggs fun]

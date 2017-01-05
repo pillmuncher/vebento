@@ -17,7 +17,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish execute fail-with fail-if-exists
+             :refer [boundary publish execute fail-with fail-if-exists
                      fail-unless-exists transform-in get-entity]]
             [vebento.specs
              :as specs]))
@@ -58,13 +58,13 @@
 
 (defrecord Component
 
-  [aggregates dispatcher journal entity-store subscriptions]
+  [boundaries dispatcher journal entity-store subscriptions]
 
   co/Lifecycle
 
   (start [this]
 
-    (register aggregates [::assortment])
+    (register boundaries [::assortment])
 
     (assoc
       this :subscriptions
@@ -76,7 +76,7 @@
 
         [::event/type ::create
          (fn [{product-id ::id name ::name}]
-           (within (aggregate this [::assortment] product-id)
+           (within (boundary this [::assortment] product-id)
              (fail-if-exists ::id product-id)
              (publish ::created
                       ::id product-id

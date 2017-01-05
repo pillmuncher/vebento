@@ -25,8 +25,8 @@
 
 (defn test-bench []
   (-> (co/system-map
-        :aggregates
-        (entity/aggregates core/aggregate-context)
+        :boundaries
+        (entity/boundaries core/aggregate-context)
         :entity-store
         (mock-entity-store)
         :dispatcher
@@ -42,10 +42,10 @@
         :order
         (order/->Component nil nil nil nil nil))
       (co/system-using
-        {:customer [:aggregates :dispatcher :journal :entity-store]
-         :merchant [:aggregates :dispatcher :journal :entity-store]
-         :order [:aggregates :dispatcher :journal :entity-store]
-         :product [:aggregates :dispatcher :journal :entity-store]
+        {:customer [:boundaries :dispatcher :journal :entity-store]
+         :merchant [:boundaries :dispatcher :journal :entity-store]
+         :order [:boundaries :dispatcher :journal :entity-store]
+         :product [:boundaries :dispatcher :journal :entity-store]
          :dispatcher [:journal]})
       (co/start)
       (:customer)))

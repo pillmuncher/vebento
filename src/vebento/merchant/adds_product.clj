@@ -12,7 +12,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish fail-unless-exists transform-in]]))
+             :refer [boundary publish fail-unless-exists transform-in]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -40,7 +40,7 @@
 
    [::event/type ::merchant/add-product
     (fn [{merchant-id ::merchant/id product-id ::product/id}]
-      (within (aggregate component [::merchant/account] merchant-id)
+      (within (boundary component [::merchant/account] merchant-id)
         (fail-unless-exists ::merchant/id merchant-id)
         (fail-unless-exists ::product/id product-id)
         (publish ::merchant/product-added

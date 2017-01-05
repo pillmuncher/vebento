@@ -35,7 +35,7 @@
 (s/def ::non-neg-int (s/and ::int ::non-neg))
 
 (s/def ::id ::uuid)
-(s/def ::aggregate ::keyword)
+(s/def ::boundary ::keyword)
 (s/def ::failure ::keyword)
 
 (s/def ::amount ::pos-int)

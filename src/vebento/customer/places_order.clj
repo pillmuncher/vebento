@@ -16,7 +16,7 @@
             [componad
              :refer [within mdo-await*]]
             [vebento.core
-             :refer [aggregate publish fail-with transform-in get-entity
+             :refer [boundary publish fail-with transform-in get-entity
                      fail-if-exists]]))
 
 
@@ -62,7 +62,7 @@
    [::event/type ::customer/place-order
     (fn [{customer-id ::customer/id
           order-id ::order/id}]
-      (within (aggregate component [::customer/shopping] customer-id)
+      (within (boundary component [::customer/shopping] customer-id)
         (fail-if-exists ::order/id order-id)
         customer <- (get-entity ::customer/id customer-id)
         (mdo-await*

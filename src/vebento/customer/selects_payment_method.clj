@@ -16,7 +16,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [aggregate publish fail-with transform-in get-entity]]))
+             :refer [boundary publish fail-with transform-in get-entity]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -48,7 +48,7 @@
    [::event/type ::customer/select-payment-method
     (fn [{customer-id ::customer/id
           payment-method ::customer/payment-method}]
-      (within (aggregate component [::customer/shopping] customer-id)
+      (within (boundary component [::customer/shopping] customer-id)
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (->> payment-method
