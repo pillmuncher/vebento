@@ -47,7 +47,7 @@
 
    [::event/type ::merchant/add-payment-method
     (fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
-      (within (boundary component [::merchant/account] merchant-id)
+      (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/payment-method-added
                  ::merchant/id merchant-id

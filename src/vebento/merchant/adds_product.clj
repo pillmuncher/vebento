@@ -40,7 +40,7 @@
 
    [::event/type ::merchant/add-product
     (fn [{merchant-id ::merchant/id product-id ::product/id}]
-      (within (boundary component [::merchant/account] merchant-id)
+      (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (fail-unless-exists ::product/id product-id)
         (publish ::merchant/product-added

@@ -39,7 +39,7 @@
 
    [::event/type ::merchant/add-area
     (fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
-      (within (boundary component [::merchant/account] merchant-id)
+      (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/area-added
                  ::merchant/id merchant-id

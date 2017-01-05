@@ -51,7 +51,7 @@
    [::event/type ::customer/remove-item-from-cart
     (fn [{customer-id ::customer/id
           product-id ::product/id}]
-      (within (boundary component [::customer/shopping] customer-id)
+      (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (->> product-id
                     (not-in? (@customer ::customer/cart)))

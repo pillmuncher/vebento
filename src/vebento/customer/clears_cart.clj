@@ -41,7 +41,7 @@
 
    [::event/type ::customer/clear-cart
     (fn [{customer-id ::customer/id}]
-      (within (boundary component [::customer/shopping] customer-id)
+      (within (boundary component #{::customer/shopping})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/cart-cleared
                  ::customer/id customer-id)))]])

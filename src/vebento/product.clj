@@ -76,7 +76,7 @@
 
         [::event/type ::create
          (fn [{product-id ::id name ::name}]
-           (within (boundary this [::assortment] product-id)
+           (within (boundary this #{::assortment})
              (fail-if-exists ::id product-id)
              (publish ::created
                       ::id product-id

@@ -48,7 +48,7 @@
    [::event/type ::customer/select-payment-method
     (fn [{customer-id ::customer/id
           payment-method ::customer/payment-method}]
-      (within (boundary component [::customer/shopping] customer-id)
+      (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (->> payment-method

@@ -47,7 +47,7 @@
 
    [::event/type ::merchant/register
     (fn [{merchant-id ::merchant/id address ::merchant/address}]
-      (within (boundary component [::merchant/account] merchant-id)
+      (within (boundary component #{::merchant/account})
         (fail-if-exists ::merchant/id merchant-id)
         (publish ::merchant/registered
                  ::merchant/id merchant-id

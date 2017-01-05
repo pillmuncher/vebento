@@ -62,7 +62,7 @@
    [::event/type ::customer/place-order
     (fn [{customer-id ::customer/id
           order-id ::order/id}]
-      (within (boundary component [::customer/shopping] customer-id)
+      (within (boundary component #{::customer/shopping})
         (fail-if-exists ::order/id order-id)
         customer <- (get-entity ::customer/id customer-id)
         (mdo-await*

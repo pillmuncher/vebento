@@ -47,8 +47,7 @@
    [::event/type ::customer/change-address
     (fn [{customer-id ::customer/id
           address ::customer/address}]
-      (within (boundary component
-                         [::customer/account ::customer/shopping] customer-id)
+      (within (boundary component #{::customer/account ::customer/shopping})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/address-changed
                  ::customer/id customer-id

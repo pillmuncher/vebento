@@ -15,7 +15,7 @@
              :refer [within system >>= mdo-future]]))
 
 
-(def get-aggegates (asks :boundaries))
+(def get-boundaries (asks :boundaries))
 (def get-dispatcher (asks :dispatcher))
 (def get-journal (asks :journal))
 (def get-entity-store (asks :entity-store))
@@ -83,14 +83,14 @@
 
 
 (defn boundary
-  [env aggs entity-id]
+  [env boundary-keys]
   (fn [computation]
     (within (system env)
-      boundaries <- get-aggegates
-      (run boundaries aggs #(within (system env) computation)))))
+      boundaries <- get-boundaries
+      (run boundaries boundary-keys #(within (system env) computation)))))
 
 (defn boundary-context
-  [a aggs fun]
+  [a boundary-keys fun]
   (fun))
 
 

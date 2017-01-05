@@ -41,7 +41,7 @@
 
    [::event/type ::merchant/add-schedule
     (fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]
-      (within (boundary component [::merchant/account] merchant-id)
+      (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/schedule-added
                  ::merchant/id merchant-id

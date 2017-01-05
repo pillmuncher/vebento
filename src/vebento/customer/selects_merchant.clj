@@ -52,7 +52,7 @@
    [::event/type ::customer/select-merchant
     (fn [{customer-id ::customer/id
           merchant-id ::merchant/id}]
-      (within (boundary component [::customer/shopping] customer-id)
+      (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (-> @customer ::customer/address nil?)
                (fail-with ::customer/has-given-no-address
