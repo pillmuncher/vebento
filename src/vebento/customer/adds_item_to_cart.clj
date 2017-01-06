@@ -50,10 +50,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::customer/item-added-to-cart
+  [[::customer/item-added-to-cart
     (transform-in (:entity-store component) ::customer/id)]
 
-   [::event/type ::customer/add-item-to-cart
+   [::customer/add-item-to-cart
     (fn [{customer-id ::customer/id
           product-id ::product/id
           amount ::product/amount}]

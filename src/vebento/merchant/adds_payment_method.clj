@@ -42,10 +42,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::merchant/payment-method-added
+  [[::merchant/payment-method-added
     (transform-in (:entity-store component) ::merchant/id)]
 
-   [::event/type ::merchant/add-payment-method
+   [::merchant/add-payment-method
     (fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)

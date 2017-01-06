@@ -64,9 +64,9 @@
   event/Dispatcher
 
   (subscribe
-    [this [event-key event-val handler]]
-    (swap! subscriptions update [event-key event-val] conj handler)
-    [event-key event-val handler])
+    [this [event-val handler]]
+    (swap! subscriptions update event-val conj handler)
+    [event-val handler])
 
   (unsubscribe
     [this _])
@@ -75,6 +75,7 @@
     [this event]
     (let [event (assoc event ::event/version (swap! counter inc))]
       (->> (select-keys event [::event/kind ::event/type])
+           (vals)
            (map @subscriptions)
            (apply union)
            (mapv #(% event)))
@@ -83,8 +84,8 @@
   co/Lifecycle
   (start [this]
     (subscribe* this
-                [::event/kind ::event/message #(store* journal %)]
-                [::event/kind ::event/failure #(store* journal %)])
+                [::event/message #(store* journal %)]
+                [::event/failure #(store* journal %)])
     this)
   (stop [this]
     (assoc this subscriptions nil)))

@@ -40,43 +40,43 @@
       (subscribe*
         dispatcher
 
-        [::event/type ::load-customer
+        [::load-customer
          (fn [{customer-id ::customer/id}]
            (swap! root
                   assoc :customer
                   (fetch-entity journal ::customer/id customer-id)))]
 
-        [::event/type ::customer/registered
+        [::customer/registered
          (fn [{customer-id ::customer/id}]
            (swap! root
                   assoc-in [:customer ::customer/id]
                   customer-id))]
 
-        [::event/type ::customer/address-changed
+        [::customer/address-changed
          (fn [{address ::customer/address}]
            (swap! root
                   assoc-in [:customer ::customer/address]
                   address))]
 
-        [::event/type ::customer/merchant-selected
+        [::customer/merchant-selected
          (fn [{merchant-id ::merchant/id}]
            (swap! root
                   assoc-in [:customer ::merchant/id]
                   merchant-id))]
 
-        [::event/type ::customer/schedule-selected
+        [::customer/schedule-selected
          (fn [{schedule ::customer/schedule}]
            (swap! root
                   update-in [:customer ::customer/schedule]
                   union schedule))]
 
-        [::event/type ::customer/payment-method-selected
+        [::customer/payment-method-selected
          (fn [{payment-method ::customer/payment-method}]
            (swap! root
                   assoc-in [:customer ::customer/payment-method]
                   payment-method))]
 
-        [::event/type ::customer/item-added-to-cart
+        [::customer/item-added-to-cart
          (fn [{product-id ::product/id
                amount ::product/amount}]
            (swap! root
@@ -86,7 +86,7 @@
                   assoc-in [:customer ::customer/cart product-id]
                   amount))]
 
-        [::event/type ::customer/item-removed-from-cart
+        [::customer/item-removed-from-cart
          (fn [{product-id ::product/id}]
            (swap! root
                   update-in [:customer ::customer/cart]
@@ -95,7 +95,7 @@
                   update-in [:resources]
                   dissoc product-id))]
 
-        [::event/type ::order/placed
+        [::order/placed
          (fn [{merchant-id ::merchant/id
                order-id ::order/id
                items ::order/items
@@ -103,40 +103,40 @@
                schedule ::order/schedule
                payment-method ::order/payment-method}])]
 
-        [::event/type ::customer/cart-cleared
+        [::customer/cart-cleared
          (fn [_]
            (swap! root
                   assoc-in [:customer ::customer/cart]
                   {}))]
 
-        [::event/type ::entity/not-found
+        [::entity/not-found
          (fn [{id-key ::entity/key id ::entity/id}])]
 
-        [::event/type ::customer/cart-is-empty
+        [::customer/cart-is-empty
          (fn [_])]
 
-        [::event/type ::customer/has-given-no-address
+        [::customer/has-given-no-address
          (fn [_])]
 
-        [::event/type ::customer/has-selected-no-schedule
+        [::customer/has-selected-no-schedule
          (fn [_])]
 
-        [::event/type ::customer/has-selected-no-payment-method
+        [::customer/has-selected-no-payment-method
          (fn [_])]
 
-        [::event/type ::customer/schedule-not-in-merchant-schedule
+        [::customer/schedule-not-in-merchant-schedule
          (fn [_])]
 
-        [::event/type ::customer/zipcode-not-in-merchant-areas
+        [::customer/zipcode-not-in-merchant-areas
          (fn [_])]
 
-        [::event/type ::merchant/does-not-support-payment-method
+        [::merchant/does-not-support-payment-method
          (fn [_])]
 
-        [::event/type ::product/not-in-merchant-assortment
+        [::product/not-in-merchant-assortment
          (fn [_])]
 
-        [::event/type ::product/not-in-cart
+        [::product/not-in-cart
          (fn [_])])))
 
   (stop [this]

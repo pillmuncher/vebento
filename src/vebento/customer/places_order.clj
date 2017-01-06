@@ -56,10 +56,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::order/placed
+  [[::order/placed
     (transform-in (:entity-store component) ::customer/id)]
 
-   [::event/type ::customer/place-order
+   [::customer/place-order
     (fn [{customer-id ::customer/id
           order-id ::order/id}]
       (within (boundary component #{::customer/shopping})

@@ -46,10 +46,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::customer/registered
+  [[::customer/registered
     (transform-in (:entity-store component) ::customer/id)]
 
-   [::event/type ::customer/register
+   [::customer/register
     (fn [{customer-id ::customer/id
           address ::customer/address
           merchant-id ::merchant/id

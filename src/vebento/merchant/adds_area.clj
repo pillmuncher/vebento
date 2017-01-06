@@ -34,10 +34,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::merchant/area-added
+  [[::merchant/area-added
     (transform-in (:entity-store component) ::merchant/id)]
 
-   [::event/type ::merchant/add-area
+   [::merchant/add-area
     (fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)

@@ -73,9 +73,9 @@
     (register boundaries [::account])
     (assoc this :subscriptions
            (apply subscribe* dispatcher
-                  [::event/type ::customer/merchant-selected
+                  [::customer/merchant-selected
                    (transform-in entity-store ::id)]
-                  [::event/type ::order/placed
+                  [::order/placed
                    (transform-in entity-store ::id)]
                   (concat (registers/subscriptions this)
                           (adds-area/subscriptions this)

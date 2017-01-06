@@ -47,5 +47,4 @@
          :order [:boundaries :dispatcher :journal :entity-store]
          :product [:boundaries :dispatcher :journal :entity-store]
          :dispatcher [:journal]})
-      (co/start)
-      (:customer)))
+      (co/start)))

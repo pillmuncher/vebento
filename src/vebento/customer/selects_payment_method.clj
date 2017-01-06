@@ -42,10 +42,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::customer/payment-method-selected
+  [[::customer/payment-method-selected
     (transform-in (:entity-store component) ::customer/id)]
 
-   [::event/type ::customer/select-payment-method
+   [::customer/select-payment-method
     (fn [{customer-id ::customer/id
           payment-method ::customer/payment-method}]
       (within (boundary component #{::customer/shopping})

@@ -93,7 +93,7 @@
       this :subscriptions
       (subscribe*
         dispatcher
-        [::event/type ::placed
+        [::placed
          (transform-in entity-store ::id)])))
 
   (stop [this]

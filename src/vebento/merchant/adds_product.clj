@@ -35,10 +35,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::merchant/product-added
+  [[::merchant/product-added
     (transform-in (:entity-store component) ::merchant/id)]
 
-   [::event/type ::merchant/add-product
+   [::merchant/add-product
     (fn [{merchant-id ::merchant/id product-id ::product/id}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)

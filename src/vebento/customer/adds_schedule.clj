@@ -47,10 +47,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::customer/schedule-added
+  [[::customer/schedule-added
     (transform-in (:entity-store component) ::customer/id)]
 
-   [::event/type ::customer/add-schedule
+   [::customer/add-schedule
     (fn [{customer-id ::customer/id
           schedule ::customer/schedule}]
       (within (boundary component #{::customer/shopping})

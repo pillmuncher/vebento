@@ -71,10 +71,10 @@
       (subscribe*
         dispatcher
 
-        [::event/type ::created
+        [::created
          (transform-in entity-store ::id)]
 
-        [::event/type ::create
+        [::create
          (fn [{product-id ::id name ::name}]
            (within (boundary this #{::assortment})
              (fail-if-exists ::id product-id)

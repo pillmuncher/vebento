@@ -46,10 +46,10 @@
 (defn subscriptions
   [component]
 
-  [[::event/type ::customer/merchant-selected
+  [[::customer/merchant-selected
     (transform-in (:entity-store component) ::customer/id)]
 
-   [::event/type ::customer/select-merchant
+   [::customer/select-merchant
     (fn [{customer-id ::customer/id
           merchant-id ::merchant/id}]
       (within (boundary component #{::customer/shopping})

@@ -38,7 +38,7 @@
 (def-scenario customer-changes-address
   [customer-id ::customer/id
    old-address ::customer/address
-   new-address ::customer/address ]
+   new-address ::customer/address]
   :using (test-bench)
   :given [(command
             ::customer/register
