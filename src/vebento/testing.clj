@@ -23,7 +23,7 @@
              :refer [within componad return* >>=]]
             [juncture.event
              :as event
-             :refer [fetch-apply dispatch subscribe* unsubscribe* store store*]]
+             :refer [fetch-apply dispatch subscribe* unsubscribe* store-in]]
             [vebento.core
              :refer [raise EntityStore store-entity fetch-entity exists-entity?
                      get-events]]))
@@ -64,9 +64,9 @@
   event/Dispatcher
 
   (subscribe
-    [this [event-val handler]]
-    (swap! subscriptions update event-val conj handler)
-    [event-val handler])
+    [this [event-val & handlers]]
+    (swap! subscriptions update event-val concat handlers)
+    (apply vector event-val handlers))
 
   (unsubscribe
     [this _])
@@ -84,8 +84,8 @@
   co/Lifecycle
   (start [this]
     (subscribe* this
-                [::event/message #(store* journal %)]
-                [::event/failure #(store* journal %)])
+                [::event/message (store-in journal)]
+                [::event/failure (store-in journal)])
     this)
   (stop [this]
     (assoc this subscriptions nil)))

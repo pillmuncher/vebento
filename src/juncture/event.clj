@@ -34,9 +34,14 @@
   (fetch-apply [this fun criteria]))
 
 
+(defn store-in
+  [journal]
+  (fn [event]
+    (store journal event)))
+
 (defn store*
   [journal & events]
-  (mapv #(store journal %) events))
+  (mapv (store-in journal) events))
 
 (defn fetch*
   [journal & {:as criteria}]
