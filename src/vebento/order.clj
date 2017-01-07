@@ -81,7 +81,7 @@
 
 (defrecord Component
 
-  [boundaries dispatcher journal entity-store subscriptions]
+  [boundaries dispatcher entity-store subscriptions]
 
   co/Lifecycle
 

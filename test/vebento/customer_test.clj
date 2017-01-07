@@ -34,15 +34,15 @@
         :journal
         (mock-journal)
         :customer
-        (customer/->Component nil nil nil nil nil)
+        (customer/->Component nil nil nil nil)
         :merchant
-        (merchant/->Component nil nil nil nil nil)
+        (merchant/->Component nil nil nil nil)
         :product
-        (product/->Component nil nil nil nil nil)
+        (product/->Component nil nil nil nil)
         :order
-        (order/->Component nil nil nil nil nil))
+        (order/->Component nil nil nil nil))
       (co/system-using
-        {:customer [:boundaries :dispatcher :journal :entity-store]
+        {:customer [:boundaries :dispatcher :entity-store]
          :merchant [:boundaries :dispatcher :journal :entity-store]
          :order [:boundaries :dispatcher :journal :entity-store]
          :product [:boundaries :dispatcher :journal :entity-store]
