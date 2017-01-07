@@ -42,7 +42,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/select-payment-method
+  {::customer/payment-method-selected
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/select-payment-method
    [(fn [{customer-id ::customer/id
           payment-method ::customer/payment-method}]
       (within (boundary component #{::customer/shopping})
@@ -55,7 +58,4 @@
                           ::merchant/payment-method payment-method))
         (publish ::customer/payment-method-selected
                  ::customer/id customer-id
-                 ::customer/payment-method payment-method)))]
-
-   ::customer/payment-method-selected
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::customer/payment-method payment-method)))]})

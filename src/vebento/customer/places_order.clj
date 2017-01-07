@@ -56,7 +56,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/place-order
+  {::order/placed
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/place-order
    [(fn [{customer-id ::customer/id
           order-id ::order/id}]
       (within (boundary component #{::customer/shopping})
@@ -109,7 +112,4 @@
                                     (@customer ::customer/schedule)
                                     (@merchant ::merchant/schedule)))
         (publish ::customer/cart-cleared
-                 ::customer/id customer-id)))]
-
-   ::order/placed
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::customer/id customer-id)))]})

@@ -45,13 +45,13 @@
 (defn subscriptions
   [component]
 
-  {::merchant/register
+  {::merchant/registered
+   [(transform-in (:entity-store component) ::merchant/id)]
+
+   ::merchant/register
    [(fn [{merchant-id ::merchant/id address ::merchant/address}]
       (within (boundary component #{::merchant/account})
         (fail-if-exists ::merchant/id merchant-id)
         (publish ::merchant/registered
                  ::merchant/id merchant-id
-                 ::merchant/address address)))]
-
-   ::merchant/registered
-   [(transform-in (:entity-store component) ::merchant/id)]})
+                 ::merchant/address address)))]})

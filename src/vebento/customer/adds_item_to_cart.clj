@@ -50,7 +50,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/add-item-to-cart
+  {::customer/item-added-to-cart
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/add-item-to-cart
    [(fn [{customer-id ::customer/id
           product-id ::product/id
           amount ::product/amount}]
@@ -65,7 +68,4 @@
         (publish ::customer/item-added-to-cart
                  ::customer/id customer-id
                  ::product/id product-id
-                 ::product/amount amount)))]
-
-   ::customer/item-added-to-cart
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::product/amount amount)))]})

@@ -47,7 +47,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/add-schedule
+  {::customer/schedule-added
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/add-schedule
    [(fn [{customer-id ::customer/id
           schedule ::customer/schedule}]
       (within (boundary component #{::customer/shopping})
@@ -60,7 +63,4 @@
                           ::customer/schedule schedule))
         (publish ::customer/schedule-added
                  ::customer/id customer-id
-                 ::customer/schedule schedule)))]
-
-   ::customer/schedule-added
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::customer/schedule schedule)))]})

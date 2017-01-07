@@ -46,7 +46,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/select-merchant
+  {::customer/merchant-selected
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/select-merchant
    [(fn [{customer-id ::customer/id
           merchant-id ::merchant/id}]
       (within (boundary component #{::customer/shopping})
@@ -64,7 +67,4 @@
                                                  ::specs/zipcode)))
         (publish ::customer/merchant-selected
                  ::customer/id customer-id
-                 ::merchant/id merchant-id)))]
-
-   ::customer/merchant-selected
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::merchant/id merchant-id)))]})

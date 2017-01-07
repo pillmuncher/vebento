@@ -41,14 +41,14 @@
 (defn subscriptions
   [component]
 
-  {::customer/change-address
+  {::customer/address-changed
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/change-address
    [(fn [{customer-id ::customer/id
           address ::customer/address}]
       (within (boundary component #{::customer/account ::customer/shopping})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/address-changed
                  ::customer/id customer-id
-                 ::customer/address address)))]
-
-   ::customer/address-changed
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::customer/address address)))]})

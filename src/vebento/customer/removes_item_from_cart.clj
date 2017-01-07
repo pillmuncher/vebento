@@ -45,7 +45,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/remove-item-from-cart
+  {::customer/item-removed-from-cart
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/remove-item-from-cart
    [(fn [{customer-id ::customer/id
           product-id ::product/id}]
       (within (boundary component #{::customer/shopping})
@@ -57,7 +60,4 @@
                           ::product/id product-id))
         (publish ::customer/item-removed-from-cart
                  ::customer/id customer-id
-                 ::product/id product-id)))]
-
-   ::customer/item-removed-from-cart
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::product/id product-id)))]})

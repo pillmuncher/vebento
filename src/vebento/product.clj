@@ -71,16 +71,16 @@
       (subscribe-maps
         dispatcher
 
-        {::create
+        {::created
+         [(transform-in entity-store ::id)]
+
+         ::create
          [(fn [{product-id ::id name ::name}]
             (within (boundary this #{::assortment})
               (fail-if-exists ::id product-id)
               (publish ::created
                        ::id product-id
-                       ::name name)))]
-
-         ::created
-         [(transform-in entity-store ::id)]})))
+                       ::name name)))]})))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)

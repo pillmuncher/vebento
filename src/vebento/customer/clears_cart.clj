@@ -36,12 +36,12 @@
 (defn subscriptions
   [component]
 
-  {::customer/clear-cart
+  {::customer/cart-cleared
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/clear-cart
    [(fn [{customer-id ::customer/id}]
       (within (boundary component #{::customer/shopping})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/cart-cleared
-                 ::customer/id customer-id)))]
-
-   ::customer/cart-cleared
-   [(transform-in (:entity-store component) ::customer/id)]})
+                 ::customer/id customer-id)))]})

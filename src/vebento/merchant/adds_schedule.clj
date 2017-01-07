@@ -39,13 +39,13 @@
 (defn subscriptions
   [component]
 
-  {::merchant/add-schedule
+  {::merchant/schedule-added
+   [(transform-in (:entity-store component) ::merchant/id)]
+
+   ::merchant/add-schedule
    [(fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/schedule-added
                  ::merchant/id merchant-id
-                 ::merchant/schedule schedule)))]
-
-   ::merchant/schedule-added
-   [(transform-in (:entity-store component) ::merchant/id)]})
+                 ::merchant/schedule schedule)))]})

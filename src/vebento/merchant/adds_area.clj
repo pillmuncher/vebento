@@ -37,13 +37,13 @@
 (defn subscriptions
   [component]
 
-  {::merchant/add-area
+  {::merchant/area-added
+   [(transform-in (:entity-store component) ::merchant/id)]
+
+   ::merchant/add-area
    [(fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/area-added
                  ::merchant/id merchant-id
-                 ::merchant/zipcode zipcode)))]
-
-   ::merchant/area-added
-   [(transform-in (:entity-store component) ::merchant/id)]})
+                 ::merchant/zipcode zipcode)))]})

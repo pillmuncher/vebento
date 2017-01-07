@@ -61,17 +61,16 @@
   (start [this]
     (register boundaries [::account ::shopping])
     (assoc this :subscriptions
-           (subscribe-maps
-             dispatcher
-             (registers/subscriptions this)
-             (changes-address/subscriptions this)
-             (selects-merchant/subscriptions this)
-             (adds-schedule/subscriptions this)
-             (selects-payment-method/subscriptions this)
-             (adds-item-to-cart/subscriptions this)
-             (removes-item-from-cart/subscriptions this)
-             (places-order/subscriptions this)
-             (clears-cart/subscriptions this))))
+           (subscribe-maps dispatcher
+                           (registers/subscriptions this)
+                           (changes-address/subscriptions this)
+                           (selects-merchant/subscriptions this)
+                           (adds-schedule/subscriptions this)
+                           (selects-payment-method/subscriptions this)
+                           (adds-item-to-cart/subscriptions this)
+                           (removes-item-from-cart/subscriptions this)
+                           (places-order/subscriptions this)
+                           (clears-cart/subscriptions this))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::account ::shopping])

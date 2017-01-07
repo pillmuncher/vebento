@@ -46,7 +46,10 @@
 (defn subscriptions
   [component]
 
-  {::customer/register
+  {::customer/registered
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/register
    [(fn [{customer-id ::customer/id
           address ::customer/address
           merchant-id ::merchant/id
@@ -66,7 +69,4 @@
         (mwhen (some? payment-method)
                (execute ::customer/select-payment-method
                         ::customer/id customer-id
-                        ::customer/payment-method payment-method))))]
-
-   ::customer/registered
-   [(transform-in (:entity-store component) ::customer/id)]})
+                        ::customer/payment-method payment-method))))]})
