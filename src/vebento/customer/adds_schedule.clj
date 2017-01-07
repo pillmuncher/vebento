@@ -9,7 +9,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-failure store-in]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -47,10 +47,8 @@
 (defn subscriptions
   [component]
 
-  [[::customer/schedule-added
-    (transform-in (:entity-store component) ::customer/id)]
-
-   [::customer/add-schedule
+  {::customer/add-schedule
+   [(store-in (:journal component))
     (fn [{customer-id ::customer/id
           schedule ::customer/schedule}]
       (within (boundary component #{::customer/shopping})
@@ -63,4 +61,11 @@
                           ::customer/schedule schedule))
         (publish ::customer/schedule-added
                  ::customer/id customer-id
-                 ::customer/schedule schedule)))]])
+                 ::customer/schedule schedule)))]
+
+   ::customer/schedule-added
+   [(store-in (:journal component))
+    (transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/schedule-not-in-merchant-schedule
+   [(store-in (:journal component))]})

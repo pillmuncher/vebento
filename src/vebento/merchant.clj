@@ -9,7 +9,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [subscribe* unsubscribe*]]
+             :refer [subscribe-maps unsubscribe*]]
             [juncture.entity
              :refer [register unregister def-entity transform]]
             [vebento.core
@@ -72,16 +72,17 @@
   (start [this]
     (register boundaries [::account])
     (assoc this :subscriptions
-           (apply subscribe* dispatcher
-                  [::customer/merchant-selected
-                   (transform-in entity-store ::id)]
-                  [::order/placed
-                   (transform-in entity-store ::id)]
-                  (concat (registers/subscriptions this)
-                          (adds-area/subscriptions this)
-                          (adds-product/subscriptions this)
-                          (adds-schedule/subscriptions this)
-                          (adds-payment-method/subscriptions this)))))
+           (subscribe-maps
+             dispatcher
+             {::customer/merchant-selected
+              [(transform-in entity-store ::id)]
+              ::order/placed
+              [(transform-in entity-store ::id)]}
+             (registers/subscriptions this)
+             (adds-area/subscriptions this)
+             (adds-product/subscriptions this)
+             (adds-schedule/subscriptions this)
+             (adds-payment-method/subscriptions this))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::account])

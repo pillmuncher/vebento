@@ -7,7 +7,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [def-command def-message store-in]]
             [juncture.entity
              :as entity
              :refer [create transform]]
@@ -46,10 +46,8 @@
 (defn subscriptions
   [component]
 
-  [[::customer/registered
-    (transform-in (:entity-store component) ::customer/id)]
-
-   [::customer/register
+  {::customer/register
+   [(store-in (:journal component))
     (fn [{customer-id ::customer/id
           address ::customer/address
           merchant-id ::merchant/id
@@ -69,4 +67,8 @@
         (mwhen (some? payment-method)
                (execute ::customer/select-payment-method
                         ::customer/id customer-id
-                        ::customer/payment-method payment-method))))]])
+                        ::customer/payment-method payment-method))))]
+
+   ::customer/registered
+   [(store-in (:journal component))
+    (transform-in (:entity-store component) ::customer/id)]})

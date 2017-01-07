@@ -15,6 +15,12 @@
   (dispatch [this event]))
 
 
+(defn subscribe-maps
+  [dispatcher & subscription-maps]
+  (->> subscription-maps
+       (apply merge-with concat)
+       (mapv #(subscribe dispatcher %))))
+
 (defn subscribe*
   [dispatcher & subscriptions]
   (mapv #(subscribe dispatcher %) subscriptions))

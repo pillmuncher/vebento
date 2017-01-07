@@ -23,7 +23,7 @@
              :refer [within componad return* >>=]]
             [juncture.event
              :as event
-             :refer [fetch-apply dispatch subscribe* unsubscribe* store-in]]
+             :refer [fetch-apply dispatch subscribe-maps unsubscribe* store-in]]
             [vebento.core
              :refer [raise EntityStore store-entity fetch-entity exists-entity?
                      get-events]]))
@@ -64,12 +64,12 @@
   event/Dispatcher
 
   (subscribe
-    [this [event-val & handlers]]
-    (swap! subscriptions update event-val concat handlers)
-    (apply vector event-val handlers))
+    [this [event-type handlers]]
+    (swap! subscriptions update event-type concat handlers)
+    (vector event-type handlers))
 
   (unsubscribe
-    [this _])
+    [this _] this)
 
   (dispatch
     [this event]
@@ -82,11 +82,15 @@
       event))
 
   co/Lifecycle
+
   (start [this]
-    (subscribe* this
-                [::event/message (store-in journal)]
-                [::event/failure (store-in journal)])
+    (subscribe-maps this
+                    {::entity/already-exists
+                     [(store-in journal)]
+                     ::entity/not-found
+                     [(store-in journal)]})
     this)
+
   (stop [this]
     (assoc this subscriptions nil)))
 
@@ -131,8 +135,10 @@
     given-events <- (raise-events given)
     after-events <- (raise-events after)
     expected <- (>>= (return* raise) strip-canonicals)
-    received <- (strip-canonicals (difference (set after-events)
-                                              (set given-events)))
+    received <- (->> (difference (set after-events)
+                                 (set given-events))
+                     (filter #(not= (::event/kind %) ::event/command))
+                     (strip-canonicals))
     (return [(set expected) (set received)])))
 
 

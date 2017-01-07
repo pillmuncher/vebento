@@ -9,7 +9,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-failure]]
+             :refer [def-command def-failure store-in]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -56,10 +56,8 @@
 (defn subscriptions
   [component]
 
-  [[::order/placed
-    (transform-in (:entity-store component) ::customer/id)]
-
-   [::customer/place-order
+  {::customer/place-order
+   [(store-in (:journal component))
     (fn [{customer-id ::customer/id
           order-id ::order/id}]
       (within (boundary component #{::customer/shopping})
@@ -112,4 +110,19 @@
                                     (@customer ::customer/schedule)
                                     (@merchant ::merchant/schedule)))
         (publish ::customer/cart-cleared
-                 ::customer/id customer-id)))]])
+                 ::customer/id customer-id)))]
+
+   ::order/placed
+   [(transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/cart-is-empty
+   [(store-in (:journal component))]
+
+   ::customer/has-selected-no-merchant
+   [(store-in (:journal component))]
+
+   ::customer/has-selected-no-schedule
+   [(store-in (:journal component))]
+
+   ::customer/has-selected-no-payment-method
+   [(store-in (:journal component))]})

@@ -5,7 +5,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-failure store-in]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -41,14 +41,19 @@
 (defn subscriptions
   [component]
 
-  [[::customer/address-changed
-    (transform-in (:entity-store component) ::customer/id)]
-
-   [::customer/change-address
+  {::customer/change-address
+   [(store-in (:journal component))
     (fn [{customer-id ::customer/id
           address ::customer/address}]
       (within (boundary component #{::customer/account ::customer/shopping})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/address-changed
                  ::customer/id customer-id
-                 ::customer/address address)))]])
+                 ::customer/address address)))]
+
+   ::customer/address-changed
+   [(store-in (:journal component))
+    (transform-in (:entity-store component) ::customer/id)]
+
+   ::customer/has-given-no-address
+   [(store-in (:journal component))]})

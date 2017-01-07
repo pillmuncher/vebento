@@ -5,7 +5,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [def-command def-message store-in]]
             [juncture.entity
              :as entity
              :refer [create transform]]
@@ -22,9 +22,11 @@
   :req [::merchant/id
         ::merchant/address])
 
+
 (def-message ::merchant/registered
   :req [::merchant/id
         ::merchant/address])
+
 
 (defmethod transform
   [nil ::merchant/registered]
@@ -39,16 +41,19 @@
           ::merchant/customers #{}
           ::merchant/pending-orders #{}))
 
+
 (defn subscriptions
   [component]
 
-  [[::merchant/registered
-    (transform-in (:entity-store component) ::merchant/id)]
-
-   [::merchant/register
+  {::merchant/register
+   [(store-in (:journal component))
     (fn [{merchant-id ::merchant/id address ::merchant/address}]
       (within (boundary component #{::merchant/account})
         (fail-if-exists ::merchant/id merchant-id)
         (publish ::merchant/registered
                  ::merchant/id merchant-id
-                 ::merchant/address address)))]])
+                 ::merchant/address address)))]
+
+   ::merchant/registered
+   [(store-in (:journal component))
+    (transform-in (:entity-store component) ::merchant/id)]})

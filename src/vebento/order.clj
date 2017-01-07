@@ -9,8 +9,8 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure
-                     subscribe* unsubscribe*]]
+             :refer [def-command def-message def-failure store-in
+                     subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
              :refer [register unregister def-entity create transform]]
@@ -89,12 +89,12 @@
 
     (register boundaries [::processing])
 
-    (assoc
-      this :subscriptions
-      (subscribe*
-        dispatcher
-        [::placed
-         (transform-in entity-store ::id)])))
+    (assoc this :subscriptions
+           (subscribe-maps
+             dispatcher
+             {::placed
+              [(store-in journal)
+               (transform-in entity-store ::id)]})))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
