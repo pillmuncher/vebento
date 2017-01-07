@@ -42,9 +42,9 @@
         :order
         (order/->Component nil nil nil nil))
       (co/system-using
-        {:customer [:boundaries :dispatcher :entity-store]
-         :merchant [:boundaries :dispatcher :journal :entity-store]
-         :order [:boundaries :dispatcher :journal :entity-store]
-         :product [:boundaries :dispatcher :journal :entity-store]
-         :dispatcher [:journal]})
+        {:dispatcher [:journal]
+         :product [:boundaries :dispatcher :entity-store]
+         :order [:boundaries :dispatcher :entity-store]
+         :merchant [:boundaries :dispatcher :entity-store]
+         :customer [:boundaries :dispatcher :entity-store]})
       (co/start)))
