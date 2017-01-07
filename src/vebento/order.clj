@@ -9,7 +9,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure store-in
+             :refer [def-command def-message def-failure
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
@@ -93,8 +93,7 @@
            (subscribe-maps
              dispatcher
              {::placed
-              [(store-in journal)
-               (transform-in entity-store ::id)]})))
+              [(transform-in entity-store ::id)]})))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)

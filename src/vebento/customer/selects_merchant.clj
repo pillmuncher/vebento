@@ -7,7 +7,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure store-in]]
+             :refer [def-command def-message def-failure]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -47,8 +47,7 @@
   [component]
 
   {::customer/select-merchant
-   [(store-in (:journal component))
-    (fn [{customer-id ::customer/id
+   [(fn [{customer-id ::customer/id
           merchant-id ::merchant/id}]
       (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
@@ -68,8 +67,4 @@
                  ::merchant/id merchant-id)))]
 
    ::customer/merchant-selected
-   [(store-in (:journal component))
-    (transform-in (:entity-store component) ::customer/id)]
-
-   ::customer/zipcode-not-in-merchant-areas
-   [(store-in (:journal component))]})
+   [(transform-in (:entity-store component) ::customer/id)]})

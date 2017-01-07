@@ -5,7 +5,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message store-in]]
+             :refer [def-command def-message]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -38,8 +38,7 @@
   [component]
 
   {::merchant/add-area
-   [(store-in (:journal component))
-    (fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
+   [(fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/area-added
@@ -47,5 +46,4 @@
                  ::merchant/zipcode zipcode)))]
 
    ::merchant/area-added
-   [(store-in (:journal component))
-    (transform-in (:entity-store component) ::merchant/id)]})
+   [(transform-in (:entity-store component) ::merchant/id)]})

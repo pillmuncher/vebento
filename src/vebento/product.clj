@@ -9,7 +9,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure store-in
+             :refer [def-command def-message def-failure
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
@@ -72,8 +72,7 @@
         dispatcher
 
         {::create
-         [(store-in journal)
-          (fn [{product-id ::id name ::name}]
+         [(fn [{product-id ::id name ::name}]
             (within (boundary this #{::assortment})
               (fail-if-exists ::id product-id)
               (publish ::created
@@ -81,8 +80,7 @@
                        ::name name)))]
 
          ::created
-         [(store-in journal)
-          (transform-in entity-store ::id)]})))
+         [(transform-in entity-store ::id)]})))
 
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)

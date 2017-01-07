@@ -5,7 +5,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure store-in]]
+             :refer [def-command def-message def-failure]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -43,8 +43,7 @@
   [component]
 
   {::merchant/add-payment-method
-   [(store-in (:journal component))
-    (fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
+   [(fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/payment-method-added
@@ -52,8 +51,4 @@
                  ::merchant/payment-method payment-method)))]
 
    ::merchant/payment-method-added
-   [(store-in (:journal component))
-    (transform-in (:entity-store component) ::merchant/id)]
-
-   ::merchant/does-not-support-payment-method
-   [(store-in (:journal component))]})
+   [(transform-in (:entity-store component) ::merchant/id)]})

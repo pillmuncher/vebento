@@ -5,7 +5,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message store-in]]
+             :refer [def-command def-message]]
             [juncture.entity
              :as entity
              :refer [transform]]
@@ -39,8 +39,7 @@
   [component]
 
   {::merchant/add-product
-   [(store-in (:journal component))
-    (fn [{merchant-id ::merchant/id product-id ::product/id}]
+   [(fn [{merchant-id ::merchant/id product-id ::product/id}]
       (within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (fail-unless-exists ::product/id product-id)
@@ -49,5 +48,4 @@
                  ::product/id product-id)))]
 
    ::merchant/product-added
-   [(store-in (:journal component))
-    (transform-in (:entity-store component) ::merchant/id)]})
+   [(transform-in (:entity-store component) ::merchant/id)]})

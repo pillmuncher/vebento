@@ -85,9 +85,9 @@
 
   (start [this]
     (subscribe-maps this
-                    {::entity/already-exists
+                    {::event/message
                      [(store-in journal)]
-                     ::entity/not-found
+                     ::event/failure
                      [(store-in journal)]})
     this)
 
@@ -135,10 +135,8 @@
     given-events <- (raise-events given)
     after-events <- (raise-events after)
     expected <- (>>= (return* raise) strip-canonicals)
-    received <- (->> (difference (set after-events)
-                                 (set given-events))
-                     (filter #(not= (::event/kind %) ::event/command))
-                     (strip-canonicals))
+    received <- (strip-canonicals (difference (set after-events)
+                                              (set given-events)))
     (return [(set expected) (set received)])))
 
 
