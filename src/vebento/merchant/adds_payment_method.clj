@@ -43,7 +43,7 @@
   [component]
 
   {::merchant/payment-method-added
-   [(transform-in (:entity-store component) ::merchant/id)]
+   [(transform-in (:componad component) ::merchant/id)]
 
    ::merchant/add-payment-method
    [(fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]

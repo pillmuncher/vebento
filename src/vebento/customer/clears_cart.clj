@@ -37,7 +37,7 @@
   [component]
 
   {::customer/cart-cleared
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/clear-cart
    [(fn [{customer-id ::customer/id}]

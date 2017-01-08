@@ -46,7 +46,7 @@
   [component]
 
   {::customer/registered
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/register
    [(fn [{customer-id ::customer/id

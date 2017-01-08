@@ -51,7 +51,7 @@
   [component]
 
   {::customer/item-added-to-cart
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/add-item-to-cart
    [(fn [{customer-id ::customer/id
@@ -60,8 +60,8 @@
       (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
-        (mwhen (->> product-id
-                    (not-in? (@merchant ::merchant/products)))
+        (mwhen (-> product-id
+                   (not-in? (@merchant ::merchant/products)))
                (fail-with ::customer/product-not-in-merchant-assortment
                           ::customer/id customer-id
                           ::product/id product-id))

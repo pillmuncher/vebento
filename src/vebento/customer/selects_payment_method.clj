@@ -43,7 +43,7 @@
   [component]
 
   {::customer/payment-method-selected
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/select-payment-method
    [(fn [{customer-id ::customer/id
@@ -51,8 +51,8 @@
       (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
-        (mwhen (->> payment-method
-                    (not-in? (@merchant ::merchant/payment-methods)))
+        (mwhen (-> payment-method
+                   (not-in? (@merchant ::merchant/payment-methods)))
                (fail-with ::merchant/does-not-support-payment-method
                           ::merchant/id (@merchant ::entity/id)
                           ::merchant/payment-method payment-method))

@@ -47,7 +47,7 @@
   [component]
 
   {::customer/merchant-selected
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/select-merchant
    [(fn [{customer-id ::customer/id
@@ -58,8 +58,8 @@
                (fail-with ::customer/has-given-no-address
                           ::customer/id customer-id))
         merchant <- (get-entity ::merchant/id merchant-id)
-        (mwhen (->> @customer ::customer/address ::specs/zipcode
-                    (not-in? (@merchant ::merchant/areas)))
+        (mwhen (-> @customer ::customer/address ::specs/zipcode
+                   (not-in? (@merchant ::merchant/areas)))
                (fail-with ::customer/zipcode-not-in-merchant-areas
                           ::customer/id customer-id
                           ::customer/zipcode (-> @customer

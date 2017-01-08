@@ -39,7 +39,7 @@
   [component]
 
   {::merchant/product-added
-   [(transform-in (:entity-store component) ::merchant/id)]
+   [(transform-in (:componad component) ::merchant/id)]
 
    ::merchant/add-product
    [(fn [{merchant-id ::merchant/id product-id ::product/id}]

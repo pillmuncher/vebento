@@ -24,17 +24,38 @@
             [juncture.event
              :as event
              :refer [fetch-apply dispatch subscribe-maps unsubscribe* store-in]]
+            [juncture.entity
+             :as entity
+             :refer [Boundary]]
             [vebento.core
              :refer [raise EntityStore store-entity fetch-entity exists-entity?
                      get-events]]))
 
 
-(ns-alias 'entity 'juncture.entity)
+(defrecord Componad
+  [boundaries entities trail counter subscriptions]
 
+  Boundary
 
-(defrecord MockJournal
+  (register [this boundary-keys]
+    (swap! boundaries union boundary-keys))
 
-  [trail]
+  (unregister [this boundary-keys]
+    (swap! boundaries #(difference boundary-keys %)))
+
+  (run [this boundary-keys fun]
+    (fun))
+
+  EntityStore
+
+  (store-entity [this id-key {id ::entity/id :as entity}]
+    (swap! entities assoc-in [id-key id] entity))
+
+  (fetch-entity [this id-key id]
+    (future (get-in @entities [id-key id])))
+
+  (exists-entity? [this id-key id]
+    (some? (get-in @entities [id-key id])))
 
   event/Journal
 
@@ -50,16 +71,7 @@
 
   (store [this event]
     (swap! trail conj event)
-    event))
-
-
-(defn mock-journal []
-  (->MockJournal (atom [])))
-
-
-(defrecord MockDispatcher
-
-  [journal counter subscriptions]
+    event)
 
   event/Dispatcher
 
@@ -86,32 +98,21 @@
   (start [this]
     (subscribe-maps this
                     {::event/message
-                     [(store-in journal)]
+                     [(store-in this)]
                      ::event/failure
-                     [(store-in journal)]})
+                     [(store-in this)]})
     this)
 
   (stop [this]
     (assoc this subscriptions nil)))
 
 
-(defn mock-dispatcher []
-  (->MockDispatcher nil (atom 0) (atom {})))
-
-
-(defrecord MockEntityStore
-  [entities]
-  EntityStore
-  (store-entity [this id-key {id ::entity/id :as entity}]
-    (swap! entities assoc-in [id-key id] entity))
-  (fetch-entity [this id-key id]
-    (future (get-in @entities [id-key id])))
-  (exists-entity? [this id-key id]
-    (some? (get-in @entities [id-key id]))))
-
-
-(defn mock-entity-store []
-  (->MockEntityStore (atom {})))
+(defn component []
+  (->Componad (atom #{})
+              (atom {})
+              (atom [])
+              (atom 0)
+              (atom {})))
 
 
 (defn- strip-canonicals

@@ -80,21 +80,15 @@
 
 
 (defrecord Component
-
-  [boundaries dispatcher entity-store subscriptions]
-
+  [componad subscriptions]
   co/Lifecycle
-
   (start [this]
-
-    (register boundaries [::processing])
-
+    (register componad [::processing])
     (assoc this :subscriptions
-           (subscribe-maps
-             dispatcher
-             {::placed
-              [(transform-in entity-store ::id)]})))
-
+           (subscribe-maps componad
+                           {::placed
+                            [(transform-in componad ::id)]})))
   (stop [this]
-    (apply unsubscribe* dispatcher subscriptions)
+    (apply unsubscribe* componad subscriptions)
+    (unregister componad [::processing])
     (assoc this :subscriptions nil)))

@@ -46,7 +46,7 @@
   [component]
 
   {::merchant/registered
-   [(transform-in (:entity-store component) ::merchant/id)]
+   [(transform-in (:componad component) ::merchant/id)]
 
    ::merchant/register
    [(fn [{merchant-id ::merchant/id address ::merchant/address}]

@@ -48,7 +48,7 @@
   [component]
 
   {::customer/schedule-added
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/add-schedule
    [(fn [{customer-id ::customer/id

@@ -38,7 +38,7 @@
   [component]
 
   {::merchant/area-added
-   [(transform-in (:entity-store component) ::merchant/id)]
+   [(transform-in (:componad component) ::merchant/id)]
 
    ::merchant/add-area
    [(fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]

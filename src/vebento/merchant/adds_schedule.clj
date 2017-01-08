@@ -40,7 +40,7 @@
   [component]
 
   {::merchant/schedule-added
-   [(transform-in (:entity-store component) ::merchant/id)]
+   [(transform-in (:componad component) ::merchant/id)]
 
    ::merchant/add-schedule
    [(fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]

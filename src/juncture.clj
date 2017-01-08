@@ -202,4 +202,4 @@
 
 ;(def-failure ::entity/not-found
   ;:req [::id-key
-        ;::id])
+;::id])

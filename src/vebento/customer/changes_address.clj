@@ -42,7 +42,7 @@
   [component]
 
   {::customer/address-changed
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/change-address
    [(fn [{customer-id ::customer/id

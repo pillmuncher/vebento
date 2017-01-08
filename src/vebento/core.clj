@@ -15,16 +15,13 @@
              :refer [within system >>= mdo-future]]))
 
 
-(def get-boundaries (asks :boundaries))
-(def get-dispatcher (asks :dispatcher))
-(def get-journal (asks :journal))
-(def get-entity-store (asks :entity-store))
+(def get-componad (asks :componad))
 
 
 (defn raise
   [event]
   (mdo
-    (>>= get-dispatcher
+    (>>= get-componad
          #(return (dispatch % event)))
     (if (failure? event)
       (fail event)
@@ -63,22 +60,22 @@
 
 (defn get-events
   [& {:as criteria}]
-  (>>= get-journal
+  (>>= get-componad
        #(return (fetch % criteria))))
 
 (defn get-commands
   [& {:as criteria}]
-  (>>= get-journal
+  (>>= get-componad
        #(return (apply get-events % ::event/kind ::event/command criteria))))
 
 (defn get-messages
   [& {:as criteria}]
-  (>>= get-journal
+  (>>= get-componad
        #(return (apply get-events % ::event/kind ::event/message criteria))))
 
 (defn get-failures
   [& {:as criteria}]
-  (>>= get-journal
+  (>>= get-componad
        #(return (apply get-events % ::event/kind ::event/failure criteria))))
 
 
@@ -86,12 +83,8 @@
   [env boundary-keys]
   (fn [computation]
     (within (system env)
-      boundaries <- get-boundaries
-      (run boundaries boundary-keys #(within (system env) computation)))))
-
-(defn boundary-context
-  [a boundary-keys fun]
-  (fun))
+      componad <- get-componad
+      (run componad boundary-keys #(within (system env) computation)))))
 
 
 (defprotocol EntityStore
@@ -101,15 +94,15 @@
 
 
 (defn transform-in
-  [entity-store id-key]
+  [componad id-key]
   (fn [event]
-    (let [entity (fetch-entity entity-store id-key (id-key event))]
-      (store-entity entity-store id-key (transform @entity event)))))
+    (let [entity (fetch-entity componad id-key (id-key event))]
+      (store-entity componad id-key (transform @entity event)))))
 
 
 (defn fail-if-exists
   [id-key id]
-  (>>= get-entity-store
+  (>>= get-componad
        #(mwhen (exists-entity? % id-key id)
                (fail-with ::entity/already-exists
                           ::entity/id-key id-key
@@ -117,7 +110,7 @@
 
 (defn fail-unless-exists
   [id-key id]
-  (>>= get-entity-store
+  (>>= get-componad
        #(mwhen (not (exists-entity? % id-key id))
                (fail-with ::entity/not-found
                           ::entity/id-key id-key
@@ -128,8 +121,8 @@
   [id-key id]
   (mdo
     (fail-unless-exists id-key id)
-    entity-store <- get-entity-store
-    (return (fetch-entity entity-store id-key id))))
+    componad <- get-componad
+    (return (fetch-entity componad id-key id))))
 
 
 (defprotocol QueryStore

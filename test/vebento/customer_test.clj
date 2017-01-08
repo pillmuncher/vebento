@@ -12,7 +12,7 @@
             [vebento.core
              :as core]
             [vebento.testing
-             :refer [mock-journal mock-dispatcher mock-entity-store]]
+             :as testing]
             [vebento.product
              :as product]
             [vebento.order
@@ -25,26 +25,19 @@
 
 (defn test-bench []
   (-> (co/system-map
-        :boundaries
-        (entity/boundaries core/boundary-context)
-        :entity-store
-        (mock-entity-store)
-        :dispatcher
-        (mock-dispatcher)
-        :journal
-        (mock-journal)
+        :componad
+        (testing/component)
         :customer
-        (customer/->Component nil nil nil nil)
+        (customer/->Component nil nil)
         :merchant
-        (merchant/->Component nil nil nil nil)
+        (merchant/->Component nil nil)
         :product
-        (product/->Component nil nil nil nil)
+        (product/->Component nil nil)
         :order
-        (order/->Component nil nil nil nil))
+        (order/->Component nil nil))
       (co/system-using
-        {:dispatcher [:journal]
-         :product [:boundaries :dispatcher :entity-store]
-         :order [:boundaries :dispatcher :entity-store]
-         :merchant [:boundaries :dispatcher :entity-store]
-         :customer [:boundaries :dispatcher :entity-store]})
+        {:product [:componad]
+         :order [:componad]
+         :merchant [:componad]
+         :customer [:componad]})
       (co/start)))

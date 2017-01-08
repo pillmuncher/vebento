@@ -46,15 +46,15 @@
   [component]
 
   {::customer/item-removed-from-cart
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/remove-item-from-cart
    [(fn [{customer-id ::customer/id
           product-id ::product/id}]
       (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
-        (mwhen (->> product-id
-                    (not-in? (@customer ::customer/cart)))
+        (mwhen (-> product-id
+                   (not-in? (@customer ::customer/cart)))
                (fail-with ::customer/product-not-in-cart
                           ::customer/id customer-id
                           ::product/id product-id))

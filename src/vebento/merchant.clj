@@ -67,23 +67,22 @@
 
 
 (defrecord Component
-  [boundaries dispatcher entity-store subscriptions]
+  [componad subscriptions]
   co/Lifecycle
   (start [this]
-    (register boundaries [::account])
+    (register componad [::account])
     (assoc this :subscriptions
-           (subscribe-maps
-             dispatcher
-             {::customer/merchant-selected
-              [(transform-in entity-store ::id)]
-              ::order/placed
-              [(transform-in entity-store ::id)]}
-             (registers/subscriptions this)
-             (adds-area/subscriptions this)
-             (adds-product/subscriptions this)
-             (adds-schedule/subscriptions this)
-             (adds-payment-method/subscriptions this))))
+           (subscribe-maps componad
+                           {::customer/merchant-selected
+                            [(transform-in componad ::id)]
+                            ::order/placed
+                            [(transform-in componad ::id)]}
+                           (registers/subscriptions this)
+                           (adds-area/subscriptions this)
+                           (adds-product/subscriptions this)
+                           (adds-schedule/subscriptions this)
+                           (adds-payment-method/subscriptions this))))
   (stop [this]
-    (apply unsubscribe* dispatcher subscriptions)
-    (unregister boundaries [::account])
+    (apply unsubscribe* componad subscriptions)
+    (unregister componad [::account])
     (assoc this :subscriptions nil)))

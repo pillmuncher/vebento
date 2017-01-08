@@ -57,7 +57,7 @@
   [component]
 
   {::order/placed
-   [(transform-in (:entity-store component) ::customer/id)]
+   [(transform-in (:componad component) ::customer/id)]
 
    ::customer/place-order
    [(fn [{customer-id ::customer/id
@@ -88,14 +88,14 @@
                  (fail-with ::customer/schedule-not-in-merchant-schedule
                             ::customer/id customer-id
                             ::customer/schedule (@customer ::customer/schedule)))
-          (mwhen (->> @customer ::customer/payment-method
-                      (not-in? (@merchant ::merchant/payment-methods)))
+          (mwhen (-> @customer ::customer/payment-method
+                     (not-in? (@merchant ::merchant/payment-methods)))
                  (fail-with ::merchant/does-not-support-payment-method
                             ::merchant/id (@merchant ::merchant/id)
                             ::merchant/payment-method (@customer
                                                         ::customer/payment-method)))
-          (mwhen (->> @customer ::customer/address ::specs/zipcode
-                      (not-in? (@merchant ::merchant/areas)))
+          (mwhen (-> @customer ::customer/address ::specs/zipcode
+                     (not-in? (@merchant ::merchant/areas)))
                  (fail-with ::customer/zipcode-not-in-merchant-areas
                             ::customer/id customer-id
                             ::specs/zipcode (-> @customer

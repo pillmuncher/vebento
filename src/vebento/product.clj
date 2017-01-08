@@ -57,31 +57,23 @@
 
 
 (defrecord Component
-
-  [boundaries dispatcher entity-store subscriptions]
-
+  [componad subscriptions]
   co/Lifecycle
-
   (start [this]
-
-    (register boundaries [::assortment])
-
+    (register componad [::assortment])
     (assoc
       this :subscriptions
-      (subscribe-maps
-        dispatcher
-
-        {::created
-         [(transform-in entity-store ::id)]
-
-         ::create
-         [(fn [{product-id ::id name ::name}]
-            (within (boundary this #{::assortment})
-              (fail-if-exists ::id product-id)
-              (publish ::created
-                       ::id product-id
-                       ::name name)))]})))
-
+      (subscribe-maps componad
+                      {::created
+                       [(transform-in componad ::id)]
+                       ::create
+                       [(fn [{product-id ::id name ::name}]
+                          (within (boundary this #{::assortment})
+                            (fail-if-exists ::id product-id)
+                            (publish ::created
+                                     ::id product-id
+                                     ::name name)))]})))
   (stop [this]
-    (apply unsubscribe* dispatcher subscriptions)
+    (apply unsubscribe* componad subscriptions)
+    (unregister componad [::assortment])
     (assoc this :subscriptions nil)))
