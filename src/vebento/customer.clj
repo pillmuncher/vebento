@@ -59,9 +59,9 @@
   [componad subscriptions]
   co/Lifecycle
   (start [this]
-    (register componad [::account ::shopping])
+    (register (:boundaries componad) [::account ::shopping])
     (assoc this :subscriptions
-           (subscribe-maps componad
+           (subscribe-maps (:dispatcher componad)
                            (registers/subscriptions this)
                            (changes-address/subscriptions this)
                            (selects-merchant/subscriptions this)
@@ -72,6 +72,6 @@
                            (places-order/subscriptions this)
                            (clears-cart/subscriptions this))))
   (stop [this]
-    (apply unsubscribe* componad subscriptions)
-    (unregister componad [::account ::shopping])
+    (apply unsubscribe* (:dispatcher componad) subscriptions)
+    (unregister (:boundaries componad) [::account ::shopping])
     (assoc this :subscriptions nil)))

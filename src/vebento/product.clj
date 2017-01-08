@@ -60,10 +60,10 @@
   [componad subscriptions]
   co/Lifecycle
   (start [this]
-    (register componad [::assortment])
+    (register (:boundaries componad) [::assortment])
     (assoc
       this :subscriptions
-      (subscribe-maps componad
+      (subscribe-maps (:dispatcher componad)
                       {::created
                        [(transform-in componad ::id)]
                        ::create
@@ -74,6 +74,6 @@
                                      ::id product-id
                                      ::name name)))]})))
   (stop [this]
-    (apply unsubscribe* componad subscriptions)
-    (unregister componad [::assortment])
+    (apply unsubscribe* (:dispatcher componad) subscriptions)
+    (unregister (:boundaries componad) [::assortment])
     (assoc this :subscriptions nil)))

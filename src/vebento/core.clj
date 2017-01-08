@@ -16,27 +16,31 @@
 
 
 (def get-componad (asks :componad))
+(def get-boundaries (asks get-in [:componad :boundaries]))
+(def get-repository (asks get-in [:componad :repository]))
+(def get-journal (asks get-in [:componad :journal]))
+(def get-dispatcher (asks get-in [:componad :dispatcher]))
 
 
 (defn boundary
   [env boundary-keys]
   (fn [computation]
     (within (system env)
-      componad <- get-componad
-      (run componad boundary-keys #(within (system env) computation)))))
+      boundaries <- get-boundaries
+      (run boundaries boundary-keys #(within (system env) computation)))))
 
 
 (defn transform-in
   [componad id-key]
   (fn [event]
-    (let [entity (entity/fetch componad id-key (id-key event))]
-      (entity/store componad id-key (transform @entity event)))))
+    (let [entity (entity/fetch (:repository componad) id-key (id-key event))]
+      (entity/store (:repository componad) id-key (transform @entity event)))))
 
 
 (defn raise
   [event]
   (mdo
-    (>>= get-componad
+    (>>= get-dispatcher
          #(return (event/dispatch % event)))
     (if (failure? event)
       (fail event)
@@ -75,28 +79,28 @@
 
 (defn get-events
   [& {:as criteria}]
-  (>>= get-componad
+  (>>= get-journal
        #(return (event/fetch % criteria))))
 
 (defn get-commands
   [& {:as criteria}]
-  (>>= get-componad
+  (>>= get-journal
        #(return (apply get-events % ::event/kind ::event/command criteria))))
 
 (defn get-messages
   [& {:as criteria}]
-  (>>= get-componad
+  (>>= get-journal
        #(return (apply get-events % ::event/kind ::event/message criteria))))
 
 (defn get-failures
   [& {:as criteria}]
-  (>>= get-componad
+  (>>= get-journal
        #(return (apply get-events % ::event/kind ::event/failure criteria))))
 
 
 (defn fail-if-exists
   [id-key id]
-  (>>= get-componad
+  (>>= get-repository
        #(mwhen (entity/exists? % id-key id)
                (fail-with ::entity/already-exists
                           ::entity/id-key id-key
@@ -104,7 +108,7 @@
 
 (defn fail-unless-exists
   [id-key id]
-  (>>= get-componad
+  (>>= get-repository
        #(mwhen (not (entity/exists? % id-key id))
                (fail-with ::entity/not-found
                           ::entity/id-key id-key
@@ -115,8 +119,8 @@
   [id-key id]
   (mdo
     (fail-unless-exists id-key id)
-    componad <- get-componad
-    (return (entity/fetch componad id-key id))))
+    repository <- get-repository
+    (return (entity/fetch repository id-key id))))
 
 
 (defprotocol QueryStore

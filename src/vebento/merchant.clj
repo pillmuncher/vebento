@@ -70,9 +70,9 @@
   [componad subscriptions]
   co/Lifecycle
   (start [this]
-    (register componad [::account])
+    (register (:boundaries componad) [::account])
     (assoc this :subscriptions
-           (subscribe-maps componad
+           (subscribe-maps (:dispatcher componad)
                            {::customer/merchant-selected
                             [(transform-in componad ::id)]
                             ::order/placed
@@ -83,6 +83,6 @@
                            (adds-schedule/subscriptions this)
                            (adds-payment-method/subscriptions this))))
   (stop [this]
-    (apply unsubscribe* componad subscriptions)
-    (unregister componad [::account])
+    (apply unsubscribe* (:dispatcher componad) subscriptions)
+    (unregister (:boundaries componad) [::account])
     (assoc this :subscriptions nil)))

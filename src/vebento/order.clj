@@ -83,12 +83,12 @@
   [componad subscriptions]
   co/Lifecycle
   (start [this]
-    (register componad [::processing])
+    (register (:boundaries componad) [::processing])
     (assoc this :subscriptions
-           (subscribe-maps componad
+           (subscribe-maps (:dispatcher componad)
                            {::placed
                             [(transform-in componad ::id)]})))
   (stop [this]
-    (apply unsubscribe* componad subscriptions)
-    (unregister componad [::processing])
+    (apply unsubscribe* (:dispatcher componad) subscriptions)
+    (unregister (:boundaries componad) [::processing])
     (assoc this :subscriptions nil)))
