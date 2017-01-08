@@ -33,15 +33,13 @@
 
 
 (defrecord Componad
-  [boundaries entities trail counter subscriptions]
+  [entities trail counter subscriptions]
 
   Boundary
 
-  (register [this boundary-keys]
-    (swap! boundaries union boundary-keys))
+  (register [this boundary-keys])
 
-  (unregister [this boundary-keys]
-    (swap! boundaries #(difference boundary-keys %)))
+  (unregister [this boundary-keys])
 
   (run [this boundary-keys fun]
     (fun))
@@ -108,11 +106,7 @@
 
 
 (defn component []
-  (->Componad (atom #{})
-              (atom {})
-              (atom [])
-              (atom 0)
-              (atom {})))
+  (->Componad (atom {}) (atom []) (atom 0) (atom {})))
 
 
 (defn- strip-canonicals
