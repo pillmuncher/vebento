@@ -1,16 +1,8 @@
 (ns vebento.customer-test
   (:require [clojure.future
              :refer :all]
-            [clojure.test
-             :refer :all]
-            [clojure.spec
-             :as s]
             [com.stuartsierra.component
              :as co]
-            [juncture.entity
-             :as entity]
-            [vebento.core
-             :as core]
             [vebento.testing
              :as testing]
             [vebento.product
