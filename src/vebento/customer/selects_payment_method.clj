@@ -9,7 +9,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message]]
             [juncture.entity
              :as entity
              :refer [transform]]

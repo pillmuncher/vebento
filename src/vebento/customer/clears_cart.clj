@@ -12,8 +12,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish transform-in get-entity
-                     fail-unless-exists]]))
+             :refer [boundary publish transform-in fail-unless-exists]]))
 
 
 (ns-alias 'customer 'vebento.customer)
