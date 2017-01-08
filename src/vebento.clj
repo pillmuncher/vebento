@@ -1,11 +1,10 @@
 (ns vebento
   (:require [clojure.future
              :refer :all]
-            [util
-             :refer [pull]]
+            [util]
+            [componad]
             [juncture.event]
             [juncture.entity]
-            [componad]
             [vebento.specs
              :as specs]
             [vebento.core
