@@ -14,28 +14,26 @@
             [com.stuartsierra.component
              :as co]
             [monads.core
-             :refer [mdo return catch-error modify]]
+             :refer [mdo return]]
             [monads.util
              :refer [map-m]]
             [util
-             :refer [ns-alias zip]]
+             :refer [zip]]
             [componad
-             :refer [within componad return* >>=]]
+             :refer [within return* >>=]]
             [juncture.event
              :as event
-             :refer [fetch-apply dispatch subscribe-maps unsubscribe* store-in]]
+             :refer [subscribe-maps store-in]]
             [juncture.entity
-             :as entity
-             :refer [Boundary]]
+             :as entity]
             [vebento.core
-             :refer [raise EntityStore store-entity fetch-entity exists-entity?
-                     get-events]]))
+             :refer [raise get-events]]))
 
 
 (defrecord Componad
   [entities trail counter subscriptions]
 
-  Boundary
+  entity/Boundary
 
   (register [this boundary-keys])
 
@@ -44,30 +42,30 @@
   (run [this boundary-keys fun]
     (fun))
 
-  EntityStore
+  entity/Repository
 
-  (store-entity [this id-key {id ::entity/id :as entity}]
+  (store [this id-key {id ::entity/id :as entity}]
     (swap! entities assoc-in [id-key id] entity))
 
-  (fetch-entity [this id-key id]
+  (fetch [this id-key id]
     (future (get-in @entities [id-key id])))
 
-  (exists-entity? [this id-key id]
+  (exists? [this id-key id]
     (some? (get-in @entities [id-key id])))
 
   event/Journal
 
-  (fetch-apply [this fun criteria]
+  (event/fetch-apply [this fun criteria]
     (future
       (->> criteria
            (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
            (sort-by ::event/version)
            (fun))))
 
-  (fetch [this criteria]
-    (fetch-apply this identity criteria))
+  (event/fetch [this criteria]
+    (event/fetch-apply this identity criteria))
 
-  (store [this event]
+  (event/store [this event]
     (swap! trail conj event)
     event)
 
@@ -126,7 +124,7 @@
 
 (defn scenario
   [& {:keys [using given after raise]}]
-  (within (componad using)
+  (within (componad/componad using)
     given-events <- (raise-events given)
     after-events <- (raise-events after)
     expected <- (>>= (return* raise) strip-canonicals)

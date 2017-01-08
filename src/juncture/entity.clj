@@ -9,7 +9,7 @@
              :refer [union difference]]
             [juncture.event
              :as event
-             :refer [def-failure fetch-apply]]))
+             :refer [def-failure]]))
 
 
 (def-failure ::already-exists
@@ -29,6 +29,12 @@
 (s/def ::spec (s/keys :req [::kind ::type ::id ::version]))
 
 (s/def ::entity #(= (::kind %) ::entity))
+
+
+(defprotocol Repository
+  (store [this id-key entity])
+  (fetch [this id-key id])
+  (exists? [this id-key id]))
 
 
 (defprotocol Boundary

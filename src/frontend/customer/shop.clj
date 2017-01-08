@@ -44,7 +44,7 @@
          (fn [{customer-id ::customer/id}]
            (swap! root
                   assoc :customer
-                  (fetch-entity journal ::customer/id customer-id)))]
+                  (entity/fetch journal ::customer/id customer-id)))]
 
         [::customer/registered
          (fn [{customer-id ::customer/id}]

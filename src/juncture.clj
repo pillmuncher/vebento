@@ -66,18 +66,18 @@
 
 
 ;(defprotocol Journal
-  ;(store [this event])
-  ;(fetch [this criteria])
-  ;(fetch-apply [this fun criteria]))
+  ;(event/store [this event])
+  ;(event/fetch [this criteria])
+  ;(event/fetch-apply [this fun criteria]))
 
 
 ;(defn store*
   ;[journal & events]
-  ;(mapv #(store journal %) events))
+  ;(mapv #(event/store journal %) events))
 
 ;(defn fetch*
   ;[journal & {:as criteria}]
-  ;(fetch journal criteria))
+  ;(event/fetch journal criteria))
 
 
 ;(s/def ::version integer?)
@@ -191,9 +191,9 @@
   ;([start events]
    ;(reduce run-transformer start events)))
 
-;(defn fetch-entity
+;(defn entity/fetch
   ;[journal id-key id]
-  ;(fetch-apply journal projection {::kind ::message
+  ;(event/fetch-apply journal projection {::kind ::message
 
 
 ;(def-failure ::entity/already-exists

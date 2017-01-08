@@ -2,12 +2,12 @@
   (:require [clojure.future
              :refer :all]
             [monads.core
-             :refer [mdo return fail ask asks catch-error]]
+             :refer [mdo return fail ask asks]]
             [monads.util
-             :refer [mwhen map-m]]
+             :refer [mwhen]]
             [juncture.event
              :as event
-             :refer [command message failure failure? dispatch fetch fetch*]]
+             :refer [command message failure failure?]]
             [juncture.entity
              :as entity
              :refer [run transform]]
@@ -18,11 +18,26 @@
 (def get-componad (asks :componad))
 
 
+(defn boundary
+  [env boundary-keys]
+  (fn [computation]
+    (within (system env)
+      componad <- get-componad
+      (run componad boundary-keys #(within (system env) computation)))))
+
+
+(defn transform-in
+  [componad id-key]
+  (fn [event]
+    (let [entity (entity/fetch componad id-key (id-key event))]
+      (entity/store componad id-key (transform @entity event)))))
+
+
 (defn raise
   [event]
   (mdo
     (>>= get-componad
-         #(return (dispatch % event)))
+         #(return (event/dispatch % event)))
     (if (failure? event)
       (fail event)
       (return event))))
@@ -61,7 +76,7 @@
 (defn get-events
   [& {:as criteria}]
   (>>= get-componad
-       #(return (fetch % criteria))))
+       #(return (event/fetch % criteria))))
 
 (defn get-commands
   [& {:as criteria}]
@@ -79,31 +94,10 @@
        #(return (apply get-events % ::event/kind ::event/failure criteria))))
 
 
-(defn boundary
-  [env boundary-keys]
-  (fn [computation]
-    (within (system env)
-      componad <- get-componad
-      (run componad boundary-keys #(within (system env) computation)))))
-
-
-(defprotocol EntityStore
-  (store-entity [this id-key entity])
-  (fetch-entity [this id-key id])
-  (exists-entity? [this id-key id]))
-
-
-(defn transform-in
-  [componad id-key]
-  (fn [event]
-    (let [entity (fetch-entity componad id-key (id-key event))]
-      (store-entity componad id-key (transform @entity event)))))
-
-
 (defn fail-if-exists
   [id-key id]
   (>>= get-componad
-       #(mwhen (exists-entity? % id-key id)
+       #(mwhen (entity/exists? % id-key id)
                (fail-with ::entity/already-exists
                           ::entity/id-key id-key
                           ::entity/id id))))
@@ -111,7 +105,7 @@
 (defn fail-unless-exists
   [id-key id]
   (>>= get-componad
-       #(mwhen (not (exists-entity? % id-key id))
+       #(mwhen (not (entity/exists? % id-key id))
                (fail-with ::entity/not-found
                           ::entity/id-key id-key
                           ::entity/id id))))
@@ -122,7 +116,7 @@
   (mdo
     (fail-unless-exists id-key id)
     componad <- get-componad
-    (return (fetch-entity componad id-key id))))
+    (return (entity/fetch componad id-key id))))
 
 
 (defprotocol QueryStore
