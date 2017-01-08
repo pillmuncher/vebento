@@ -44,16 +44,23 @@
 
   entity/Repository
 
-  (store [this id-key {id ::entity/id :as entity}]
+  (entity/store [this id-key {id ::entity/id :as entity}]
     (swap! entities assoc-in [id-key id] entity))
 
-  (fetch [this id-key id]
+  (entity/fetch [this id-key id]
     (future (get-in @entities [id-key id])))
 
-  (exists? [this id-key id]
+  (entity/exists? [this id-key id]
     (some? (get-in @entities [id-key id])))
 
   event/Journal
+
+  (event/store [this event]
+    (swap! trail conj event)
+    event)
+
+  (event/fetch [this criteria]
+    (event/fetch-apply this identity criteria))
 
   (event/fetch-apply [this fun criteria]
     (future
@@ -61,13 +68,6 @@
            (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
            (sort-by ::event/version)
            (fun))))
-
-  (event/fetch [this criteria]
-    (event/fetch-apply this identity criteria))
-
-  (event/store [this event]
-    (swap! trail conj event)
-    event)
 
   event/Dispatcher
 
