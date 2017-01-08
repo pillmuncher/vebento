@@ -5,8 +5,6 @@
              :as s]
             [clojure.spec.test
              :as s-test]
-            [clojure.set
-             :refer [union difference]]
             [juncture.event
              :as event
              :refer [def-failure]]))
