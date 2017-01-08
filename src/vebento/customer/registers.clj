@@ -14,8 +14,7 @@
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish execute fail-if-exists
-                     fail-unless-exists transform-in]]))
+             :refer [boundary publish execute fail-if-exists transform-in]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
