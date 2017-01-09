@@ -65,15 +65,13 @@
     (assoc
       this :subscriptions
       (subscribe-maps dispatcher
-                      {::created
-                       [(transform-in repository ::id)]
-                       ::create
-                       [(fn [{product-id ::id name ::name}]
-                          (within (boundary this #{::assortment})
-                            (fail-if-exists ::id product-id)
-                            (publish ::created
-                                     ::id product-id
-                                     ::name name)))]})))
+                      {::created [(transform-in repository ::id)]
+                       ::create [(fn [{product-id ::id name ::name}]
+                                   (within (boundary this #{::assortment})
+                                     (fail-if-exists ::id product-id)
+                                     (publish ::created
+                                              ::id product-id
+                                              ::name name)))]})))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::assortment])

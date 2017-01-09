@@ -87,8 +87,7 @@
     (register boundaries [::processing])
     (assoc this :subscriptions
            (subscribe-maps dispatcher
-                           {::placed
-                            [(transform-in repository ::id)]})))
+                           {::placed [(transform-in repository ::id)]})))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::processing])
