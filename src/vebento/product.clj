@@ -13,12 +13,13 @@
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister def-entity create transform]]
+             :refer [register unregister def-entity create transform
+                     transform-in]]
             [componad
              :refer [within]]
             [vebento.core
              :refer [boundary publish execute fail-with fail-if-exists
-                     fail-unless-exists transform-in get-entity]]
+                     fail-unless-exists get-entity]]
             [vebento.specs
              :as specs]))
 
@@ -57,15 +58,15 @@
 
 
 (defrecord Component
-  [componad subscriptions]
+  [boundaries repository journal dispatcher subscriptions]
   co/Lifecycle
   (start [this]
-    (register (:boundaries componad) [::assortment])
+    (register boundaries [::assortment])
     (assoc
       this :subscriptions
-      (subscribe-maps (:dispatcher componad)
+      (subscribe-maps dispatcher
                       {::created
-                       [(transform-in componad ::id)]
+                       [(transform-in repository ::id)]
                        ::create
                        [(fn [{product-id ::id name ::name}]
                           (within (boundary this #{::assortment})
@@ -74,6 +75,6 @@
                                      ::id product-id
                                      ::name name)))]})))
   (stop [this]
-    (apply unsubscribe* (:dispatcher componad) subscriptions)
-    (unregister (:boundaries componad) [::assortment])
+    (apply unsubscribe* dispatcher subscriptions)
+    (unregister boundaries [::assortment])
     (assoc this :subscriptions nil)))

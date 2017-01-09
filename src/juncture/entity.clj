@@ -29,18 +29,6 @@
 (s/def ::entity #(= (::kind %) ::entity))
 
 
-(defprotocol Repository
-  (store [this id-key entity])
-  (fetch [this id-key id])
-  (exists? [this id-key id]))
-
-
-(defprotocol Boundary
-  (register [this aggs])
-  (unregister [this aggs])
-  (run [this aggs fun]))
-
-
 (defmacro def-entity
   [entity-type & {:keys [req opt]}]
   `(s/def ~entity-type
@@ -85,6 +73,25 @@
   :default
   [entity _]
   entity)
+
+
+(defprotocol Boundaries
+  (register [this aggs])
+  (unregister [this aggs])
+  (run [this aggs fun]))
+
+
+(defprotocol Repository
+  (store [this id-key entity])
+  (fetch [this id-key id])
+  (exists? [this id-key id]))
+
+
+(defn transform-in
+  [repository id-key]
+  (fn [event]
+    (let [entity (fetch repository id-key (id-key event))]
+      (store repository id-key (transform @entity event)))))
 
 
 (defn- run-and-attach-event-id

@@ -10,11 +10,11 @@
              :refer [def-command def-message def-failure]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish fail-with transform-in get-entity]]))
+             :refer [boundary publish fail-with get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -47,7 +47,7 @@
   [component]
 
   {::customer/merchant-selected
-   [(transform-in (:componad component) ::customer/id)]
+   [(transform-in (:repository component) ::customer/id)]
 
    ::customer/select-merchant
    [(fn [{customer-id ::customer/id

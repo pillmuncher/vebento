@@ -8,11 +8,11 @@
              :refer [def-command def-message]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish transform-in fail-unless-exists]]))
+             :refer [boundary publish fail-unless-exists]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -36,7 +36,7 @@
   [component]
 
   {::customer/cart-cleared
-   [(transform-in (:componad component) ::customer/id)]
+   [(transform-in (:repository component) ::customer/id)]
 
    ::customer/clear-cart
    [(fn [{customer-id ::customer/id}]

@@ -11,9 +11,9 @@
              :as event
              :refer [subscribe-maps unsubscribe*]]
             [juncture.entity
-             :refer [register unregister def-entity transform]]
+             :refer [register unregister def-entity transform transform-in]]
             [vebento.core
-             :refer [transform-in]]
+             :as core]
             [vebento.specs
              :as specs]
             [vebento.merchant.registers
@@ -67,22 +67,22 @@
 
 
 (defrecord Component
-  [componad subscriptions]
+  [boundaries repository journal dispatcher subscriptions]
   co/Lifecycle
   (start [this]
-    (register (:boundaries componad) [::account])
+    (register boundaries [::account])
     (assoc this :subscriptions
-           (subscribe-maps (:dispatcher componad)
+           (subscribe-maps dispatcher
                            {::customer/merchant-selected
-                            [(transform-in componad ::id)]
+                            [(transform-in repository ::id)]
                             ::order/placed
-                            [(transform-in componad ::id)]}
+                            [(transform-in repository ::id)]}
                            (registers/subscriptions this)
                            (adds-area/subscriptions this)
                            (adds-product/subscriptions this)
                            (adds-schedule/subscriptions this)
                            (adds-payment-method/subscriptions this))))
   (stop [this]
-    (apply unsubscribe* (:dispatcher componad) subscriptions)
-    (unregister (:boundaries componad) [::account])
+    (apply unsubscribe* dispatcher subscriptions)
+    (unregister boundaries [::account])
     (assoc this :subscriptions nil)))

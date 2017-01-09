@@ -10,11 +10,11 @@
              :refer [def-command def-message]]
             [juncture.entity
              :as entity
-             :refer [create transform]]
+             :refer [create transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish execute fail-if-exists transform-in]]))
+             :refer [boundary publish execute fail-if-exists]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -46,7 +46,7 @@
   [component]
 
   {::customer/registered
-   [(transform-in (:componad component) ::customer/id)]
+   [(transform-in (:repository component) ::customer/id)]
 
    ::customer/register
    [(fn [{customer-id ::customer/id

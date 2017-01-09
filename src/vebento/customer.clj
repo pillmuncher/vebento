@@ -56,12 +56,12 @@
 
 
 (defrecord Component
-  [componad subscriptions]
+  [boundaries repository journal dispatcher subscriptions]
   co/Lifecycle
   (start [this]
-    (register (:boundaries componad) [::account ::shopping])
+    (register boundaries [::account ::shopping])
     (assoc this :subscriptions
-           (subscribe-maps (:dispatcher componad)
+           (subscribe-maps dispatcher
                            (registers/subscriptions this)
                            (changes-address/subscriptions this)
                            (selects-merchant/subscriptions this)
@@ -72,6 +72,6 @@
                            (places-order/subscriptions this)
                            (clears-cart/subscriptions this))))
   (stop [this]
-    (apply unsubscribe* (:dispatcher componad) subscriptions)
-    (unregister (:boundaries componad) [::account ::shopping])
+    (apply unsubscribe* dispatcher subscriptions)
+    (unregister boundaries [::account ::shopping])
     (assoc this :subscriptions nil)))

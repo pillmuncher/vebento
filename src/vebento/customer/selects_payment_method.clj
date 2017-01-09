@@ -12,11 +12,11 @@
              :refer [def-command def-message]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish fail-with transform-in get-entity]]))
+             :refer [boundary publish fail-with get-entity]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -43,7 +43,7 @@
   [component]
 
   {::customer/payment-method-selected
-   [(transform-in (:componad component) ::customer/id)]
+   [(transform-in (:repository component) ::customer/id)]
 
    ::customer/select-payment-method
    [(fn [{customer-id ::customer/id

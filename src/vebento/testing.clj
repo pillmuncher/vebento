@@ -30,86 +30,97 @@
              :refer [raise get-events]]))
 
 
-(defrecord Componad
-  [boundaries repository journal dispatcher]
+(defrecord MockBoundaries
+  []
+  entity/Boundaries
+
+  (register [this boundary-keys])
+
+  (unregister [this boundary-keys])
+
+  (run [this boundary-keys fun]
+    (fun)))
+
+
+(defrecord MockRepository
+  [entities]
+  entity/Repository
+
+  (entity/store [this id-key {id ::entity/id :as entity}]
+    (swap! entities assoc-in [id-key id] entity))
+
+  (entity/fetch [this id-key id]
+    (future (get-in @entities [id-key id])))
+
+  (entity/exists? [this id-key id]
+    (some? (get-in @entities [id-key id]))))
+
+
+(defrecord MockJournal
+  [trail]
+  event/Journal
+
+  (event/store [this event]
+    (swap! trail conj event)
+    event)
+
+  (event/fetch [this criteria]
+    (event/fetch-apply this identity criteria))
+
+  (event/fetch-apply [this fun criteria]
+    (future
+      (->> criteria
+           (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
+           (sort-by ::event/version)
+           (fun)))))
+
+
+
+(defrecord MockDispatcher
+  [journal counter subscriptions]
+  event/Dispatcher
+
+  (subscribe
+    [this [event-type handlers]]
+    (swap! subscriptions update event-type concat handlers)
+    [event-type handlers])
+
+  (unsubscribe
+    [this _] this)
+
+  (dispatch
+    [this event]
+    (let [event (assoc event ::event/version (swap! counter inc))]
+      (->> (select-keys event [::event/kind ::event/type])
+           (vals)
+           (map @subscriptions)
+           (apply union)
+           (mapv #(% event)))
+      event))
 
   co/Lifecycle
 
   (start [this]
-    (subscribe-maps dispatcher
-                    {::event/message
-                     [(store-in journal)]
-                     ::event/failure
-                     [(store-in journal)]})
+    (subscribe-maps this
+                    {::event/message [(store-in journal)]
+                     ::event/failure [(store-in journal)]})
     this)
 
   (stop [this]
-    (assoc dispatcher :subscriptions nil)))
+    (assoc this :subscriptions nil)))
 
 
-(defn component []
-  (let [entities (atom {})
-        trail (atom [])
-        counter (atom 0)
-        subscriptions (atom {})]
+(defn boundaries []
+  (->MockBoundaries))
 
-    (->Componad
+(defn repository []
+  (->MockRepository (atom {})))
 
-      (reify entity/Boundary
+(defn journal []
+  (->MockJournal (atom [])))
 
-        (register [this boundary-keys])
-
-        (unregister [this boundary-keys])
-
-        (run [this boundary-keys fun]
-          (fun)))
-
-      (reify entity/Repository
-
-        (entity/store [this id-key {id ::entity/id :as entity}]
-          (swap! entities assoc-in [id-key id] entity))
-
-        (entity/fetch [this id-key id]
-          (future (get-in @entities [id-key id])))
-
-        (entity/exists? [this id-key id]
-          (some? (get-in @entities [id-key id]))))
-
-      (reify event/Journal
-
-        (event/store [this event]
-          (swap! trail conj event)
-          event)
-
-        (event/fetch [this criteria]
-          (event/fetch-apply this identity criteria))
-
-        (event/fetch-apply [this fun criteria]
-          (future
-            (->> criteria
-                 (reduce (fn [r [k v]] (filter #(= (k %) v) r)) @trail)
-                 (sort-by ::event/version)
-                 (fun)))))
-
-      (reify event/Dispatcher
-
-        (subscribe
-          [this [event-type handlers]]
-          (swap! subscriptions update event-type concat handlers)
-          [event-type handlers])
-
-        (unsubscribe
-          [this _] this)
-
-        (dispatch
-          [this event]
-          (let [event (assoc event ::event/version (swap! counter inc))]
-            (->> (select-keys event [::event/kind ::event/type])
-                 (vals)
-                 (map @subscriptions)
-                 (apply union)
-                 (mapv #(% event)))
-            event))))))
+(defn dispatcher []
+  (->MockDispatcher nil (atom 0) (atom {})))
 
 
 (defn- strip-canonicals

@@ -8,11 +8,11 @@
              :refer [def-command def-message def-failure]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish fail-unless-exists transform-in]]))
+             :refer [boundary publish fail-unless-exists]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -43,7 +43,7 @@
   [component]
 
   {::merchant/payment-method-added
-   [(transform-in (:componad component) ::merchant/id)]
+   [(transform-in (:repository component) ::merchant/id)]
 
    ::merchant/add-payment-method
    [(fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]

@@ -10,16 +10,15 @@
              :refer [command message failure failure?]]
             [juncture.entity
              :as entity
-             :refer [run transform]]
+             :refer [run]]
             [componad
              :refer [within system >>= mdo-future]]))
 
 
-(def get-componad (asks :componad))
-(def get-boundaries (asks get-in [:componad :boundaries]))
-(def get-repository (asks get-in [:componad :repository]))
-(def get-journal (asks get-in [:componad :journal]))
-(def get-dispatcher (asks get-in [:componad :dispatcher]))
+(def get-boundaries (asks :boundaries))
+(def get-repository (asks :repository))
+(def get-journal (asks :journal))
+(def get-dispatcher (asks :dispatcher))
 
 
 (defn boundary
@@ -28,13 +27,6 @@
     (within (system env)
       boundaries <- get-boundaries
       (run boundaries boundary-keys #(within (system env) computation)))))
-
-
-(defn transform-in
-  [componad id-key]
-  (fn [event]
-    (let [entity (entity/fetch (:repository componad) id-key (id-key event))]
-      (entity/store (:repository componad) id-key (transform @entity event)))))
 
 
 (defn raise

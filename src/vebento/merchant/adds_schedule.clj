@@ -10,11 +10,11 @@
              :refer [def-command def-message]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish fail-unless-exists transform-in]]))
+             :refer [boundary publish fail-unless-exists]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -40,7 +40,7 @@
   [component]
 
   {::merchant/schedule-added
-   [(transform-in (:componad component) ::merchant/id)]
+   [(transform-in (:repository component) ::merchant/id)]
 
    ::merchant/add-schedule
    [(fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]

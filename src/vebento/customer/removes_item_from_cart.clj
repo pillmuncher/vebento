@@ -10,11 +10,11 @@
              :refer [def-command def-message def-failure]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within]]
             [vebento.core
-             :refer [boundary publish fail-with transform-in get-entity]]))
+             :refer [boundary publish fail-with get-entity]]))
 
 
 (ns-alias 'product 'vebento.product)
@@ -46,7 +46,7 @@
   [component]
 
   {::customer/item-removed-from-cart
-   [(transform-in (:componad component) ::customer/id)]
+   [(transform-in (:repository component) ::customer/id)]
 
    ::customer/remove-item-from-cart
    [(fn [{customer-id ::customer/id

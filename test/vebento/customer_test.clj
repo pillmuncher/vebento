@@ -17,19 +17,18 @@
 
 (defn test-bench []
   (-> (co/system-map
-        :componad
-        (testing/component)
-        :customer
-        (customer/->Component nil nil)
-        :merchant
-        (merchant/->Component nil nil)
-        :product
-        (product/->Component nil nil)
-        :order
-        (order/->Component nil nil))
+        :boundaries (testing/boundaries)
+        :repository (testing/repository)
+        :journal (testing/journal)
+        :dispatcher (testing/dispatcher)
+        :customer (customer/->Component nil nil nil nil nil)
+        :merchant (merchant/->Component nil nil nil nil nil)
+        :product (product/->Component nil nil nil nil nil)
+        :order (order/->Component nil nil nil nil nil))
       (co/system-using
-        {:product [:componad]
-         :order [:componad]
-         :merchant [:componad]
-         :customer [:componad]})
+        {:dispatcher [:journal]
+         :product [:boundaries :repository :journal :dispatcher]
+         :order [:boundaries :repository :journal :dispatcher]
+         :merchant [:boundaries :repository :journal :dispatcher]
+         :customer [:boundaries :repository :journal :dispatcher]})
       (co/start)))

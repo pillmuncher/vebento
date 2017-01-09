@@ -12,12 +12,11 @@
              :refer [def-command def-failure]]
             [juncture.entity
              :as entity
-             :refer [transform]]
+             :refer [transform transform-in]]
             [componad
              :refer [within mdo-await*]]
             [vebento.core
-             :refer [boundary publish fail-with transform-in get-entity
-                     fail-if-exists]]))
+             :refer [boundary publish fail-with get-entity fail-if-exists]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -57,7 +56,7 @@
   [component]
 
   {::order/placed
-   [(transform-in (:componad component) ::customer/id)]
+   [(transform-in (:repository component) ::customer/id)]
 
    ::customer/place-order
    [(fn [{customer-id ::customer/id
