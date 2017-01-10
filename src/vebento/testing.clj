@@ -23,7 +23,7 @@
              :refer [within return* >>=]]
             [juncture.event
              :as event
-             :refer [subscribe-maps store-in]]
+             :refer [subscribe-maps store-in unsubscribe*]]
             [juncture.entity
              :as entity]
             [vebento.core
@@ -56,6 +56,29 @@
     (some? (get-in @entities [id-key id]))))
 
 
+(defrecord MockDispatcher
+  [journal counter subscriptions]
+  event/Dispatcher
+
+  (subscribe
+    [this [event-type handlers]]
+    (swap! subscriptions update event-type concat handlers)
+    [event-type handlers])
+
+  (unsubscribe
+    [this _])
+
+  (dispatch
+    [this event]
+    (let [event (assoc event ::event/version (swap! counter inc))]
+      (->> (select-keys event [::event/kind ::event/type])
+           (vals)
+           (map @subscriptions)
+           (apply union)
+           (mapv #(% event)))
+      event)))
+
+
 (defrecord MockJournal
   [trail]
   event/Journal
@@ -75,38 +98,18 @@
            (fun)))))
 
 
-(defrecord MockDispatcher
-  [journal counter subscriptions]
-  event/Dispatcher
-
-  (subscribe
-    [this [event-type handlers]]
-    (swap! subscriptions update event-type concat handlers)
-    [event-type handlers])
-
-  (unsubscribe
-    [this _] this)
-
-  (dispatch
-    [this event]
-    (let [event (assoc event ::event/version (swap! counter inc))]
-      (->> (select-keys event [::event/kind ::event/type])
-           (vals)
-           (map @subscriptions)
-           (apply union)
-           (mapv #(% event)))
-      event))
+(defrecord Router
+  [dispatcher journal subscriptions]
 
   co/Lifecycle
 
   (start [this]
-    (subscribe-maps this
-                    {::event/message [(store-in journal)]
-                     ::event/failure [(store-in journal)]})
-    this)
+    (assoc this :subscriptions
+           (subscribe-maps dispatcher
+                           {::event/message [(store-in journal)]
+                            ::event/failure [(store-in journal)]})))
 
-  (stop [this]
-    (assoc this :subscriptions nil)))
+  (stop [this]))
 
 
 (defn boundaries []
@@ -115,11 +118,14 @@
 (defn repository []
   (->MockRepository (atom {})))
 
+(defn dispatcher []
+  (->MockDispatcher nil (atom 0) (atom {})))
+
 (defn journal []
   (->MockJournal (atom [])))
 
-(defn dispatcher []
-  (->MockDispatcher nil (atom 0) (atom {})))
+(defn router []
+  (->Router nil nil nil))
 
 
 (defn- strip-canonicals
@@ -139,12 +145,13 @@
 
 (defn scenario
   [& {:keys [using given after raise]}]
-  (within (componad/componad using)
+  (within (componad/componad (co/start using))
     given-events <- (raise-events given)
     after-events <- (raise-events after)
     expected <- (>>= (return* raise) strip-canonicals)
     received <- (strip-canonicals (difference (set after-events)
                                               (set given-events)))
+    (return (co/stop using))
     (return [(set expected) (set received)])))
 
 

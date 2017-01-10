@@ -136,3 +136,26 @@
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
+
+
+(def-scenario customer-registers-but-cannot-select-retailer
+  [customer-id ::customer/id
+   customer-address ::customer/address
+   merchant-id ::merchant/id]
+  :using (test-bench)
+  :after [(command
+            ::customer/register
+            ::customer/id customer-id
+            ::customer/address customer-address
+            ::merchant/id merchant-id)]
+  :raise [(message
+            ::customer/registered
+            ::customer/id customer-id)
+          (message
+            ::customer/address-changed
+            ::customer/id customer-id
+            ::customer/address customer-address)
+          (failure
+            ::entity/not-found
+            ::entity/id-key ::merchant/id
+            ::entity/id merchant-id)])

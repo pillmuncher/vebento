@@ -19,16 +19,16 @@
   (-> (co/system-map
         :boundaries (testing/boundaries)
         :repository (testing/repository)
-        :journal (testing/journal)
         :dispatcher (testing/dispatcher)
+        :journal (testing/journal)
+        :router (testing/router)
         :customer (customer/->Component nil nil nil nil nil)
         :merchant (merchant/->Component nil nil nil nil nil)
         :product (product/->Component nil nil nil nil nil)
         :order (order/->Component nil nil nil nil nil))
       (co/system-using
-        {:dispatcher [:journal]
+        {:router [:dispatcher :journal]
          :product [:boundaries :repository :journal :dispatcher]
          :order [:boundaries :repository :journal :dispatcher]
          :merchant [:boundaries :repository :journal :dispatcher]
-         :customer [:boundaries :repository :journal :dispatcher]})
-      (co/start)))
+         :customer [:boundaries :repository :journal :dispatcher]})))
