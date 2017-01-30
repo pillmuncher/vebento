@@ -16,16 +16,11 @@
              :as core]
             [vebento.specs
              :as specs]
-            [vebento.merchant.registers
-             :as registers]
-            [vebento.merchant.adds-area
-             :as adds-area]
-            [vebento.merchant.adds-product
-             :as adds-product]
-            [vebento.merchant.adds-schedule
-             :as adds-schedule]
-            [vebento.merchant.adds-payment-method
-             :as adds-payment-method]))
+            [vebento.merchant.registers]
+            [vebento.merchant.adds-area]
+            [vebento.merchant.adds-product]
+            [vebento.merchant.adds-schedule]
+            [vebento.merchant.adds-payment-method]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -72,16 +67,17 @@
   (start [this]
     (register boundaries [::account])
     (assoc this :subscriptions
-           (subscribe-maps dispatcher
-                           {::customer/merchant-selected
-                            [(transform-in repository ::id)]
-                            ::order/placed
-                            [(transform-in repository ::id)]}
-                           (registers/subscriptions this)
-                           (adds-area/subscriptions this)
-                           (adds-product/subscriptions this)
-                           (adds-schedule/subscriptions this)
-                           (adds-payment-method/subscriptions this))))
+           (subscribe-maps
+             dispatcher
+             {::customer/merchant-selected
+              [(transform-in repository ::id)]
+              ::order/placed
+              [(transform-in repository ::id)]}
+             (vebento.merchant.registers/subscriptions this)
+             (vebento.merchant.adds-area/subscriptions this)
+             (vebento.merchant.adds-product/subscriptions this)
+             (vebento.merchant.adds-schedule/subscriptions this)
+             (vebento.merchant.adds-payment-method/subscriptions this))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::account])

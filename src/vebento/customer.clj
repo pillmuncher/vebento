@@ -15,24 +15,15 @@
              :refer [register unregister def-entity]]
             [vebento.specs
              :as specs]
-            [vebento.customer.registers
-             :as registers]
-            [vebento.customer.changes-address
-             :as changes-address]
-            [vebento.customer.selects-merchant
-             :as selects-merchant]
-            [vebento.customer.adds-schedule
-             :as adds-schedule]
-            [vebento.customer.selects-payment-method
-             :as selects-payment-method]
-            [vebento.customer.adds-item-to-cart
-             :as adds-item-to-cart]
-            [vebento.customer.removes-item-from-cart
-             :as removes-item-from-cart]
-            [vebento.customer.places-order
-             :as places-order]
-            [vebento.customer.clears-cart
-             :as clears-cart]))
+            [vebento.customer.registers]
+            [vebento.customer.changes-address]
+            [vebento.customer.selects-merchant]
+            [vebento.customer.adds-schedule]
+            [vebento.customer.selects-payment-method]
+            [vebento.customer.adds-item-to-cart]
+            [vebento.customer.removes-item-from-cart]
+            [vebento.customer.places-order]
+            [vebento.customer.clears-cart]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -61,16 +52,17 @@
   (start [this]
     (register boundaries [::account ::shopping])
     (assoc this :subscriptions
-           (subscribe-maps dispatcher
-                           (registers/subscriptions this)
-                           (changes-address/subscriptions this)
-                           (selects-merchant/subscriptions this)
-                           (adds-schedule/subscriptions this)
-                           (selects-payment-method/subscriptions this)
-                           (adds-item-to-cart/subscriptions this)
-                           (removes-item-from-cart/subscriptions this)
-                           (places-order/subscriptions this)
-                           (clears-cart/subscriptions this))))
+           (subscribe-maps
+             dispatcher
+             (vebento.customer.registers/subscriptions this)
+             (vebento.customer.changes-address/subscriptions this)
+             (vebento.customer.selects-merchant/subscriptions this)
+             (vebento.customer.adds-schedule/subscriptions this)
+             (vebento.customer.selects-payment-method/subscriptions this)
+             (vebento.customer.adds-item-to-cart/subscriptions this)
+             (vebento.customer.removes-item-from-cart/subscriptions this)
+             (vebento.customer.places-order/subscriptions this)
+             (vebento.customer.clears-cart/subscriptions this))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::account ::shopping])
