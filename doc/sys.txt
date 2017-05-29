@@ -11,7 +11,7 @@ Sie werden über einen Event-Bus geleitet, den man abonnieren kann.
 
 Auslöser und Handler eines Events brauchen sich nicht zu kennen.
 
-Zu jedem Event kann es mehrere Händler geben, die alle ausgeführt werden.
+Zu jedem Event kann es mehrere Handler geben, die alle ausgeführt werden.
 
 Jede Abarbeitung eines Events kann weitere Events zur Folge haben.
 

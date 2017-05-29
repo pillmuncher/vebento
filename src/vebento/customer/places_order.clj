@@ -82,8 +82,8 @@
                             ::customer/id customer-id)))
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mdo-await*
-          (mwhen (empty? (intersection (@customer ::customer/schedule)
-                                       (@merchant ::merchant/schedule)))
+          (mwhen (distinct? (@customer ::customer/schedule)
+                            (@merchant ::merchant/schedule))
                  (fail-with ::customer/schedule-not-in-merchant-schedule
                             ::customer/id customer-id
                             ::customer/schedule (@customer ::customer/schedule)))

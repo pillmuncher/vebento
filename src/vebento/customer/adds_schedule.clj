@@ -2,7 +2,7 @@
   (:require [clojure.future
              :refer :all]
             [clojure.set
-             :refer [union intersection]]
+             :refer [union]]
             [monads.util
              :refer [mwhen]]
             [util
@@ -56,8 +56,7 @@
       (within (boundary component #{::customer/shopping})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
-        (mwhen (empty? (intersection schedule
-                                     (@merchant ::merchant/schedule)))
+        (mwhen (distinct? schedule (@merchant ::merchant/schedule))
                (fail-with ::customer/schedule-not-in-merchant-schedule
                           ::customer/id customer-id
                           ::customer/schedule schedule))

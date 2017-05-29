@@ -21,6 +21,15 @@
 (def get-dispatcher (asks :dispatcher))
 
 
+(defn boundary1
+  [boundary-keys]
+  (fn [computation]
+    (mdo
+      env <- ask
+      boundaries <- get-boundaries
+      (run boundaries boundary-keys #(within (system env) computation)))))
+
+
 (defn boundary
   [env boundary-keys]
   (fn [computation]

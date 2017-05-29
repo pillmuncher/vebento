@@ -156,7 +156,7 @@
         (->WebJournal)
         :queries
         (atom {})
-        :init
+        :init)
       (co/system-using
         {:dispatcher [:journal]
          :shop [:dispatcher :journal :queries :root]})

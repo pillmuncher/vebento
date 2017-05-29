@@ -21,7 +21,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-gets-registered
+(def-scenario customer-registers
   [customer-id ::customer/id]
   :using (test-bench)
   :after [(command
