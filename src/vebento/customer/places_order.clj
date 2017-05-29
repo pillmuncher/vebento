@@ -86,13 +86,14 @@
                             (@merchant ::merchant/schedule))
                  (fail-with ::customer/schedule-not-in-merchant-schedule
                             ::customer/id customer-id
-                            ::customer/schedule (@customer ::customer/schedule)))
+                            ::customer/schedule (@customer
+                                                  ::customer/schedule)))
           (mwhen (-> @customer ::customer/payment-method
                      (not-in? (@merchant ::merchant/payment-methods)))
                  (fail-with ::merchant/does-not-support-payment-method
                             ::merchant/id (@merchant ::merchant/id)
-                            ::merchant/payment-method (@customer
-                                                        ::customer/payment-method)))
+                            ::merchant/payment-method
+                              (@customer ::customer/payment-method)))
           (mwhen (-> @customer ::customer/address ::specs/zipcode
                      (not-in? (@merchant ::merchant/areas)))
                  (fail-with ::customer/zipcode-not-in-merchant-areas
