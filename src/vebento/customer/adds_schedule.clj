@@ -53,7 +53,7 @@
    ::customer/add-schedule
    [(fn [{customer-id ::customer/id
           schedule ::customer/schedule}]
-      (within (boundary component #{::customer/shopping})
+      (within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (distinct? schedule (@merchant ::merchant/schedule))

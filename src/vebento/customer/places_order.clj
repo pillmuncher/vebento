@@ -61,7 +61,7 @@
    ::customer/place-order
    [(fn [{customer-id ::customer/id
           order-id ::order/id}]
-      (within (boundary component #{::customer/shopping})
+      (within (boundary component #{::customer/shop})
         (fail-if-exists ::order/id order-id)
         customer <- (get-entity ::customer/id customer-id)
         (mdo-await*

@@ -53,7 +53,7 @@
           address ::customer/address
           merchant-id ::merchant/id
           payment-method ::customer/payment-method}]
-      (within (boundary component #{::customer/account ::customer/shopping})
+      (within (boundary component #{::customer/account ::customer/shop})
         (fail-if-exists ::customer/id customer-id)
         (publish ::customer/registered
                  ::customer/id customer-id)

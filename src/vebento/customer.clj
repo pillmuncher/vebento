@@ -50,7 +50,7 @@
   [boundaries repository journal dispatcher subscriptions]
   co/Lifecycle
   (start [this]
-    (register boundaries [::account ::shopping])
+    (register boundaries [::account ::shop])
     (assoc this :subscriptions
            (subscribe-maps
              dispatcher
@@ -65,5 +65,5 @@
              (vebento.customer.clears-cart/subscriptions this))))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
-    (unregister boundaries [::account ::shopping])
+    (unregister boundaries [::account ::shop])
     (assoc this :subscriptions nil)))

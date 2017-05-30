@@ -57,7 +57,7 @@
    [(fn [{customer-id ::customer/id
           product-id ::product/id
           amount ::product/amount}]
-      (within (boundary component #{::customer/shopping})
+      (within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (-> product-id
