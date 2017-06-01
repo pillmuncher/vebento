@@ -98,7 +98,7 @@
            (fun)))))
 
 
-(defrecord Router
+(defrecord MockRouter
   [dispatcher journal subscriptions]
 
   co/Lifecycle
@@ -125,7 +125,7 @@
   (->MockJournal (atom [])))
 
 (defn router []
-  (->Router nil nil nil))
+  (->MockRouter nil nil nil))
 
 
 (defn- strip-canonicals
