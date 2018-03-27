@@ -1,9 +1,7 @@
 (ns juncture.event
-  (:require [clojure.future
-             :refer :all]
-            [clojure.spec
+  (:require [clojure.spec.alpha
              :as s]
-            [clojure.spec.test
+            [clojure.spec.test.alpha
              :as s-test]
             [util
              :refer [uuid inst]]))
@@ -58,13 +56,16 @@
 (s/def ::id uuid?)
 (s/def ::date inst?)
 (s/def ::type keyword?)
-(s/def ::kind #{::command ::message ::failure})
+(s/def ::kind #{::command ::message ::error})
 (s/def ::spec (s/keys :req [::kind ::type ::date ::id]
                       :opt [::version]))
 
 (s/def ::command #(= (::kind %) ::command))
 (s/def ::message #(= (::kind %) ::message))
-(s/def ::failure #(= (::kind %) ::failure))
+(s/def ::error #(= (::kind %) ::error))
+
+
+(defmulti handle ::type)
 
 
 (defmacro def-event
@@ -81,9 +82,9 @@
   [message-type & {:as message-keys}]
   `(def-event ::message ~message-type ~message-keys))
 
-(defmacro def-failure
-  [failure-type & {:as failure-keys}]
-  `(def-event ::failure ~failure-type ~failure-keys))
+(defmacro def-error
+  [error-type & {:as error-keys}]
+  `(def-event ::error ~error-type ~error-keys))
 
 
 (defn valid?
@@ -121,11 +122,11 @@
   [event-type & {:as event-params}]
   (-create ::message event-type event-params))
 
-(defn failure
+(defn error
   [event-type & {:as event-params}]
-  (-create ::failure event-type event-params))
+  (-create ::error event-type event-params))
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))
 (def message? #(s/valid? (s/and valid? ::message) %))
-(def failure? #(s/valid? (s/and valid? ::failure) %))
+(def error? #(s/valid? (s/and valid? ::error) %))

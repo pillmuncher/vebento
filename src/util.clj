@@ -1,5 +1,7 @@
 (ns util
-  (:import  [java.util UUID Date]))
+  (:require [clojure.set
+             :refer [intersection]])
+  (:import (java.util UUID Date)))
 
 
 (defmacro pull [ns names]
@@ -28,6 +30,7 @@
 
 (def in? (flip contains?))
 (def not-in? (comp not in?))
+(def intersect? (comp not empty? intersection))
 
 (def zip (partial apply map vector))
 

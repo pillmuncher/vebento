@@ -1,7 +1,5 @@
 (ns vebento.customer
-  (:require [clojure.future
-             :refer :all]
-            [clojure.spec
+  (:require [clojure.spec.alpha
              :as s]
             [com.stuartsierra.component
              :as co]

@@ -1,12 +1,10 @@
 (ns vebento.customer.registers-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -27,7 +25,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :raise [(message
+  :relay [(message
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -41,7 +39,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :raise [(failure
+  :relay [(error
             ::entity/already-exists
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -55,7 +53,7 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :raise [(message
+  :relay [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -83,7 +81,7 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :raise [(message
+  :relay [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -121,7 +119,7 @@
             ::customer/address customer-address
             ::merchant/id merchant-id
             ::customer/payment-method payment-method)]
-  :raise [(message
+  :relay [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -148,14 +146,14 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :raise [(message
+  :relay [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)
-          (failure
+          (error
             ::entity/not-found
             ::entity/id-key ::merchant/id
             ::entity/id merchant-id)])

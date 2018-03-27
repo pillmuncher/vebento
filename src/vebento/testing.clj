@@ -1,13 +1,11 @@
 (ns vebento.testing
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer [deftest is]]
-            [clojure.spec
+            [clojure.spec.alpha
              :as s]
-            [clojure.spec.test
+            [clojure.spec.test.alpha
              :as stest]
-            [clojure.spec.gen
+            [clojure.spec.gen.alpha
              :as gen]
             [clojure.set
              :refer [union difference]]
@@ -20,14 +18,14 @@
             [util
              :refer [zip]]
             [componad
-             :refer [within return* >>=]]
+             :refer [mdo-within return* >>=]]
             [juncture.event
              :as event
              :refer [subscribe-maps store-in unsubscribe*]]
             [juncture.entity
              :as entity]
             [vebento.core
-             :refer [raise get-events]]))
+             :refer [relay get-events]]))
 
 
 (defrecord MockBoundaries
@@ -107,7 +105,7 @@
     (assoc this :subscriptions
            (subscribe-maps dispatcher
                            {::event/message [(store-in journal)]
-                            ::event/failure [(store-in journal)]})))
+                            ::event/error [(store-in journal)]})))
 
   (stop [this]))
 
@@ -135,20 +133,20 @@
        (return)))
 
 
-(defn- raise-events
+(defn- relay-events
   [events]
   (mdo
-    (map-m raise events)
+    (map-m relay events)
     (>>= (get-events)
          #(return @%))))
 
 
 (defn scenario
-  [& {:keys [using given after raise]}]
-  (within (componad/componad (co/start using))
-    given-events <- (raise-events given)
-    after-events <- (raise-events after)
-    expected <- (>>= (return* raise) strip-canonicals)
+  [& {:keys [using given after relay]}]
+  (mdo-within (componad/componad (co/start using))
+    given-events <- (relay-events given)
+    after-events <- (relay-events after)
+    expected <- (>>= (return* relay) strip-canonicals)
     received <- (strip-canonicals (difference (set after-events)
                                               (set given-events)))
     (return (co/stop using))

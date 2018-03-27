@@ -1,7 +1,5 @@
 (ns vebento.merchant.adds-product
-  (:require [clojure.future
-             :refer :all]
-            [util
+  (:require [util
              :refer [ns-alias]]
             [juncture.event
              :as event
@@ -10,7 +8,7 @@
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
              :refer [boundary publish fail-unless-exists]]))
 
@@ -43,7 +41,7 @@
 
    ::merchant/add-product
    [(fn [{merchant-id ::merchant/id product-id ::product/id}]
-      (within (boundary component #{::merchant/account})
+      (mdo-within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (fail-unless-exists ::product/id product-id)
         (publish ::merchant/product-added

@@ -1,12 +1,10 @@
 (ns vebento.customer.clears-cart-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -27,7 +25,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :raise [(message
+  :relay [(message
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
@@ -38,7 +36,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :raise [(failure
+  :relay [(error
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])

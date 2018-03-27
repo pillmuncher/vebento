@@ -1,7 +1,5 @@
 (ns vebento.product
-  (:require [clojure.future
-             :refer :all]
-            [clojure.spec
+  (:require [clojure.spec.alpha
              :as s]
             [com.stuartsierra.component
              :as co]
@@ -9,16 +7,16 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure
+             :refer [def-command def-message def-error
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
              :refer [register unregister def-entity create transform
                      transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish execute fail-with fail-if-exists
+             :refer [boundary publish execute raise fail-if-exists
                      fail-unless-exists get-entity]]
             [vebento.specs
              :as specs]))
@@ -67,7 +65,7 @@
       (subscribe-maps dispatcher
                       {::created [(transform-in repository ::id)]
                        ::create [(fn [{product-id ::id name ::name}]
-                                   (within (boundary this #{::assortment})
+                                   (mdo-within (boundary this #{::assortment})
                                      (fail-if-exists ::id product-id)
                                      (publish ::created
                                               ::id product-id

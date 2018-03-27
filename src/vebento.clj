@@ -1,7 +1,5 @@
 (ns vebento
-  (:require [clojure.future
-             :refer :all]
-            [util]
+  (:require [util]
             [componad]
             [juncture.event]
             [juncture.entity]

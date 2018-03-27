@@ -1,12 +1,10 @@
 (ns vebento.customer.selects-payment-method-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -47,7 +45,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :raise [(message
+  :relay [(message
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
@@ -77,7 +75,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :raise [(failure
+  :relay [(error
             ::merchant/does-not-support-payment-method
             ::merchant/id merchant-id
             ::merchant/payment-method payment-method)])

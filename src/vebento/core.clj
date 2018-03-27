@@ -1,18 +1,16 @@
 (ns vebento.core
-  (:require [clojure.future
-             :refer :all]
-            [monads.core
+  (:require [monads.core
              :refer [mdo return fail ask asks]]
             [monads.util
              :refer [mwhen]]
             [juncture.event
              :as event
-             :refer [command message failure failure?]]
+             :refer [command message error error?]]
             [juncture.entity
              :as entity
-             :refer [run]]
+             :refer [run transform-in]]
             [componad
-             :refer [within system >>= mdo-future]]))
+             :refer [mdo-within system >>= mdo-future]]))
 
 
 (def get-boundaries (asks :boundaries))
@@ -21,61 +19,60 @@
 (def get-dispatcher (asks :dispatcher))
 
 
-(defn boundary1
-  [boundary-keys]
-  (fn [computation]
-    (mdo
-      env <- ask
-      boundaries <- get-boundaries
-      (run boundaries boundary-keys #(within (system env) computation)))))
+;(defn boundary1
+  ;[id-key boundary-keys]
+  ;(fn [computation]
+    ;(mdo-sync
+      ;[id-key boundary-keys]
+      ;computation)))
 
 
 (defn boundary
   [env boundary-keys]
   (fn [computation]
-    (within (system env)
+    (mdo-within (system env)
       boundaries <- get-boundaries
-      (run boundaries boundary-keys #(within (system env) computation)))))
+      (run boundaries boundary-keys #(mdo-within (system env) computation)))))
 
 
-(defn raise
+(defn relay
   [event]
   (mdo
     (>>= get-dispatcher
          #(return (event/dispatch % event)))
-    (if (failure? event)
+    (if (error? event)
       (fail event)
       (return event))))
 
 
 (defn execute
   [command-type & command-params]
-  (raise (apply command command-type command-params)))
+  (relay (apply command command-type command-params)))
 
 (defn execute-in
   [env command-type & command-params]
-  (within (system env)
+  (mdo-within (system env)
     (apply execute command-type command-params)))
 
 
 (defn publish
   [message-type & message-params]
-  (raise (apply message message-type message-params)))
+  (relay (apply message message-type message-params)))
 
 (defn publish-in
   [env message-type & message-params]
-  (within (system env)
+  (mdo-within (system env)
     (apply publish message-type message-params)))
 
 
-(defn fail-with
-  [failure-type & failure-params]
-  (raise (apply failure failure-type failure-params)))
+(defn raise
+  [error-type & error-params]
+  (relay (apply error error-type error-params)))
 
-(defn fail-in
-  [env failure-type & failure-params]
-  (within (system env)
-    (apply fail-with failure-type failure-params)))
+(defn raise-in
+  [env error-type & error-params]
+  (mdo-within (system env)
+    (apply raise error-type error-params)))
 
 
 (defn get-events
@@ -83,27 +80,17 @@
   (>>= get-journal
        #(return (event/fetch % criteria))))
 
-(defn get-commands
-  [& {:as criteria}]
-  (>>= get-journal
-       #(return (apply get-events % ::event/kind ::event/command criteria))))
 
-(defn get-messages
-  [& {:as criteria}]
-  (>>= get-journal
-       #(return (apply get-events % ::event/kind ::event/message criteria))))
-
-(defn get-failures
-  [& {:as criteria}]
-  (>>= get-journal
-       #(return (apply get-events % ::event/kind ::event/failure criteria))))
+(def get-commands (partial get-events ::event/kind ::event/command))
+(def get-messages (partial get-events ::event/kind ::event/message))
+(def get-errors (partial get-events ::event/kind ::event/error))
 
 
 (defn fail-if-exists
   [id-key id]
   (>>= get-repository
        #(mwhen (entity/exists? % id-key id)
-               (fail-with ::entity/already-exists
+               (raise ::entity/already-exists
                           ::entity/id-key id-key
                           ::entity/id id))))
 
@@ -111,7 +98,7 @@
   [id-key id]
   (>>= get-repository
        #(mwhen (not (entity/exists? % id-key id))
-               (fail-with ::entity/not-found
+               (raise ::entity/not-found
                           ::entity/id-key id-key
                           ::entity/id id))))
 
@@ -122,6 +109,11 @@
     (fail-unless-exists id-key id)
     repository <- get-repository
     (return (entity/fetch repository id-key id))))
+
+
+(defn update-entity [id-key event]
+  (>>= (comp return :repository)
+       (transform-in id-key event)))
 
 
 (defprotocol QueryStore

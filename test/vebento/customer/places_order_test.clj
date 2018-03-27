@@ -1,12 +1,10 @@
 (ns vebento.customer.places-order-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -78,7 +76,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :raise [(message
+  :relay [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -142,7 +140,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :raise [(failure
+  :relay [(error
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -198,7 +196,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :raise [(failure
+  :relay [(error
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])
 
@@ -246,18 +244,18 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :raise [(failure
+  :relay [(error
             ::customer/cart-is-empty
             ::customer/id customer-id)
-          (failure
+          (error
             ::customer/has-given-no-address
             ::customer/id customer-id)
-          (failure
+          (error
             ::customer/has-selected-no-payment-method
             ::customer/id customer-id)
-          (failure
+          (error
             ::customer/has-selected-no-merchant
             ::customer/id customer-id)
-          (failure
+          (error
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])

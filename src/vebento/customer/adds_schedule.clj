@@ -1,22 +1,20 @@
 (ns vebento.customer.adds-schedule
-  (:require [clojure.future
-             :refer :all]
-            [clojure.set
+  (:require [clojure.set
              :refer [union]]
             [monads.util
              :refer [mwhen]]
             [util
-             :refer [ns-alias]]
+             :refer [ns-alias intersect?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-error]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within munless]]
             [vebento.core
-             :refer [boundary publish fail-with get-entity]]))
+             :refer [boundary publish raise get-entity]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -33,7 +31,7 @@
         ::customer/schedule])
 
 
-(def-failure ::customer/schedule-not-in-merchant-schedule
+(def-error ::customer/schedule-not-in-merchant-schedule
   :req [::customer/id
         ::customer/schedule])
 
@@ -53,13 +51,13 @@
    ::customer/add-schedule
    [(fn [{customer-id ::customer/id
           schedule ::customer/schedule}]
-      (within (boundary component #{::customer/shop})
+      (mdo-within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
-        (mwhen (distinct? schedule (@merchant ::merchant/schedule))
-               (fail-with ::customer/schedule-not-in-merchant-schedule
-                          ::customer/id customer-id
-                          ::customer/schedule schedule))
+        (munless (intersect? schedule (@merchant ::merchant/schedule))
+                 (raise ::customer/schedule-not-in-merchant-schedule
+                        ::customer/id customer-id
+                        ::customer/schedule schedule))
         (publish ::customer/schedule-added
                  ::customer/id customer-id
                  ::customer/schedule schedule)))]})

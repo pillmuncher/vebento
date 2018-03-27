@@ -1,7 +1,5 @@
 (ns vebento.merchant.registers
-  (:require [clojure.future
-             :refer :all]
-            [util
+  (:require [util
              :refer [ns-alias]]
             [juncture.event
              :as event
@@ -10,7 +8,7 @@
              :as entity
              :refer [create transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
              :refer [boundary publish fail-if-exists]]))
 
@@ -50,7 +48,7 @@
 
    ::merchant/register
    [(fn [{merchant-id ::merchant/id address ::merchant/address}]
-      (within (boundary component #{::merchant/account})
+      (mdo-within (boundary component #{::merchant/account})
         (fail-if-exists ::merchant/id merchant-id)
         (publish ::merchant/registered
                  ::merchant/id merchant-id

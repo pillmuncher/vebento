@@ -1,12 +1,10 @@
 (ns vebento.customer.adds-item-to-cart-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -54,7 +52,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :raise [(message
+  :relay [(message
             ::customer/item-added-to-cart
             ::customer/id customer-id
             ::product/id product-id
@@ -92,7 +90,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :raise [(failure
+  :relay [(error
             ::customer/product-not-in-merchant-assortment
             ::customer/id customer-id
             ::product/id product-id)])

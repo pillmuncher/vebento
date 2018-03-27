@@ -1,20 +1,21 @@
 (ns vebento.customer.registers
-  (:require [clojure.future
-             :refer :all]
+  (:require [monads.core
+             :as monad
+             :refer [return]]
             [monads.util
              :refer [mwhen]]
             [util
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [def-command def-message handle]]
             [juncture.entity
              :as entity
              :refer [create transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within >>=]]
             [vebento.core
-             :refer [boundary publish execute fail-if-exists]]))
+             :refer [boundary publish execute fail-if-exists update-entity]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -53,7 +54,7 @@
           address ::customer/address
           merchant-id ::merchant/id
           payment-method ::customer/payment-method}]
-      (within (boundary component #{::customer/account ::customer/shop})
+      (mdo-within (boundary component #{::customer/account ::customer/shop})
         (fail-if-exists ::customer/id customer-id)
         (publish ::customer/registered
                  ::customer/id customer-id)

@@ -1,7 +1,5 @@
 (ns vebento.merchant.adds-schedule
-  (:require [clojure.future
-             :refer :all]
-            [clojure.set
+  (:require [clojure.set
              :refer [union]]
             [util
              :refer [ns-alias]]
@@ -12,7 +10,7 @@
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
              :refer [boundary publish fail-unless-exists]]))
 
@@ -44,7 +42,7 @@
 
    ::merchant/add-schedule
    [(fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]
-      (within (boundary component #{::merchant/account})
+      (mdo-within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/schedule-added
                  ::merchant/id merchant-id

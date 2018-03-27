@@ -1,5 +1,3 @@
 (ns vebento.testing-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]))

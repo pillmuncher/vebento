@@ -1,9 +1,7 @@
 (ns componad
-  (:require [clojure.future
-             :refer :all]
-            [monads.core
+  (:require [monads.core
              :as monad
-             :refer [mdo return fail ask get-state]]
+             :refer [ask fail get-state mdo return]]
             [monads.types
              :refer [fst either]]
             [monads.util
@@ -29,6 +27,14 @@
 (defn >>=
   [m & mfs]
   (reduce monad/>>= m mfs))
+
+
+(defmacro munless
+  "Execute the computation acc if p is falsy."
+  [p acc]
+  `(if ~p
+    ~(return nil)
+    ~acc))
 
 
 (defmacro m-when
@@ -79,7 +85,7 @@
                                     :component (co-key co)))))))
 
 
-(defmacro within
+(defmacro mdo-within
   [environment & computations]
   `(~environment (mdo ~@computations)))
 
@@ -101,7 +107,7 @@
                 (deref [me] @result#)))))))
 
 
-(defmacro mdo-await*
+(defmacro mdo-parallel
   [& computations]
   (let [qs (for [c computations]
              `(mdo-future ~c))]

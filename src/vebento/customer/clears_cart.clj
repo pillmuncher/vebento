@@ -1,7 +1,5 @@
 (ns vebento.customer.clears-cart
-  (:require [clojure.future
-             :refer :all]
-            [util
+  (:require [util
              :refer [ns-alias]]
             [juncture.event
              :as event
@@ -10,7 +8,7 @@
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
              :refer [boundary publish fail-unless-exists]]))
 
@@ -40,7 +38,7 @@
 
    ::customer/clear-cart
    [(fn [{customer-id ::customer/id}]
-      (within (boundary component #{::customer/shop})
+      (mdo-within (boundary component #{::customer/shop})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/cart-cleared
                  ::customer/id customer-id)))]})

@@ -1,7 +1,5 @@
 (ns vebento.customer.selects-payment-method
-  (:require [clojure.future
-             :refer :all]
-            [monads.core
+  (:require [monads.core
              :refer [return]]
             [monads.util
              :refer [mwhen]]
@@ -14,9 +12,9 @@
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish fail-with get-entity]]))
+             :refer [boundary publish raise get-entity]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -48,14 +46,14 @@
    ::customer/select-payment-method
    [(fn [{customer-id ::customer/id
           payment-method ::customer/payment-method}]
-      (within (boundary component #{::customer/shop})
+      (mdo-within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (-> payment-method
                    (not-in? (@merchant ::merchant/payment-methods)))
-               (fail-with ::merchant/does-not-support-payment-method
-                          ::merchant/id (@merchant ::entity/id)
-                          ::merchant/payment-method payment-method))
+               (raise ::merchant/does-not-support-payment-method
+                      ::merchant/id (@merchant ::entity/id)
+                      ::merchant/payment-method payment-method))
         (publish ::customer/payment-method-selected
                  ::customer/id customer-id
                  ::customer/payment-method payment-method)))]})

@@ -1,12 +1,10 @@
 (ns vebento.customer.changes-address-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -29,7 +27,7 @@
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :raise [(message
+  :relay [(message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)])
@@ -48,7 +46,7 @@
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address new-address)]
-  :raise [(message
+  :relay [(message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address new-address)])

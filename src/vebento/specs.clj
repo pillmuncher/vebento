@@ -1,9 +1,7 @@
 (ns vebento.specs
-  (:require [clojure.future
-             :refer :all]
-            [clojure.spec
+  (:require [clojure.spec.alpha
              :as s]
-            [clojure.spec.gen
+            [clojure.spec.gen.alpha
              :as gen]
             [util
              :refer [ns-alias uuid]]))
@@ -36,7 +34,7 @@
 
 (s/def ::id ::uuid)
 (s/def ::boundary ::keyword)
-(s/def ::failure ::keyword)
+(s/def ::error ::keyword)
 
 (s/def ::amount ::pos-int)
 (s/def ::name ::string)

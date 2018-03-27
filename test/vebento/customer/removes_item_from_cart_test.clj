@@ -1,12 +1,10 @@
 (ns vebento.customer.removes-item-from-cart-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -58,7 +56,7 @@
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :raise [(message
+  :relay [(message
             ::customer/item-removed-from-cart
             ::customer/id customer-id
             ::product/id product-id)])
@@ -97,7 +95,7 @@
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :raise [(failure
+  :relay [(error
             ::customer/product-not-in-cart
             ::customer/id customer-id
             ::product/id product-id)])

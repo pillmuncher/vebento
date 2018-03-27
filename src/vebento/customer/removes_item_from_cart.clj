@@ -1,20 +1,18 @@
 (ns vebento.customer.removes-item-from-cart
-  (:require [clojure.future
-             :refer :all]
-            [monads.util
+  (:require [monads.util
              :refer [mwhen]]
             [util
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-error]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish fail-with get-entity]]))
+             :refer [boundary publish raise get-entity]]))
 
 
 (ns-alias 'product 'vebento.product)
@@ -31,7 +29,7 @@
         ::product/id])
 
 
-(def-failure ::customer/product-not-in-cart
+(def-error ::customer/product-not-in-cart
   :req [::customer/id
         ::product/id])
 
@@ -51,13 +49,13 @@
    ::customer/remove-item-from-cart
    [(fn [{customer-id ::customer/id
           product-id ::product/id}]
-      (within (boundary component #{::customer/shop})
+      (mdo-within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (-> product-id
                    (not-in? (@customer ::customer/cart)))
-               (fail-with ::customer/product-not-in-cart
-                          ::customer/id customer-id
-                          ::product/id product-id))
+               (raise ::customer/product-not-in-cart
+                      ::customer/id customer-id
+                      ::product/id product-id))
         (publish ::customer/item-removed-from-cart
                  ::customer/id customer-id
                  ::product/id product-id)))]})

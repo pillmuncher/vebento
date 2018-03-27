@@ -1,12 +1,10 @@
 (ns vebento.customer.adds-schedule-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -47,7 +45,7 @@
             ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)]
-  :raise [(message
+  :relay [(message
             ::customer/schedule-added
             ::customer/id customer-id
             ::customer/schedule schedule)])

@@ -1,20 +1,18 @@
 (ns vebento.customer.selects-merchant
-  (:require [clojure.future
-             :refer :all]
-            [monads.util
+  (:require [monads.util
              :refer [mwhen]]
             [util
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-error]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish fail-with get-entity]]))
+             :refer [boundary publish raise get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -32,7 +30,7 @@
         ::merchant/id])
 
 
-(def-failure ::customer/zipcode-not-in-merchant-areas
+(def-error ::customer/zipcode-not-in-merchant-areas
   :req [::customer/id
         ::customer/zipcode])
 
@@ -52,19 +50,19 @@
    ::customer/select-merchant
    [(fn [{customer-id ::customer/id
           merchant-id ::merchant/id}]
-      (within (boundary component #{::customer/shop})
+      (mdo-within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (-> @customer ::customer/address nil?)
-               (fail-with ::customer/has-given-no-address
-                          ::customer/id customer-id))
+               (raise ::customer/has-given-no-address
+                      ::customer/id customer-id))
         merchant <- (get-entity ::merchant/id merchant-id)
         (mwhen (-> @customer ::customer/address ::specs/zipcode
                    (not-in? (@merchant ::merchant/areas)))
-               (fail-with ::customer/zipcode-not-in-merchant-areas
-                          ::customer/id customer-id
-                          ::customer/zipcode (-> @customer
-                                                 ::customer/address
-                                                 ::specs/zipcode)))
+               (raise ::customer/zipcode-not-in-merchant-areas
+                      ::customer/id customer-id
+                      ::customer/zipcode (-> @customer
+                                             ::customer/address
+                                             ::specs/zipcode)))
         (publish ::customer/merchant-selected
                  ::customer/id customer-id
                  ::merchant/id merchant-id)))]})

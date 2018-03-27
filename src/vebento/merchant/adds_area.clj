@@ -1,7 +1,5 @@
 (ns vebento.merchant.adds-area
-  (:require [clojure.future
-             :refer :all]
-            [util
+  (:require [util
              :refer [ns-alias]]
             [juncture.event
              :as event
@@ -10,7 +8,7 @@
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
              :refer [boundary publish fail-unless-exists]]))
 
@@ -42,7 +40,7 @@
 
    ::merchant/add-area
    [(fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]
-      (within (boundary component #{::merchant/account})
+      (mdo-within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (publish ::merchant/area-added
                  ::merchant/id merchant-id

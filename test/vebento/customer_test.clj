@@ -1,7 +1,5 @@
 (ns vebento.customer-test
-  (:require [clojure.future
-             :refer :all]
-            [com.stuartsierra.component
+  (:require [com.stuartsierra.component
              :as co]
             [vebento.testing
              :as testing]

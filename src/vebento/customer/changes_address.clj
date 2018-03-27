@@ -1,16 +1,14 @@
 (ns vebento.customer.changes-address
-  (:require [clojure.future
-             :refer :all]
-            [util
+  (:require [util
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-error]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
-             :refer [within]]
+             :refer [mdo-within]]
             [vebento.core
              :refer [boundary publish fail-unless-exists]]))
 
@@ -28,7 +26,7 @@
         ::customer/address])
 
 
-(def-failure ::customer/has-given-no-address
+(def-error ::customer/has-given-no-address
   :req [::customer/id])
 
 
@@ -47,7 +45,7 @@
    ::customer/change-address
    [(fn [{customer-id ::customer/id
           address ::customer/address}]
-      (within (boundary component #{::customer/account ::customer/shop})
+      (mdo-within (boundary component #{::customer/account ::customer/shop})
         (fail-unless-exists ::customer/id customer-id)
         (publish ::customer/address-changed
                  ::customer/id customer-id

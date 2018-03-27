@@ -1,12 +1,10 @@
 (ns vebento.customer.selects-merchant-test
-  (:require [clojure.future
-             :refer :all]
-            [clojure.test
+  (:require [clojure.test
              :refer :all]
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message failure]]
+             :refer [command message error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -42,7 +40,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :raise [(message
+  :relay [(message
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])
@@ -56,7 +54,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :raise [(failure
+  :relay [(error
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -83,7 +81,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :raise [(failure
+  :relay [(error
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
@@ -106,7 +104,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :raise [(failure
+  :relay [(error
             ::customer/zipcode-not-in-merchant-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])

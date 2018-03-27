@@ -1,20 +1,18 @@
 (ns juncture.entity
-  (:require [clojure.future
-             :refer :all]
-            [clojure.spec
+  (:require [clojure.spec.alpha
              :as s]
-            [clojure.spec.test
+            [clojure.spec.test.alpha
              :as s-test]
             [juncture.event
              :as event
-             :refer [def-failure]]))
+             :refer [def-error]]))
 
 
-(def-failure ::already-exists
+(def-error ::already-exists
   :req [::id-key
         ::id])
 
-(def-failure ::not-found
+(def-error ::not-found
   :req [::id-key
         ::id])
 
