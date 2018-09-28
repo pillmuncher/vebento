@@ -1,3 +1,1 @@
-(ns vebento.testing-test
-  (:require [clojure.test
-             :refer :all]))
+(ns vebento.testing-test)

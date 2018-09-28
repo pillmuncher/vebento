@@ -40,7 +40,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :relay [(message
+  :issue [(message
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])
@@ -54,7 +54,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :relay [(error
+  :issue [(error
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -81,7 +81,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :relay [(error
+  :issue [(error
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
@@ -104,7 +104,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :relay [(error
+  :issue [(error
             ::customer/zipcode-not-in-merchant-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])

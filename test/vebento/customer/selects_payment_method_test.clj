@@ -45,7 +45,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :relay [(message
+  :issue [(message
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
@@ -75,7 +75,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :relay [(error
+  :issue [(error
             ::merchant/does-not-support-payment-method
             ::merchant/id merchant-id
             ::merchant/payment-method payment-method)])

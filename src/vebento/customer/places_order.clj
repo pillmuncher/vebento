@@ -57,62 +57,6 @@
   (transform-in (:repository component) ::id event))
 
 
-(defmethod handle
-  [::component ::place-order]
-  [component {customer-id ::id
-              order-id ::order/id}]
-  (mdo-within (boundary component customer-id #{::shop})
-    (fail-if-exists ::order/id order-id)
-    customer <- (get-entity ::id customer-id)
-    (mdo-parallel
-      (mwhen (-> @customer ::cart empty?)
-             (raise ::cart-is-empty
-                    ::id customer-id))
-      (mwhen (-> @customer ::merchant/id nil?)
-             (raise ::has-selected-no-merchant
-                    ::id customer-id))
-      (mwhen (-> @customer ::address nil?)
-             (raise ::has-given-no-address
-                    ::id customer-id))
-      (mwhen (-> @customer ::schedule empty?)
-             (raise ::has-selected-no-schedule
-                    ::id customer-id))
-      (mwhen (-> @customer ::payment-method nil?)
-             (raise ::has-selected-no-payment-method
-                    ::id customer-id)))
-    merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
-    (mdo-parallel
-      (mwhen (empty? (intersection (@customer ::schedule)
-                                   (@merchant ::merchant/schedule)))
-             (raise ::schedule-not-in-merchant-schedule
-                    ::id customer-id
-                    ::schedule (@customer ::schedule)))
-      (mwhen (-> @customer ::payment-method
-                 (not-in? (@merchant ::merchant/payment-methods)))
-             (raise ::merchant/does-not-support-payment-method
-                    ::merchant/id (@merchant ::merchant/id)
-                    ::merchant/payment-method (@customer ::payment-method)))
-      (mwhen (-> @customer ::address ::specs/zipcode
-                 (not-in? (@merchant ::merchant/areas)))
-             (raise ::zipcode-not-in-merchant-areas
-                    ::id customer-id
-                    ::specs/zipcode (-> @customer
-                                        ::address
-                                        ::specs/zipcode))))
-    (publish ::order/placed
-             ::id customer-id
-             ::merchant/id (@customer ::merchant/id)
-             ::order/id order-id
-             ::order/items (@customer ::cart)
-             ::order/address (@customer ::address)
-             ::order/payment-method (@customer ::payment-method)
-             ::order/schedule (intersection
-                                (@customer ::schedule)
-                                (@merchant ::merchant/schedule)))
-    (publish ::cart-cleared
-             ::id customer-id)))
-
-
 (defn subscriptions
   [component]
 

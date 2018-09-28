@@ -35,7 +35,7 @@
       (run boundaries boundary-keys #(mdo-within (system env) computation)))))
 
 
-(defn relay
+(defn issue
   [event]
   (mdo
     (>>= get-dispatcher
@@ -47,7 +47,7 @@
 
 (defn execute
   [command-type & command-params]
-  (relay (apply command command-type command-params)))
+  (issue (apply command command-type command-params)))
 
 (defn execute-in
   [env command-type & command-params]
@@ -57,7 +57,7 @@
 
 (defn publish
   [message-type & message-params]
-  (relay (apply message message-type message-params)))
+  (issue (apply message message-type message-params)))
 
 (defn publish-in
   [env message-type & message-params]
@@ -67,7 +67,7 @@
 
 (defn raise
   [error-type & error-params]
-  (relay (apply error error-type error-params)))
+  (issue (apply error error-type error-params)))
 
 (defn raise-in
   [env error-type & error-params]
