@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message error]]
+             :refer [command notice error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -27,7 +27,7 @@
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :issue [(message
+  :issue [(notice
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)])
@@ -46,7 +46,7 @@
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address new-address)]
-  :issue [(message
+  :issue [(notice
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address new-address)])

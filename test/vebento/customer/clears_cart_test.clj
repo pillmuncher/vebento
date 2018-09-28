@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message error]]
+             :refer [command notice error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -25,7 +25,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :issue [(message
+  :issue [(notice
             ::customer/cart-cleared
             ::customer/id customer-id)])
 

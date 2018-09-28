@@ -5,7 +5,7 @@
              :refer [mwhen]]
             [juncture.event
              :as event
-             :refer [command message error error?]]
+             :refer [command notice error error?]]
             [juncture.entity
              :as entity
              :refer [run transform-in]]
@@ -56,13 +56,13 @@
 
 
 (defn publish
-  [message-type & message-params]
-  (issue (apply message message-type message-params)))
+  [notice-type & notice-params]
+  (issue (apply notice notice-type notice-params)))
 
 (defn publish-in
-  [env message-type & message-params]
+  [env notice-type & notice-params]
   (mdo-within (system env)
-    (apply publish message-type message-params)))
+    (apply publish notice-type notice-params)))
 
 
 (defn raise
@@ -82,7 +82,7 @@
 
 
 (def get-commands (partial get-events ::event/kind ::event/command))
-(def get-messages (partial get-events ::event/kind ::event/message))
+(def get-notices (partial get-events ::event/kind ::event/notice))
 (def get-errors (partial get-events ::event/kind ::event/error))
 
 

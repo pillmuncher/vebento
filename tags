@@ -23,7 +23,7 @@ def-command	./src/juncture/event.clj	/^(defmacro def-command$/;"	m
 def-entity	./src/juncture/entity.clj	/^(defmacro def-entity$/;"	m
 def-error	./src/juncture/event.clj	/^(defmacro def-error$/;"	m
 def-event	./src/juncture/event.clj	/^(defmacro def-event$/;"	m
-def-message	./src/juncture/event.clj	/^(defmacro def-message$/;"	m
+def-notice	./src/juncture/event.clj	/^(defmacro def-message$/;"	m
 def-scenario	./src/vebento/testing.clj	/^(defmacro def-scenario$/;"	m
 dispatch*	./src/juncture/event.clj	/^(defn dispatch*$/;"	f
 dispatcher	./src/vebento/testing.clj	/^(defn dispatcher []$/;"	f
@@ -49,7 +49,7 @@ get-entity	./src/vebento/core.clj	/^(defn get-entity$/;"	f
 get-errors	./src/vebento/core.clj	/^(def get-errors (partial get-events ::event\/kind ::event\/error))$/;"	d
 get-events	./src/vebento/core.clj	/^(defn get-events$/;"	f
 get-journal	./src/vebento/core.clj	/^(def get-journal (asks :journal))$/;"	d
-get-messages	./src/vebento/core.clj	/^(def get-messages (partial get-events ::event\/kind ::event\/message))$/;"	d
+get-notices	./src/vebento/core.clj	/^(def get-messages (partial get-events ::event\/kind ::event\/message))$/;"	d
 get-repository	./src/vebento/core.clj	/^(def get-repository (asks :repository))$/;"	d
 handle	./src/juncture/event.clj	/^(defmulti handle ::type)$/;"	a
 handle	./src/vebento/customer/places_order.clj	/^(defmethod handle$/;"	b
@@ -69,8 +69,8 @@ m-when	./src/componad.clj	/^(defmacro m-when$/;"	m
 mdo-future	./src/componad.clj	/^(defmacro mdo-future [& computations]$/;"	m
 mdo-parallel	./src/componad.clj	/^(defmacro mdo-parallel$/;"	m
 mdo-within	./src/componad.clj	/^(defmacro mdo-within$/;"	m
-message	./src/juncture/event.clj	/^(defn message$/;"	f
-message?	./src/juncture/event.clj	/^(def message? #(s\/valid? (s\/and valid? ::message) %))$/;"	d
+notice	./src/juncture/event.clj	/^(defn message$/;"	f
+notice?	./src/juncture/event.clj	/^(def message? #(s\/valid? (s\/and valid? ::message) %))$/;"	d
 munless	./src/componad.clj	/^(defmacro munless$/;"	m
 not-in?	./src/util.clj	/^(def not-in? (comp not in?))$/;"	d
 ns-alias	./src/util.clj	/^(defn ns-alias$/;"	f

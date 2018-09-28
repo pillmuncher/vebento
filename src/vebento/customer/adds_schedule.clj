@@ -7,7 +7,7 @@
              :refer [ns-alias intersect?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-error]]
+             :refer [def-command def-notice def-error]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -26,7 +26,7 @@
         ::customer/schedule])
 
 
-(def-message ::customer/schedule-added
+(def-notice ::customer/schedule-added
   :req [::customer/id
         ::customer/schedule])
 

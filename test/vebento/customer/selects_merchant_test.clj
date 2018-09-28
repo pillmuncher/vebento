@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message error]]
+             :refer [command notice error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -40,7 +40,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(message
+  :issue [(notice
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])

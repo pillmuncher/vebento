@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message error]]
+             :refer [command notice error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -45,7 +45,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :issue [(message
+  :issue [(notice
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])

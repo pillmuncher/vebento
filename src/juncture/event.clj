@@ -56,12 +56,12 @@
 (s/def ::id uuid?)
 (s/def ::date inst?)
 (s/def ::type keyword?)
-(s/def ::kind #{::command ::message ::error})
+(s/def ::kind #{::command ::notice ::error})
 (s/def ::spec (s/keys :req [::kind ::type ::date ::id]
                       :opt [::version]))
 
 (s/def ::command #(= (::kind %) ::command))
-(s/def ::message #(= (::kind %) ::message))
+(s/def ::notice #(= (::kind %) ::notice))
 (s/def ::error #(= (::kind %) ::error))
 
 
@@ -78,9 +78,9 @@
   [command-type & {:as command-keys}]
   `(def-event ::command ~command-type ~command-keys))
 
-(defmacro def-message
-  [message-type & {:as message-keys}]
-  `(def-event ::message ~message-type ~message-keys))
+(defmacro def-notice
+  [notice-type & {:as notice-keys}]
+  `(def-event ::notice ~notice-type ~notice-keys))
 
 (defmacro def-error
   [error-type & {:as error-keys}]
@@ -118,9 +118,9 @@
   [event-type & {:as event-params}]
   (-create ::command event-type event-params))
 
-(defn message
+(defn notice
   [event-type & {:as event-params}]
-  (-create ::message event-type event-params))
+  (-create ::notice event-type event-params))
 
 (defn error
   [event-type & {:as event-params}]
@@ -128,5 +128,5 @@
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))
-(def message? #(s/valid? (s/and valid? ::message) %))
+(def notice? #(s/valid? (s/and valid? ::notice) %))
 (def error? #(s/valid? (s/and valid? ::error) %))

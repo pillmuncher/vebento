@@ -5,7 +5,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-error]]
+             :refer [def-command def-notice def-error]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -24,7 +24,7 @@
         ::product/id])
 
 
-(def-message ::customer/item-removed-from-cart
+(def-notice ::customer/item-removed-from-cart
   :req [::customer/id
         ::product/id])
 

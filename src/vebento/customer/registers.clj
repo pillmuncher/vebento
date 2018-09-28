@@ -8,7 +8,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message handle]]
+             :refer [def-command def-notice handle]]
             [juncture.entity
              :as entity
              :refer [create transform transform-in]]
@@ -29,7 +29,7 @@
         ::customer/payment-method])
 
 
-(def-message ::customer/registered
+(def-notice ::customer/registered
   :req [::customer/id])
 
 

@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message error]]
+             :refer [command notice error]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -25,7 +25,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :issue [(message
+  :issue [(notice
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -53,10 +53,10 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :issue [(message
+  :issue [(notice
             ::customer/registered
             ::customer/id customer-id)
-          (message
+          (notice
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)])
@@ -81,14 +81,14 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :issue [(message
+  :issue [(notice
             ::customer/registered
             ::customer/id customer-id)
-          (message
+          (notice
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)
-          (message
+          (notice
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])
@@ -119,18 +119,18 @@
             ::customer/address customer-address
             ::merchant/id merchant-id
             ::customer/payment-method payment-method)]
-  :issue [(message
+  :issue [(notice
             ::customer/registered
             ::customer/id customer-id)
-          (message
+          (notice
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)
-          (message
+          (notice
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)
-          (message
+          (notice
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
@@ -146,10 +146,10 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :issue [(message
+  :issue [(notice
             ::customer/registered
             ::customer/id customer-id)
-          (message
+          (notice
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)

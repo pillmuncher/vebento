@@ -7,7 +7,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-error
+             :refer [def-command def-notice def-error
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
@@ -36,7 +36,7 @@
 (s/def ::shipped ::specs/shipped)
 
 
-(def-message ::placed
+(def-notice ::placed
   :req [::id
         ::customer/id
         ::merchant/id

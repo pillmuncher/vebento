@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [def-command def-notice]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -22,7 +22,7 @@
         ::product/id])
 
 
-(def-message ::merchant/product-added
+(def-notice ::merchant/product-added
   :req [::merchant/id
         ::product/id])
 

@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command message error]]
+             :refer [command notice error]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -56,7 +56,7 @@
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :issue [(message
+  :issue [(notice
             ::customer/item-removed-from-cart
             ::customer/id customer-id
             ::product/id product-id)])
