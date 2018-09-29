@@ -104,8 +104,8 @@
   (start [this]
     (assoc this :subscriptions
            (subscribe-maps dispatcher
-                           {::event/notice [(store-in journal)]
-                            ::event/error [(store-in journal)]})))
+                           {::event/message [(store-in journal)]
+                            ::event/failure [(store-in journal)]})))
 
   (stop [this]))
 

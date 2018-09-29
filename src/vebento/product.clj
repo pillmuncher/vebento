@@ -7,7 +7,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-notice def-error
+             :refer [def-command def-message def-failure
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
@@ -37,7 +37,7 @@
         ::name])
 
 
-(def-notice ::created
+(def-message ::created
   :req [::id
         ::name])
 

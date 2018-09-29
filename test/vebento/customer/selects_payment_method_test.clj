@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command notice error]]
+             :refer [command message failure]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -45,7 +45,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :issue [(notice
+  :issue [(message
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
@@ -75,7 +75,7 @@
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :issue [(error
+  :issue [(failure
             ::merchant/does-not-support-payment-method
             ::merchant/id merchant-id
             ::merchant/payment-method payment-method)])

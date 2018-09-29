@@ -7,7 +7,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-notice]]
+             :refer [def-command def-message]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -26,7 +26,7 @@
         ::customer/payment-method])
 
 
-(def-notice ::customer/payment-method-selected
+(def-message ::customer/payment-method-selected
   :req [::customer/id
         ::customer/payment-method])
 

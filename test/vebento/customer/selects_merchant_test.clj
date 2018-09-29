@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command notice error]]
+             :refer [command message failure]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -40,7 +40,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(notice
+  :issue [(message
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])
@@ -54,7 +54,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(error
+  :issue [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -81,7 +81,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(error
+  :issue [(failure
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
@@ -104,7 +104,7 @@
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(error
+  :issue [(failure
             ::customer/zipcode-not-in-merchant-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])

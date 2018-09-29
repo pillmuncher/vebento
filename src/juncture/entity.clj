@@ -5,14 +5,14 @@
              :as s-test]
             [juncture.event
              :as event
-             :refer [def-error]]))
+             :refer [def-failure]]))
 
 
-(def-error ::already-exists
+(def-failure ::already-exists
   :req [::id-key
         ::id])
 
-(def-error ::not-found
+(def-failure ::not-found
   :req [::id-key
         ::id])
 

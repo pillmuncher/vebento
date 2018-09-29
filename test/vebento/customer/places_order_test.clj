@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command notice error]]
+             :refer [command message failure]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -76,7 +76,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(notice
+  :issue [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -85,7 +85,7 @@
             ::order/address customer-address
             ::order/schedule schedule
             ::order/payment-method payment-method)
-          (notice
+          (message
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
@@ -140,7 +140,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(error
+  :issue [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -196,7 +196,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(error
+  :issue [(failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])
 
@@ -244,18 +244,18 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(error
+  :issue [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)
-          (error
+          (failure
             ::customer/has-given-no-address
             ::customer/id customer-id)
-          (error
+          (failure
             ::customer/has-selected-no-payment-method
             ::customer/id customer-id)
-          (error
+          (failure
             ::customer/has-selected-no-merchant
             ::customer/id customer-id)
-          (error
+          (failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])

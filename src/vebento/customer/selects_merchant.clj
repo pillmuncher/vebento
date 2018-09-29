@@ -5,7 +5,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-notice def-error]]
+             :refer [def-command def-message def-failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -25,12 +25,12 @@
         ::merchant/id])
 
 
-(def-notice ::customer/merchant-selected
+(def-message ::customer/merchant-selected
   :req [::customer/id
         ::merchant/id])
 
 
-(def-error ::customer/zipcode-not-in-merchant-areas
+(def-failure ::customer/zipcode-not-in-merchant-areas
   :req [::customer/id
         ::customer/zipcode])
 

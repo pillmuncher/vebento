@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command notice error]]
+             :refer [command message failure]]
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
@@ -45,7 +45,7 @@
             ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)]
-  :issue [(notice
+  :issue [(message
             ::customer/schedule-added
             ::customer/id customer-id
             ::customer/schedule schedule)])

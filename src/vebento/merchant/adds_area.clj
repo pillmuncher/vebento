@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-notice]]
+             :refer [def-command def-message]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -21,7 +21,7 @@
         ::merchant/zipcode])
 
 
-(def-notice ::merchant/area-added
+(def-message ::merchant/area-added
   :req [::merchant/id
         ::merchant/zipcode])
 

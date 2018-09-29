@@ -7,7 +7,7 @@
              :refer [ns-alias not-in? intersect?]]
             [juncture.event
              :as event
-             :refer [def-command def-error handle]]
+             :refer [def-command def-failure message handle]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -15,7 +15,7 @@
              :refer [mdo-within mdo-parallel]]
             [vebento.core
              :refer [boundary publish raise get-entity fail-if-exists
-                     update-entity]]))
+                     update-entity issue*]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -29,19 +29,19 @@
         ::order/id])
 
 
-(def-error ::customer/cart-is-empty
+(def-failure ::customer/cart-is-empty
   :req [::customer/id])
 
 
-(def-error ::customer/has-selected-no-merchant
+(def-failure ::customer/has-selected-no-merchant
   :req [::customer/id])
 
 
-(def-error ::customer/has-selected-no-schedule
+(def-failure ::customer/has-selected-no-schedule
   :req [::customer/id])
 
 
-(def-error ::customer/has-selected-no-payment-method
+(def-failure ::customer/has-selected-no-payment-method
   :req [::customer/id])
 
 
@@ -107,15 +107,16 @@
                         ::specs/zipcode (-> @customer
                                             ::customer/address
                                             ::specs/zipcode))))
-        (publish ::order/placed
-                 ::customer/id customer-id
-                 ::merchant/id (@customer ::merchant/id)
-                 ::order/id order-id
-                 ::order/items (@customer ::customer/cart)
-                 ::order/address (@customer ::customer/address)
-                 ::order/payment-method (@customer ::customer/payment-method)
-                 ::order/schedule (intersection
-                                    (@customer ::customer/schedule)
-                                    (@merchant ::merchant/schedule)))
-        (publish ::customer/cart-cleared
-                 ::customer/id customer-id)))]})
+        (issue*
+          (message ::order/placed
+                  ::customer/id customer-id
+                  ::merchant/id (@customer ::merchant/id)
+                  ::order/id order-id
+                  ::order/items (@customer ::customer/cart)
+                  ::order/address (@customer ::customer/address)
+                  ::order/payment-method (@customer ::customer/payment-method)
+                  ::order/schedule (intersection
+                                      (@customer ::customer/schedule)
+                                      (@merchant ::merchant/schedule)))
+          (message ::customer/cart-cleared
+                  ::customer/id customer-id))))]})

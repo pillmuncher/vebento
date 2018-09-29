@@ -2,10 +2,10 @@
   (:require [monads.core
              :refer [mdo return fail ask asks]]
             [monads.util
-             :refer [mwhen]]
+             :refer [mwhen map-m]]
             [juncture.event
              :as event
-             :refer [command notice error error?]]
+             :refer [command message failure failure?]]
             [juncture.entity
              :as entity
              :refer [run transform-in]]
@@ -17,14 +17,6 @@
 (def get-repository (asks :repository))
 (def get-journal (asks :journal))
 (def get-dispatcher (asks :dispatcher))
-
-
-;(defn boundary1
-  ;[id-key boundary-keys]
-  ;(fn [computation]
-    ;(mdo-sync
-      ;[id-key boundary-keys]
-      ;computation)))
 
 
 (defn boundary
@@ -40,9 +32,14 @@
   (mdo
     (>>= get-dispatcher
          #(return (event/dispatch % event)))
-    (if (error? event)
+    (if (failure? event)
       (fail event)
       (return event))))
+
+
+(defn issue*
+  [& events]
+  (map-m issue events))
 
 
 (defn execute
@@ -56,34 +53,34 @@
 
 
 (defn publish
-  [notice-type & notice-params]
-  (issue (apply notice notice-type notice-params)))
+  [message-type & message-params]
+  (issue (apply message message-type message-params)))
 
 (defn publish-in
-  [env notice-type & notice-params]
+  [env message-type & message-params]
   (mdo-within (system env)
-    (apply publish notice-type notice-params)))
+    (apply publish message-type message-params)))
 
 
 (defn raise
-  [error-type & error-params]
-  (issue (apply error error-type error-params)))
+  [failure-type & failure-params]
+  (issue (apply failure failure-type failure-params)))
 
 (defn raise-in
-  [env error-type & error-params]
+  [env failure-type & failure-params]
   (mdo-within (system env)
-    (apply raise error-type error-params)))
+    (apply raise failure-type failure-params)))
 
 
 (defn get-events
-  [& {:as criteria}]
+  [& criteria]
   (>>= get-journal
        #(return (event/fetch % criteria))))
 
 
 (def get-commands (partial get-events ::event/kind ::event/command))
-(def get-notices (partial get-events ::event/kind ::event/notice))
-(def get-errors (partial get-events ::event/kind ::event/error))
+(def get-messages (partial get-events ::event/kind ::event/message))
+(def get-failures (partial get-events ::event/kind ::event/failure))
 
 
 (defn fail-if-exists

@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-notice]]
+             :refer [def-command def-message]]
             [juncture.entity
              :as entity
              :refer [create transform transform-in]]
@@ -21,7 +21,7 @@
         ::merchant/address])
 
 
-(def-notice ::merchant/registered
+(def-message ::merchant/registered
   :req [::merchant/id
         ::merchant/address])
 

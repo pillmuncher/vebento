@@ -4,7 +4,7 @@
             [util
              :refer [ns-alias]]
             [juncture.event
-             :refer [command notice error]]
+             :refer [command message failure]]
             [juncture.entity
              :as entity]
             [vebento.testing
@@ -25,7 +25,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :issue [(notice
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -39,7 +39,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :issue [(error
+  :issue [(failure
             ::entity/already-exists
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -53,10 +53,10 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :issue [(notice
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
-          (notice
+          (message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)])
@@ -81,14 +81,14 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :issue [(notice
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
-          (notice
+          (message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)
-          (notice
+          (message
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])
@@ -119,18 +119,18 @@
             ::customer/address customer-address
             ::merchant/id merchant-id
             ::customer/payment-method payment-method)]
-  :issue [(notice
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
-          (notice
+          (message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)
-          (notice
+          (message
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)
-          (notice
+          (message
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
@@ -146,14 +146,14 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :issue [(notice
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
-          (notice
+          (message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)
-          (error
+          (failure
             ::entity/not-found
             ::entity/id-key ::merchant/id
             ::entity/id merchant-id)])

@@ -34,7 +34,7 @@
 
 (s/def ::id ::uuid)
 (s/def ::boundary ::keyword)
-(s/def ::error ::keyword)
+(s/def ::failure ::keyword)
 
 (s/def ::amount ::pos-int)
 (s/def ::name ::string)

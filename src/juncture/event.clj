@@ -56,13 +56,13 @@
 (s/def ::id uuid?)
 (s/def ::date inst?)
 (s/def ::type keyword?)
-(s/def ::kind #{::command ::notice ::error})
+(s/def ::kind #{::command ::message ::failure})
 (s/def ::spec (s/keys :req [::kind ::type ::date ::id]
                       :opt [::version]))
 
 (s/def ::command #(= (::kind %) ::command))
-(s/def ::notice #(= (::kind %) ::notice))
-(s/def ::error #(= (::kind %) ::error))
+(s/def ::message #(= (::kind %) ::message))
+(s/def ::failure #(= (::kind %) ::failure))
 
 
 (defmulti handle ::type)
@@ -78,13 +78,13 @@
   [command-type & {:as command-keys}]
   `(def-event ::command ~command-type ~command-keys))
 
-(defmacro def-notice
-  [notice-type & {:as notice-keys}]
-  `(def-event ::notice ~notice-type ~notice-keys))
+(defmacro def-message
+  [message-type & {:as message-keys}]
+  `(def-event ::message ~message-type ~message-keys))
 
-(defmacro def-error
-  [error-type & {:as error-keys}]
-  `(def-event ::error ~error-type ~error-keys))
+(defmacro def-failure
+  [failure-type & {:as failure-keys}]
+  `(def-event ::failure ~failure-type ~failure-keys))
 
 
 (defn valid?
@@ -118,15 +118,15 @@
   [event-type & {:as event-params}]
   (-create ::command event-type event-params))
 
-(defn notice
+(defn message
   [event-type & {:as event-params}]
-  (-create ::notice event-type event-params))
+  (-create ::message event-type event-params))
 
-(defn error
+(defn failure
   [event-type & {:as event-params}]
-  (-create ::error event-type event-params))
+  (-create ::failure event-type event-params))
 
 
 (def command? #(s/valid? (s/and valid? ::command) %))
-(def notice? #(s/valid? (s/and valid? ::notice) %))
-(def error? #(s/valid? (s/and valid? ::error) %))
+(def message? #(s/valid? (s/and valid? ::message) %))
+(def failure? #(s/valid? (s/and valid? ::failure) %))
