@@ -81,8 +81,8 @@ pull	./src/util.clj	/^(defmacro pull [ns names]$/;"	m
 query	./src/vebento/core.clj	/^(defn query$/;"	f
 raise	./src/vebento/core.clj	/^(defn raise$/;"	f
 raise-in	./src/vebento/core.clj	/^(defn raise-in$/;"	f
-issue	./src/vebento/core.clj	/^(defn relay$/;"	f
-issue-events	./src/vebento/testing.clj	/^(defn- relay-events$/;"	p
+then	./src/vebento/core.clj	/^(defn relay$/;"	f
+then-events	./src/vebento/testing.clj	/^(defn- relay-events$/;"	p
 repository	./src/vebento/testing.clj	/^(defn repository []$/;"	f
 return*	./src/componad.clj	/^(defn return*$/;"	f
 root	./src/frontend/customer/shop.clj	/^(defn root []$/;"	f

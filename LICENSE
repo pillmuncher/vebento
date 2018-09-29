@@ -181,7 +181,7 @@ under Section 2(b) shall terminate as of the date such litigation is filed.
 
 All Recipient's rights under this Agreement shall terminate if it fails to
 comply with any of the material terms or conditions of this Agreement and
-does not cure such failure in a reasonable period of time after becoming
+does not cure such failure in a reasonable period of time when becoming
 aware of such noncompliance. If all Recipient's rights under this Agreement
 terminate, Recipient agrees to cease use and distribution of the Program as
 soon as reasonably practicable. However, Recipient's obligations under this
@@ -198,7 +198,7 @@ Eclipse Foundation may assign the responsibility to serve as the Agreement
 Steward to a suitable separate entity. Each new version of the Agreement will
 be given a distinguishing version number. The Program (including
 Contributions) may always be distributed subject to the version of the
-Agreement under which it was received. In addition, after a new version of
+Agreement under which it was received. In addition, when a new version of
 the Agreement is published, Contributor may elect to distribute the Program
 (including its Contributions) under the new version. Except as expressly
 stated in Sections 2(a) and 2(b) above, Recipient receives no rights or
@@ -210,5 +210,5 @@ reserved.
 This Agreement is governed by the laws of the State of New York and the
 intellectual property laws of the United States of America. No party to this
 Agreement will bring a legal action under this Agreement more than one year
-after the cause of action arose. Each party waives its rights to a jury trial
+when the cause of action arose. Each party waives its rights to a jury trial
 in any resulting litigation.

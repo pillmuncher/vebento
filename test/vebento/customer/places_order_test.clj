@@ -72,11 +72,11 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :after [(command
+  :when  [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(message
+  :then  [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -136,11 +136,11 @@
             ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)]
-  :after [(command
+  :when  [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(failure
+  :then  [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -192,11 +192,11 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :after [(command
+  :when  [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(failure
+  :then  [(failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])
 
@@ -240,11 +240,11 @@
           (command
             ::customer/register
             ::customer/id customer-id)]
-  :after [(command
+  :when  [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :issue [(failure
+  :then  [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)
           (failure

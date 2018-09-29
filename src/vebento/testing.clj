@@ -25,7 +25,7 @@
             [juncture.entity
              :as entity]
             [vebento.core
-             :refer [issue get-events]]))
+             :refer [then get-events]]))
 
 
 (defrecord MockBoundaries
@@ -133,21 +133,21 @@
        (return)))
 
 
-(defn- issue-events
+(defn- then-events
   [events]
   (mdo
-    (map-m issue events)
+    (map-m then events)
     (>>= (get-events)
          #(return @%))))
 
 
 (defn scenario
-  [& {:keys [using given after issue]}]
+  [& {:keys [using given when then]}]
   (mdo-within (componad/componad (co/start using))
-    given-events <- (issue-events given)
-    after-events <- (issue-events after)
-    expected <- (>>= (return* issue) strip-canonicals)
-    received <- (strip-canonicals (difference (set after-events)
+    given-events <- (then-events given)
+    when-events <- (then-events when)
+    expected <- (>>= (return* then) strip-canonicals)
+    received <- (strip-canonicals (difference (set when-events)
                                               (set given-events)))
     (return (co/stop using))
     (return [(set expected) (set received)])))

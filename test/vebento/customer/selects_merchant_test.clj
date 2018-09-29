@@ -36,11 +36,11 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :after [(command
+  :when  [(command
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(message
+  :then  [(message
             ::customer/merchant-selected
             ::customer/id customer-id
             ::merchant/id merchant-id)])
@@ -50,11 +50,11 @@
   [customer-id ::customer/id
    merchant-id ::merchant/id]
   :using (test-bench)
-  :after [(command
+  :when  [(command
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(failure
+  :then  [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -77,11 +77,11 @@
           (command
             ::customer/register
             ::customer/id customer-id)]
-  :after [(command
+  :when  [(command
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(failure
+  :then  [(failure
             ::customer/has-given-no-address
             ::customer/id customer-id)])
 
@@ -100,11 +100,11 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :after [(command
+  :when  [(command
             ::customer/select-merchant
             ::customer/id customer-id
             ::merchant/id merchant-id)]
-  :issue [(failure
+  :then  [(failure
             ::customer/zipcode-not-in-merchant-areas
             ::customer/id customer-id
             ::customer/zipcode (::specs/zipcode customer-address))])

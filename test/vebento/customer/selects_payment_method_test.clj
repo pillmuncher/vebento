@@ -41,11 +41,11 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :after [(command
+  :when  [(command
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :issue [(message
+  :then  [(message
             ::customer/payment-method-selected
             ::customer/id customer-id
             ::customer/payment-method payment-method)])
@@ -71,11 +71,11 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :after [(command
+  :when  [(command
             ::customer/select-payment-method
             ::customer/id customer-id
             ::customer/payment-method payment-method)]
-  :issue [(failure
+  :then  [(failure
             ::merchant/does-not-support-payment-method
             ::merchant/id merchant-id
             ::merchant/payment-method payment-method)])

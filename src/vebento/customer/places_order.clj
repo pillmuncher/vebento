@@ -15,7 +15,7 @@
              :refer [mdo-within mdo-parallel]]
             [vebento.core
              :refer [boundary publish raise get-entity fail-if-exists
-                     update-entity issue*]]))
+                     update-entity then*]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -107,7 +107,7 @@
                         ::specs/zipcode (-> @customer
                                             ::customer/address
                                             ::specs/zipcode))))
-        (issue*
+        (then*
           (message ::order/placed
                   ::customer/id customer-id
                   ::merchant/id (@customer ::merchant/id)

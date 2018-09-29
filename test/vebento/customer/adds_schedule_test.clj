@@ -41,11 +41,11 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :after [(command
+  :when  [(command
             ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)]
-  :issue [(message
+  :then  [(message
             ::customer/schedule-added
             ::customer/id customer-id
             ::customer/schedule schedule)])

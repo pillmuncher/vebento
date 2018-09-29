@@ -27,7 +27,7 @@
       (run boundaries boundary-keys #(mdo-within (system env) computation)))))
 
 
-(defn issue
+(defn then
   [event]
   (mdo
     (>>= get-dispatcher
@@ -37,14 +37,14 @@
       (return event))))
 
 
-(defn issue*
+(defn then*
   [& events]
-  (map-m issue events))
+  (map-m then events))
 
 
 (defn execute
   [command-type & command-params]
-  (issue (apply command command-type command-params)))
+  (then (apply command command-type command-params)))
 
 (defn execute-in
   [env command-type & command-params]
@@ -54,7 +54,7 @@
 
 (defn publish
   [message-type & message-params]
-  (issue (apply message message-type message-params)))
+  (then (apply message message-type message-params)))
 
 (defn publish-in
   [env message-type & message-params]
@@ -64,7 +64,7 @@
 
 (defn raise
   [failure-type & failure-params]
-  (issue (apply failure failure-type failure-params)))
+  (then (apply failure failure-type failure-params)))
 
 (defn raise-in
   [env failure-type & failure-params]
