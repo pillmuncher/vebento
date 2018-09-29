@@ -22,10 +22,10 @@
   :given [(command
             ::customer/register
             ::customer/id customer-id)]
-  :when  [(command
+  :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :then  [(message
+  :yield [(message
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
@@ -33,10 +33,10 @@
 (def-scenario only-an-existing-customer-can-clear-cart
   [customer-id ::customer/id]
   :using (test-bench)
-  :when  [(command
+  :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :then  [(failure
+  :yield [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])

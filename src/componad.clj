@@ -37,7 +37,7 @@
     ~acc))
 
 
-(defmacro m-when
+(defmacro m-after
   [m-condition computation]
   `(>>= ~m-condition #(mwhen % ~computation)))
 

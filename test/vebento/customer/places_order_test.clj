@@ -72,11 +72,11 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :when  [(command
+  :after [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :then  [(message
+  :yield [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -90,7 +90,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-cannot-place-order-when-cart-is-empty
+(def-scenario customer-cannot-place-order-after-cart-is-empty
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -136,11 +136,11 @@
             ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)]
-  :when  [(command
+  :after [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :then  [(failure
+  :yield [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -192,11 +192,11 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :when  [(command
+  :after [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :then  [(failure
+  :yield [(failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])
 
@@ -240,11 +240,11 @@
           (command
             ::customer/register
             ::customer/id customer-id)]
-  :when  [(command
+  :after [(command
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :then  [(failure
+  :yield [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)
           (failure

@@ -52,11 +52,11 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :when  [(command
+  :after [(command
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :then  [(message
+  :yield [(message
             ::customer/item-removed-from-cart
             ::customer/id customer-id
             ::product/id product-id)])
@@ -91,11 +91,11 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :when  [(command
+  :after [(command
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :then  [(failure
+  :yield [(failure
             ::customer/product-not-in-cart
             ::customer/id customer-id
             ::product/id product-id)])

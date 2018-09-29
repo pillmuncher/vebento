@@ -15,7 +15,7 @@ change log follows the conventions of
 - `make-widget-sync` - we're all async, all the time.
 
 ### Fixed
-- Fixed widget maker to keep working when daylight savings switches over.
+- Fixed widget maker to keep working after daylight savings switches over.
 
 ## 0.1.0 - 2016-12-17
 ### Added

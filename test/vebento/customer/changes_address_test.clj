@@ -23,11 +23,11 @@
   :given [(command
             ::customer/register
             ::customer/id customer-id)]
-  :when  [(command
+  :after [(command
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :then  [(message
+  :yield [(message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)])
@@ -42,11 +42,11 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address old-address)]
-  :when  [(command
+  :after [(command
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address new-address)]
-  :then  [(message
+  :yield [(message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address new-address)])

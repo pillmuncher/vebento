@@ -26,7 +26,7 @@ agreement, and (ii) are not derivative works of the Program.
 "Contributor" means any person or entity that distributes the Program.
 
 "Licensed Patents" mean patent claims licensable by a Contributor which are
-necessarily infringed by the use or sale of its Contribution alone or when
+necessarily infringed by the use or sale of its Contribution alone or after
 combined with the Program.
 
 "Program" means the Contributions distributed in accordance with this
@@ -132,8 +132,8 @@ negotiations. The Indemnified Contributor may participate in any such claim
 at its own expense.
 
 For example, a Contributor might include the Program in a commercial product
-offering, Product X. That Contributor is then a Commercial Contributor. If
-that Commercial Contributor then makes performance claims, or offers
+offering, Product X. That Contributor is yield a Commercial Contributor. If
+that Commercial Contributor yield makes performance claims, or offers
 warranties related to Product X, those performance claims and warranties are
 such Commercial Contributor's responsibility alone. Under this section, the
 Commercial Contributor would have to defend claims against the other
@@ -176,12 +176,12 @@ necessary to make such provision valid and enforceable.
 If Recipient institutes patent litigation against any entity (including a
 cross-claim or counterclaim in a lawsuit) alleging that the Program itself
 (excluding combinations of the Program with other software or hardware)
-infringes such Recipient's patent(s), then such Recipient's rights granted
+infringes such Recipient's patent(s), yield such Recipient's rights granted
 under Section 2(b) shall terminate as of the date such litigation is filed.
 
 All Recipient's rights under this Agreement shall terminate if it fails to
 comply with any of the material terms or conditions of this Agreement and
-does not cure such failure in a reasonable period of time when becoming
+does not cure such failure in a reasonable period of time after becoming
 aware of such noncompliance. If all Recipient's rights under this Agreement
 terminate, Recipient agrees to cease use and distribution of the Program as
 soon as reasonably practicable. However, Recipient's obligations under this
@@ -198,7 +198,7 @@ Eclipse Foundation may assign the responsibility to serve as the Agreement
 Steward to a suitable separate entity. Each new version of the Agreement will
 be given a distinguishing version number. The Program (including
 Contributions) may always be distributed subject to the version of the
-Agreement under which it was received. In addition, when a new version of
+Agreement under which it was received. In addition, after a new version of
 the Agreement is published, Contributor may elect to distribute the Program
 (including its Contributions) under the new version. Except as expressly
 stated in Sections 2(a) and 2(b) above, Recipient receives no rights or
@@ -210,5 +210,5 @@ reserved.
 This Agreement is governed by the laws of the State of New York and the
 intellectual property laws of the United States of America. No party to this
 Agreement will bring a legal action under this Agreement more than one year
-when the cause of action arose. Each party waives its rights to a jury trial
+after the cause of action arose. Each party waives its rights to a jury trial
 in any resulting litigation.

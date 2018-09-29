@@ -47,12 +47,12 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :when  [(command
+  :after [(command
             ::customer/add-item-to-cart
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :then  [(message
+  :yield [(message
             ::customer/item-added-to-cart
             ::customer/id customer-id
             ::product/id product-id
@@ -85,12 +85,12 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :when  [(command
+  :after [(command
             ::customer/add-item-to-cart
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :then  [(failure
+  :yield [(failure
             ::customer/product-not-in-merchant-assortment
             ::customer/id customer-id
             ::product/id product-id)])

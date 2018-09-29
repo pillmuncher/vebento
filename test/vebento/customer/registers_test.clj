@@ -22,10 +22,10 @@
 (def-scenario customer-registers
   [customer-id ::customer/id]
   :using (test-bench)
-  :when  [(command
+  :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :then  [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -36,10 +36,10 @@
   :given [(command
             ::customer/register
             ::customer/id customer-id)]
-  :when  [(command
+  :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :then  [(failure
+  :yield [(failure
             ::entity/already-exists
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -49,11 +49,11 @@
   [customer-id ::customer/id
    customer-address ::customer/address]
   :using (test-bench)
-  :when  [(command
+  :after [(command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :then  [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -76,12 +76,12 @@
             ::merchant/add-area
             ::merchant/id merchant-id
             ::merchant/zipcode (::specs/zipcode customer-address))]
-  :when  [(command
+  :after [(command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :then  [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -113,13 +113,13 @@
             ::merchant/add-payment-method
             ::merchant/id merchant-id
             ::merchant/payment-method payment-method)]
-  :when  [(command
+  :after [(command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id
             ::customer/payment-method payment-method)]
-  :then  [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -141,12 +141,12 @@
    customer-address ::customer/address
    merchant-id ::merchant/id]
   :using (test-bench)
-  :when  [(command
+  :after [(command
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :then  [(message
+  :yield [(message
             ::customer/registered
             ::customer/id customer-id)
           (message

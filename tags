@@ -65,7 +65,7 @@ juncture.event	./src/juncture/event.clj	/^(ns juncture.event$/;"	n
 juncture.event-test	./test/juncture/event_test.clj	/^(ns juncture.event-test)$/;"	n
 m-extract	./src/componad.clj	/^(defn m-extract$/;"	f
 m-unless	./src/componad.clj	/^(defmacro m-unless$/;"	m
-m-when	./src/componad.clj	/^(defmacro m-when$/;"	m
+m-after	./src/componad.clj	/^(defmacro m-after$/;"	m
 mdo-future	./src/componad.clj	/^(defmacro mdo-future [& computations]$/;"	m
 mdo-parallel	./src/componad.clj	/^(defmacro mdo-parallel$/;"	m
 mdo-within	./src/componad.clj	/^(defmacro mdo-within$/;"	m
@@ -81,8 +81,8 @@ pull	./src/util.clj	/^(defmacro pull [ns names]$/;"	m
 query	./src/vebento/core.clj	/^(defn query$/;"	f
 raise	./src/vebento/core.clj	/^(defn raise$/;"	f
 raise-in	./src/vebento/core.clj	/^(defn raise-in$/;"	f
-then	./src/vebento/core.clj	/^(defn relay$/;"	f
-then-events	./src/vebento/testing.clj	/^(defn- relay-events$/;"	p
+yield	./src/vebento/core.clj	/^(defn relay$/;"	f
+yield-events	./src/vebento/testing.clj	/^(defn- relay-events$/;"	p
 repository	./src/vebento/testing.clj	/^(defn repository []$/;"	f
 return*	./src/componad.clj	/^(defn return*$/;"	f
 root	./src/frontend/customer/shop.clj	/^(defn root []$/;"	f
