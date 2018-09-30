@@ -27,7 +27,7 @@
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :issue [(message
+  :reply [(message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address customer-address)])
@@ -46,7 +46,7 @@
             ::customer/change-address
             ::customer/id customer-id
             ::customer/address new-address)]
-  :issue [(message
+  :reply [(message
             ::customer/address-changed
             ::customer/id customer-id
             ::customer/address new-address)])

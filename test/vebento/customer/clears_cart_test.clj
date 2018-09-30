@@ -25,7 +25,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :issue [(message
+  :reply [(message
             ::customer/cart-cleared
             ::customer/id customer-id)])
 
@@ -36,7 +36,7 @@
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]
-  :issue [(failure
+  :reply [(failure
             ::entity/not-found
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])

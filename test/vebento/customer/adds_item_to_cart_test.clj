@@ -52,7 +52,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :issue [(message
+  :reply [(message
             ::customer/item-added-to-cart
             ::customer/id customer-id
             ::product/id product-id
@@ -90,7 +90,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :issue [(failure
+  :reply [(failure
             ::customer/product-not-in-merchant-assortment
             ::customer/id customer-id
             ::product/id product-id)])
