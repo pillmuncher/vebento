@@ -85,7 +85,7 @@
   (exists? [this id-key id]))
 
 
-(defn transform-in
+(defn transform-in ;; TODO: make atomic.
   [repository id-key]
   (fn [event]
     (let [entity (fetch repository id-key (id-key event))]

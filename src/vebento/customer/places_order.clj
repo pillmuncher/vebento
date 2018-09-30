@@ -4,18 +4,17 @@
             [monads.util
              :refer [mwhen]]
             [util
-             :refer [ns-alias not-in? intersect?]]
+             :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-failure message handle]]
+             :refer [def-command def-failure handle]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within mdo-parallel]]
             [vebento.core
-             :refer [boundary publish raise get-entity fail-if-exists
-                     update-entity yield*]]))
+             :refer [boundary publish raise get-entity fail-if-exists]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -49,12 +48,6 @@
   [::customer/entity ::order/placed]
   [customer {order-id ::order/id}]
   (update customer ::customer/pending-orders conj order-id))
-
-
-(defmethod handle
-  [::component ::order/placed]
-  [component event]
-  (transform-in (:repository component) ::id event))
 
 
 (defn subscriptions
@@ -98,8 +91,8 @@
                      (not-in? (@merchant ::merchant/payment-methods)))
                  (raise ::merchant/does-not-support-payment-method
                         ::merchant/id (@merchant ::merchant/id)
-                        ::merchant/payment-method (@customer
-                                                    ::customer/payment-method)))
+                        ::merchant/payment-method
+                          (@customer ::customer/payment-method)))
           (mwhen (-> @customer ::customer/address ::specs/zipcode
                      (not-in? (@merchant ::merchant/areas)))
                  (raise ::customer/zipcode-not-in-merchant-areas
@@ -107,16 +100,15 @@
                         ::specs/zipcode (-> @customer
                                             ::customer/address
                                             ::specs/zipcode))))
-        (yield*
-          (message ::order/placed
-                  ::customer/id customer-id
-                  ::merchant/id (@customer ::merchant/id)
-                  ::order/id order-id
-                  ::order/items (@customer ::customer/cart)
-                  ::order/address (@customer ::customer/address)
-                  ::order/payment-method (@customer ::customer/payment-method)
-                  ::order/schedule (intersection
-                                      (@customer ::customer/schedule)
-                                      (@merchant ::merchant/schedule)))
-          (message ::customer/cart-cleared
-                  ::customer/id customer-id))))]})
+        (publish ::order/placed
+                 ::customer/id customer-id
+                 ::merchant/id (@customer ::merchant/id)
+                 ::order/id order-id
+                 ::order/items (@customer ::customer/cart)
+                 ::order/address (@customer ::customer/address)
+                 ::order/payment-method (@customer ::customer/payment-method)
+                 ::order/schedule (intersection
+                                    (@customer ::customer/schedule)
+                                    (@merchant ::merchant/schedule)))
+        (publish ::customer/cart-cleared
+                 ::customer/id customer-id)))]})

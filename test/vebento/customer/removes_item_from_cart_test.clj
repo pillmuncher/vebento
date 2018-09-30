@@ -56,7 +56,7 @@
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :yield [(message
+  :issue [(message
             ::customer/item-removed-from-cart
             ::customer/id customer-id
             ::product/id product-id)])
@@ -95,7 +95,7 @@
             ::customer/remove-item-from-cart
             ::customer/id customer-id
             ::product/id product-id)]
-  :yield [(failure
+  :issue [(failure
             ::customer/product-not-in-cart
             ::customer/id customer-id
             ::product/id product-id)])

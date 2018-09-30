@@ -15,7 +15,7 @@
             [componad
              :refer [mdo-within >>=]]
             [vebento.core
-             :refer [boundary publish execute fail-if-exists update-entity]]))
+             :refer [boundary publish execute fail-if-exists]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)

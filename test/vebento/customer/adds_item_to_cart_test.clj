@@ -52,7 +52,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :yield [(message
+  :issue [(message
             ::customer/item-added-to-cart
             ::customer/id customer-id
             ::product/id product-id
@@ -90,7 +90,7 @@
             ::customer/id customer-id
             ::product/id product-id
             ::product/amount amount)]
-  :yield [(failure
+  :issue [(failure
             ::customer/product-not-in-merchant-assortment
             ::customer/id customer-id
             ::product/id product-id)])

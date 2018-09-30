@@ -76,7 +76,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(message
+  :issue [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -90,7 +90,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-cannot-place-order-after-cart-is-empty
+(def-scenario customer-cannot-place-order-when-cart-is-empty
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -140,7 +140,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(failure
+  :issue [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -196,7 +196,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(failure
+  :issue [(failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])
 
@@ -244,7 +244,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :yield [(failure
+  :issue [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)
           (failure

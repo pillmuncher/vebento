@@ -25,7 +25,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :yield [(message
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)])
 
@@ -39,7 +39,7 @@
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
-  :yield [(failure
+  :issue [(failure
             ::entity/already-exists
             ::entity/id-key ::customer/id
             ::entity/id customer-id)])
@@ -53,7 +53,7 @@
             ::customer/register
             ::customer/id customer-id
             ::customer/address customer-address)]
-  :yield [(message
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -81,7 +81,7 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :yield [(message
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -119,7 +119,7 @@
             ::customer/address customer-address
             ::merchant/id merchant-id
             ::customer/payment-method payment-method)]
-  :yield [(message
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
@@ -146,7 +146,7 @@
             ::customer/id customer-id
             ::customer/address customer-address
             ::merchant/id merchant-id)]
-  :yield [(message
+  :issue [(message
             ::customer/registered
             ::customer/id customer-id)
           (message
