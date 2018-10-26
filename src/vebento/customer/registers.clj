@@ -8,14 +8,14 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message handle]]
+             :refer [def-command def-message command message]]
             [juncture.entity
              :as entity
              :refer [create transform transform-in]]
             [componad
              :refer [mdo-within >>=]]
             [vebento.core
-             :refer [boundary publish execute fail-if-exists]]))
+             :refer [boundary issue fail-if-exists]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -56,17 +56,21 @@
           payment-method ::customer/payment-method}]
       (mdo-within (boundary component #{::customer/account ::customer/shop})
         (fail-if-exists ::customer/id customer-id)
-        (publish ::customer/registered
-                 ::customer/id customer-id)
+        (issue
+          (message ::customer/registered
+                   ::customer/id customer-id))
         (mwhen (some? address)
-               (execute ::customer/change-address
-                        ::customer/id customer-id
-                        ::customer/address address))
+               (issue
+                 (command ::customer/change-address
+                          ::customer/id customer-id
+                          ::customer/address address)))
         (mwhen (some? merchant-id)
-               (execute ::customer/select-merchant
-                        ::customer/id customer-id
-                        ::merchant/id merchant-id))
+               (issue
+                 (command ::customer/select-merchant
+                          ::customer/id customer-id
+                          ::merchant/id merchant-id)))
         (mwhen (some? payment-method)
-               (execute ::customer/select-payment-method
-                        ::customer/id customer-id
-                        ::customer/payment-method payment-method))))]})
+               (issue
+                 (command ::customer/select-payment-method
+                          ::customer/id customer-id
+                          ::customer/payment-method payment-method)))))]})

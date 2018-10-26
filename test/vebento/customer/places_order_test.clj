@@ -76,7 +76,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :reply [(message
+  :issue [(message
             ::order/placed
             ::order/id order-id
             ::customer/id customer-id
@@ -140,7 +140,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :reply [(failure
+  :issue [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)])
 
@@ -196,7 +196,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :reply [(failure
+  :issue [(failure
             ::customer/has-selected-no-schedule
             ::customer/id customer-id)])
 
@@ -244,7 +244,7 @@
             ::customer/place-order
             ::customer/id customer-id
             ::order/id order-id)]
-  :reply [(failure
+  :issue [(failure
             ::customer/cart-is-empty
             ::customer/id customer-id)
           (failure

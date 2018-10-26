@@ -33,6 +33,7 @@
 (s/def ::non-neg-int (s/and ::int ::non-neg))
 
 (s/def ::id ::uuid)
+(s/def ::nullable-id (s/or ::uuid nil))
 (s/def ::boundary ::keyword)
 (s/def ::failure ::keyword)
 

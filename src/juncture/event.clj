@@ -4,7 +4,7 @@
             [clojure.spec.test.alpha
              :as s-test]
             [util
-             :refer [uuid inst]]))
+             :refer [uuid inst dummy-uuid]]))
 
 
 (defprotocol Dispatcher
@@ -53,19 +53,21 @@
 
 
 (s/def ::version integer?)
+(s/def ::nil nil?)
 (s/def ::id uuid?)
+(s/def ::parent (s/or :id uuid? :nil nil?))
 (s/def ::date inst?)
 (s/def ::type keyword?)
 (s/def ::kind #{::command ::message ::failure})
 (s/def ::spec (s/keys :req [::kind ::type ::date ::id]
-                      :opt [::version]))
+                      :opt [::version ::parent]))
 
 (s/def ::command #(= (::kind %) ::command))
 (s/def ::message #(= (::kind %) ::message))
 (s/def ::failure #(= (::kind %) ::failure))
 
 
-(defmulti handle ::type)
+;(defmulti handle ::type)
 
 
 (defmacro def-event

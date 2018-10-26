@@ -45,7 +45,7 @@
             ::customer/add-schedule
             ::customer/id customer-id
             ::customer/schedule schedule)]
-  :reply [(message
+  :issue [(message
             ::customer/schedule-added
             ::customer/id customer-id
             ::customer/schedule schedule)])

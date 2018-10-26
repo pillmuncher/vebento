@@ -7,14 +7,14 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-failure handle]]
+             :refer [def-command def-failure command message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within mdo-parallel]]
             [vebento.core
-             :refer [boundary publish raise get-entity fail-if-exists]]))
+             :refer [boundary get-entity fail-if-exists issue]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -64,51 +64,61 @@
         customer <- (get-entity ::customer/id customer-id)
         (mdo-parallel
           (mwhen (-> @customer ::customer/cart empty?)
-                 (raise ::customer/cart-is-empty
-                        ::customer/id customer-id))
+                 (issue
+                   (failure ::customer/cart-is-empty
+                            ::customer/id customer-id)))
           (mwhen (-> @customer ::merchant/id nil?)
-                 (raise ::customer/has-selected-no-merchant
-                        ::customer/id customer-id))
+                 (issue
+                   (failure ::customer/has-selected-no-merchant
+                            ::customer/id customer-id)))
           (mwhen (-> @customer ::customer/address nil?)
-                 (raise ::customer/has-given-no-address
-                        ::customer/id customer-id))
+                 (issue
+                   (failure ::customer/has-given-no-address
+                            ::customer/id customer-id)))
           (mwhen (-> @customer ::customer/schedule empty?)
-                 (raise ::customer/has-selected-no-schedule
-                        ::customer/id customer-id))
+                 (issue
+                   (failure ::customer/has-selected-no-schedule
+                            ::customer/id customer-id)))
           (mwhen (-> @customer ::customer/payment-method nil?)
-                 (raise ::customer/has-selected-no-payment-method
-                        ::customer/id customer-id)))
+                 (issue
+                   (failure ::customer/has-selected-no-payment-method
+                            ::customer/id customer-id))))
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mdo-parallel
           (mwhen (empty? (intersection
                            (@customer ::customer/schedule)
                            (@merchant ::merchant/schedule)))
-                 (raise ::customer/schedule-not-in-merchant-schedule
-                        ::customer/id customer-id
-                        ::customer/schedule (@customer
-                                              ::customer/schedule)))
+                 (issue
+                   (failure ::customer/schedule-not-in-merchant-schedule
+                            ::customer/id customer-id
+                            ::customer/schedule (@customer
+                                                  ::customer/schedule))))
           (mwhen (-> @customer ::customer/payment-method
                      (not-in? (@merchant ::merchant/payment-methods)))
-                 (raise ::merchant/does-not-support-payment-method
-                        ::merchant/id (@merchant ::merchant/id)
-                        ::merchant/payment-method
-                          (@customer ::customer/payment-method)))
+                 (issue
+                   (failure ::merchant/does-not-support-payment-method
+                            ::merchant/id (@merchant ::merchant/id)
+                            ::merchant/payment-method
+                            (@customer ::customer/payment-method))))
           (mwhen (-> @customer ::customer/address ::specs/zipcode
                      (not-in? (@merchant ::merchant/areas)))
-                 (raise ::customer/zipcode-not-in-merchant-areas
-                        ::customer/id customer-id
-                        ::specs/zipcode (-> @customer
-                                            ::customer/address
-                                            ::specs/zipcode))))
-        (publish ::order/placed
-                 ::customer/id customer-id
-                 ::merchant/id (@customer ::merchant/id)
-                 ::order/id order-id
-                 ::order/items (@customer ::customer/cart)
-                 ::order/address (@customer ::customer/address)
-                 ::order/payment-method (@customer ::customer/payment-method)
-                 ::order/schedule (intersection
-                                    (@customer ::customer/schedule)
-                                    (@merchant ::merchant/schedule)))
-        (publish ::customer/cart-cleared
-                 ::customer/id customer-id)))]})
+                 (issue
+                   (failure ::customer/zipcode-not-in-merchant-areas
+                            ::customer/id customer-id
+                            ::specs/zipcode (-> @customer
+                                                ::customer/address
+                                                ::specs/zipcode)))))
+        (issue
+          (message ::order/placed
+                   ::customer/id customer-id
+                   ::merchant/id (@customer ::merchant/id)
+                   ::order/id order-id
+                   ::order/items (@customer ::customer/cart)
+                   ::order/address (@customer ::customer/address)
+                   ::order/payment-method (@customer
+                                            ::customer/payment-method)
+                   ::order/schedule (intersection
+                                      (@customer ::customer/schedule)
+                                      (@merchant ::merchant/schedule)))
+          (command ::customer/clear-cart
+                   ::customer/id customer-id))))]})

@@ -1,6 +1,6 @@
 (ns vebento.core
   (:require [monads.core
-             :refer [mdo return fail ask asks]]
+             :refer [mdo return fail ask asks get-state]]
             [monads.util
              :refer [mwhen map-m]]
             [juncture.event
@@ -27,24 +27,27 @@
       (run boundaries boundary-keys #(mdo-within (system env) computation)))))
 
 
-(defn reply
+(defn- -issue
   [event]
   (mdo
+    parent <- (if (-> event ::event/parent nil?)
+                (>>= get-state #(-> % ::event/parent return))
+                (::event/parent event))
     (>>= get-dispatcher
-         #(return (event/dispatch % event)))
+         #(return (event/dispatch % (assoc event ::event/parent parent))))
     (if (failure? event)
       (fail event)
       (return event))))
 
 
-(defn reply*
+(defn issue
   [& events]
-  (map-m reply events))
+  (map-m -issue events))
 
 
 (defn execute
   [command-type & command-params]
-  (reply (apply command command-type command-params)))
+  (issue (apply command command-type command-params)))
 
 (defn execute-in
   [env command-type & command-params]
@@ -54,7 +57,7 @@
 
 (defn publish
   [message-type & message-params]
-  (reply (apply message message-type message-params)))
+  (issue (apply message message-type message-params)))
 
 (defn publish-in
   [env message-type & message-params]
@@ -64,7 +67,7 @@
 
 (defn raise
   [failure-type & failure-params]
-  (reply (apply failure failure-type failure-params)))
+  (issue (apply failure failure-type failure-params)))
 
 (defn raise-in
   [env failure-type & failure-params]

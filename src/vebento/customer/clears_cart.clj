@@ -3,14 +3,14 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [def-command def-message message]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish fail-unless-exists]]))
+             :refer [boundary issue fail-unless-exists]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -40,5 +40,6 @@
    [(fn [{customer-id ::customer/id}]
       (mdo-within (boundary component #{::customer/shop})
         (fail-unless-exists ::customer/id customer-id)
-        (publish ::customer/cart-cleared
-                 ::customer/id customer-id)))]})
+        (issue
+          (message ::customer/cart-cleared
+                   ::customer/id customer-id))))]})

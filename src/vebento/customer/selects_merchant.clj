@@ -5,14 +5,14 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-failure message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish raise get-entity]]))
+             :refer [boundary issue get-entity]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -53,16 +53,19 @@
       (mdo-within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (-> @customer ::customer/address nil?)
-               (raise ::customer/has-given-no-address
-                      ::customer/id customer-id))
+               (issue
+                 (failure ::customer/has-given-no-address
+                          ::customer/id customer-id)))
         merchant <- (get-entity ::merchant/id merchant-id)
         (mwhen (-> @customer ::customer/address ::specs/zipcode
                    (not-in? (@merchant ::merchant/areas)))
-               (raise ::customer/zipcode-not-in-merchant-areas
-                      ::customer/id customer-id
-                      ::customer/zipcode (-> @customer
-                                             ::customer/address
-                                             ::specs/zipcode)))
-        (publish ::customer/merchant-selected
-                 ::customer/id customer-id
-                 ::merchant/id merchant-id)))]})
+               (issue
+                 (failure ::customer/zipcode-not-in-merchant-areas
+                          ::customer/id customer-id
+                          ::customer/zipcode (-> @customer
+                                                 ::customer/address
+                                                 ::specs/zipcode))))
+        (issue
+          (message ::customer/merchant-selected
+                   ::customer/id customer-id
+                   ::merchant/id merchant-id))))]})

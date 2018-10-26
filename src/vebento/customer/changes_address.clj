@@ -3,14 +3,14 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-failure message]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish fail-unless-exists]]))
+             :refer [boundary issue fail-unless-exists]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -47,6 +47,7 @@
           address ::customer/address}]
       (mdo-within (boundary component #{::customer/account ::customer/shop})
         (fail-unless-exists ::customer/id customer-id)
-        (publish ::customer/address-changed
-                 ::customer/id customer-id
-                 ::customer/address address)))]})
+        (issue
+          (message ::customer/address-changed
+                   ::customer/id customer-id
+                   ::customer/address address))))]})

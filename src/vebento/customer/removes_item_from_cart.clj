@@ -5,14 +5,14 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [def-command def-message def-failure message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish raise get-entity]]))
+             :refer [boundary get-entity issue]]))
 
 
 (ns-alias 'product 'vebento.product)
@@ -53,9 +53,11 @@
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (-> product-id
                    (not-in? (@customer ::customer/cart)))
-               (raise ::customer/product-not-in-cart
-                      ::customer/id customer-id
-                      ::product/id product-id))
-        (publish ::customer/item-removed-from-cart
-                 ::customer/id customer-id
-                 ::product/id product-id)))]})
+               (issue
+                 (failure ::customer/product-not-in-cart
+                          ::customer/id customer-id
+                          ::product/id product-id)))
+        (issue
+          (message ::customer/item-removed-from-cart
+                   ::customer/id customer-id
+                   ::product/id product-id))))]})

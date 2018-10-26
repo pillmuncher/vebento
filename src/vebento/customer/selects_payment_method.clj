@@ -7,14 +7,14 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [def-command def-message message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish raise get-entity]]))
+             :refer [boundary issue get-entity]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -51,9 +51,11 @@
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (-> payment-method
                    (not-in? (@merchant ::merchant/payment-methods)))
-               (raise ::merchant/does-not-support-payment-method
-                      ::merchant/id (@merchant ::entity/id)
-                      ::merchant/payment-method payment-method))
-        (publish ::customer/payment-method-selected
-                 ::customer/id customer-id
-                 ::customer/payment-method payment-method)))]})
+               (issue
+                 (failure ::merchant/does-not-support-payment-method
+                          ::merchant/id (@merchant ::entity/id)
+                          ::merchant/payment-method payment-method)))
+        (issue
+          (message ::customer/payment-method-selected
+                   ::customer/id customer-id
+                   ::customer/payment-method payment-method))))]})
