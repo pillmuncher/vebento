@@ -10,7 +10,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -23,7 +23,7 @@
    merchant-id ::merchant/id
    customer-address ::customer/address
    merchant-address ::merchant/address]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id
@@ -49,7 +49,7 @@
 (def-scenario only-an-existing-customer-can-select-merchant
   [customer-id ::customer/id
    merchant-id ::merchant/id]
-  :using (test-bench)
+  :using (test-environment)
   :after [(command
             ::customer/select-merchant
             ::customer/id customer-id
@@ -65,7 +65,7 @@
    merchant-id ::merchant/id
    customer-address ::customer/address
    merchant-address ::merchant/address]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id
@@ -91,7 +91,7 @@
    merchant-id ::merchant/id
    customer-address ::customer/address
    merchant-address ::merchant/address]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id

@@ -10,7 +10,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -21,7 +21,7 @@
 
 (def-scenario customer-registers
   [customer-id ::customer/id]
-  :using (test-bench)
+  :using (test-environment)
   :after [(command
             ::customer/register
             ::customer/id customer-id)]
@@ -32,7 +32,7 @@
 
 (def-scenario customer-can-register-only-once
   [customer-id ::customer/id]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::customer/register
             ::customer/id customer-id)]
@@ -48,7 +48,7 @@
 (def-scenario customer-gets-registered-with-address
   [customer-id ::customer/id
    customer-address ::customer/address]
-  :using (test-bench)
+  :using (test-environment)
   :after [(command
             ::customer/register
             ::customer/id customer-id
@@ -67,7 +67,7 @@
    customer-address ::customer/address
    merchant-id ::merchant/id
    merchant-address ::merchant/address]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id
@@ -100,7 +100,7 @@
    merchant-id ::merchant/id
    merchant-address ::merchant/address
    payment-method ::order/payment-method]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id
@@ -140,7 +140,7 @@
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id]
-  :using (test-bench)
+  :using (test-environment)
   :after [(command
             ::customer/register
             ::customer/id customer-id

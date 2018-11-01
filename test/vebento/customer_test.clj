@@ -13,7 +13,7 @@
              :as customer]))
 
 
-(defn test-bench []
+(defn test-environment []
   (-> (co/system-map
         :boundaries (testing/boundaries)
         :repository (testing/repository)

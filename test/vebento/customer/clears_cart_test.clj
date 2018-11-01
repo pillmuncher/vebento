@@ -10,7 +10,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -18,7 +18,7 @@
 
 (def-scenario customer-clears-cart
   [customer-id ::customer/id]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::customer/register
             ::customer/id customer-id)]
@@ -32,7 +32,7 @@
 
 (def-scenario only-an-existing-customer-can-clear-cart
   [customer-id ::customer/id]
-  :using (test-bench)
+  :using (test-environment)
   :after [(command
             ::customer/clear-cart
             ::customer/id customer-id)]

@@ -8,7 +8,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -29,7 +29,7 @@
    order-id ::order/id
    payment-method ::order/payment-method
    schedule ::order/schedule]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::product/create
             ::product/id product-id
@@ -101,7 +101,7 @@
    order-id ::order/id
    payment-method ::order/payment-method
    schedule ::order/schedule]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::product/create
             ::product/id product-id
@@ -156,7 +156,7 @@
    order-id ::order/id
    payment-method ::order/payment-method
    schedule ::order/schedule]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::product/create
             ::product/id product-id
@@ -212,7 +212,7 @@
    order-id ::order/id
    payment-method ::order/payment-method
    schedule ::order/schedule]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::product/create
             ::product/id product-id

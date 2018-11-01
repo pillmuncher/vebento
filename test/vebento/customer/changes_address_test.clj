@@ -10,7 +10,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -19,7 +19,7 @@
 (def-scenario customer-adds-address
   [customer-id ::customer/id
    customer-address ::customer/address]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::customer/register
             ::customer/id customer-id)]
@@ -37,7 +37,7 @@
   [customer-id ::customer/id
    old-address ::customer/address
    new-address ::customer/address]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::customer/register
             ::customer/id customer-id

@@ -8,7 +8,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -25,7 +25,7 @@
    product-id ::product/id
    product-name ::product/name
    amount ::product/amount]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::product/create
             ::product/id product-id
@@ -69,7 +69,7 @@
    merchant-address ::merchant/address
    product-id ::product/id
    product-name ::product/name]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::product/create
             ::product/id product-id

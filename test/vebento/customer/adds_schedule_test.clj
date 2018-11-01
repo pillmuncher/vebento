@@ -8,7 +8,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -23,7 +23,7 @@
    merchant-id ::merchant/id
    merchant-address ::merchant/address
    schedule ::order/schedule]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id

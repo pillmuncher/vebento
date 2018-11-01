@@ -8,7 +8,7 @@
             [vebento.testing
              :refer [def-scenario]]
             [vebento.customer-test
-             :refer [test-bench]]))
+             :refer [test-environment]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -23,7 +23,7 @@
    merchant-id ::merchant/id
    merchant-address ::merchant/address
    payment-method ::order/payment-method]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id
@@ -57,7 +57,7 @@
    merchant-id ::merchant/id
    merchant-address ::merchant/address
    payment-method ::order/payment-method]
-  :using (test-bench)
+  :using (test-environment)
   :given [(command
             ::merchant/register
             ::merchant/id merchant-id
