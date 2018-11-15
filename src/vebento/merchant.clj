@@ -9,7 +9,7 @@
              :as event
              :refer [subscribe-maps unsubscribe*]]
             [juncture.entity
-             :refer [register unregister def-entity transform transform-in]]
+             :refer [register unregister defentity transform transform-in]]
             [vebento.core
              :as core]
             [vebento.specs
@@ -38,7 +38,7 @@
 (s/def ::schedule-is-recurrent string?)
 
 
-(def-entity ::entity
+(defentity ::entity
   :req [::address
         ::areas
         ::products

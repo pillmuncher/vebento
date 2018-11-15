@@ -8,7 +8,7 @@
             [juncture.entity
              :as entity]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -16,7 +16,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-adds-address
+(defscenario customer-adds-address
   [customer-id ::customer/id
    customer-address ::customer/address]
   :using (test-environment)
@@ -33,7 +33,7 @@
             ::customer/address customer-address)])
 
 
-(def-scenario customer-changes-address
+(defscenario customer-changes-address
   [customer-id ::customer/id
    old-address ::customer/address
    new-address ::customer/address]

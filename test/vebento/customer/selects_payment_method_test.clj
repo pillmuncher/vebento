@@ -6,7 +6,7 @@
             [juncture.event
              :refer [command message failure]]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -17,7 +17,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-selects-payment-method
+(defscenario customer-selects-payment-method
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -51,7 +51,7 @@
             ::customer/payment-method payment-method)])
 
 
-(def-scenario customer-can-only-select-payment-method-that-merchant-supports
+(defscenario customer-can-only-select-payment-method-that-merchant-supports
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id

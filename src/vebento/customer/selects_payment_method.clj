@@ -7,7 +7,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message message failure]]
+             :refer [defcommand defmessage message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -21,12 +21,12 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-command ::customer/select-payment-method
+(defcommand ::customer/select-payment-method
   :req [::customer/id
         ::customer/payment-method])
 
 
-(def-message ::customer/payment-method-selected
+(defmessage ::customer/payment-method-selected
   :req [::customer/id
         ::customer/payment-method])
 

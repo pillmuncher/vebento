@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message message]]
+             :refer [defcommand defmessage message]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -16,11 +16,11 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-command ::customer/clear-cart
+(defcommand ::customer/clear-cart
   :req [::customer/id])
 
 
-(def-message ::customer/cart-cleared
+(defmessage ::customer/cart-cleared
   :req [::customer/id])
 
 

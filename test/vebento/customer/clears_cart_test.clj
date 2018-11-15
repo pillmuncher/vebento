@@ -8,7 +8,7 @@
             [juncture.entity
              :as entity]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -16,7 +16,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-clears-cart
+(defscenario customer-clears-cart
   [customer-id ::customer/id]
   :using (test-environment)
   :given [(command
@@ -30,7 +30,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario only-an-existing-customer-can-clear-cart
+(defscenario only-an-existing-customer-can-clear-cart
   [customer-id ::customer/id]
   :using (test-environment)
   :after [(command

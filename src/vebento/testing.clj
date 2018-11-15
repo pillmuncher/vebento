@@ -167,7 +167,7 @@
                     10
                     (s/fspec :args (s/cat ~@(flatten fspec-params))))))
 
-(defmacro def-scenario
+(defmacro defscenario
   [sym params & body]
   `(deftest ~sym
      (->> ~(test-fn-call params body)

@@ -8,7 +8,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message command message]]
+             :refer [defcommand defmessage command message]]
             [juncture.entity
              :as entity
              :refer [create transform transform-in]]
@@ -22,14 +22,14 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-command ::customer/register
+(defcommand ::customer/register
   :req [::customer/id]
   :opt [::customer/address
         ::merchant/id
         ::customer/payment-method])
 
 
-(def-message ::customer/registered
+(defmessage ::customer/registered
   :req [::customer/id])
 
 

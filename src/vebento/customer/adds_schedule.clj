@@ -7,7 +7,7 @@
              :refer [ns-alias intersect?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure message failure]]
+             :refer [defcommand defmessage deffailure message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -21,17 +21,17 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-command ::customer/add-schedule
+(defcommand ::customer/add-schedule
   :req [::customer/id
         ::customer/schedule])
 
 
-(def-message ::customer/schedule-added
+(defmessage ::customer/schedule-added
   :req [::customer/id
         ::customer/schedule])
 
 
-(def-failure ::customer/schedule-not-in-merchant-schedule
+(deffailure ::customer/schedule-not-in-merchant-schedule
   :req [::customer/id
         ::customer/schedule])
 

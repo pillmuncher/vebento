@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure]]
+             :refer [defcommand defmessage deffailure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -16,17 +16,17 @@
 (ns-alias 'merchant 'vebento.merchant)
 
 
-(def-command ::merchant/add-payment-method
+(defcommand ::merchant/add-payment-method
   :req [::merchant/id
         ::merchant/payment-method])
 
 
-(def-message ::merchant/payment-method-added
+(defmessage ::merchant/payment-method-added
   :req [::merchant/id
         ::merchant/payment-method])
 
 
-(def-failure ::merchant/does-not-support-payment-method
+(deffailure ::merchant/does-not-support-payment-method
   :req [::merchant/id
         ::merchant/payment-method])
 

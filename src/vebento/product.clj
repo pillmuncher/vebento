@@ -7,11 +7,11 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure
+             :refer [defcommand defmessage deffailure
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister def-entity create transform
+             :refer [register unregister defentity create transform
                      transform-in]]
             [componad
              :refer [mdo-within]]
@@ -32,17 +32,17 @@
 (s/def ::amount ::specs/amount)
 
 
-(def-command ::create
+(defcommand ::create
   :req [::id
         ::name])
 
 
-(def-message ::created
+(defmessage ::created
   :req [::id
         ::name])
 
 
-(def-entity ::entity
+(defentity ::entity
   :req [::name])
 
 

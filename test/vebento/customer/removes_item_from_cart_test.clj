@@ -6,7 +6,7 @@
             [juncture.event
              :refer [command message failure]]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -17,7 +17,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-removes-item-from-cart
+(defscenario customer-removes-item-from-cart
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address
@@ -62,7 +62,7 @@
             ::product/id product-id)])
 
 
-(def-scenario customer-removes-item-from-cart
+(defscenario customer-removes-item-from-cart
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address

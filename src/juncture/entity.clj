@@ -5,14 +5,14 @@
              :as s-test]
             [juncture.event
              :as event
-             :refer [def-failure]]))
+             :refer [deffailure]]))
 
 
-(def-failure ::already-exists
+(deffailure ::already-exists
   :req [::id-key
         ::id])
 
-(def-failure ::not-found
+(deffailure ::not-found
   :req [::id-key
         ::id])
 
@@ -27,7 +27,7 @@
 (s/def ::entity #(= (::kind %) ::entity))
 
 
-(defmacro def-entity
+(defmacro defentity
   [entity-type & {:keys [req opt]}]
   `(s/def ~entity-type
      (s/and ::spec (s/keys :req ~req :opt ~opt))))

@@ -16,7 +16,7 @@
 (ns-alias 'product 'vebento.entity.product)
 
 
-(def-command ::load-customer
+(defcommand ::load-customer
   :req [::customer/id])
 
 

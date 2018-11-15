@@ -5,7 +5,7 @@
              :refer [ns-alias not-in?]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure message failure]]
+             :refer [defcommand defmessage deffailure message failure]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -19,17 +19,17 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-command ::customer/remove-item-from-cart
+(defcommand ::customer/remove-item-from-cart
   :req [::customer/id
         ::product/id])
 
 
-(def-message ::customer/item-removed-from-cart
+(defmessage ::customer/item-removed-from-cart
   :req [::customer/id
         ::product/id])
 
 
-(def-failure ::customer/product-not-in-cart
+(deffailure ::customer/product-not-in-cart
   :req [::customer/id
         ::product/id])
 

@@ -10,7 +10,7 @@
              :refer [subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister def-entity]]
+             :refer [register unregister defentity]]
             [vebento.specs
              :as specs]
             [vebento.customer.registers]
@@ -35,7 +35,7 @@
 (s/def ::payment-method ::specs/payment-method)
 
 
-(def-entity ::entity
+(defentity ::entity
   :req [::cart
         ::schedule
         ::pending-orders]

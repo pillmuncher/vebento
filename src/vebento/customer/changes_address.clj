@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message def-failure message]]
+             :refer [defcommand defmessage deffailure message]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -16,17 +16,17 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-command ::customer/change-address
+(defcommand ::customer/change-address
   :req [::customer/id
         ::customer/address])
 
 
-(def-message ::customer/address-changed
+(defmessage ::customer/address-changed
   :req [::customer/id
         ::customer/address])
 
 
-(def-failure ::customer/has-given-no-address
+(deffailure ::customer/has-given-no-address
   :req [::customer/id])
 
 

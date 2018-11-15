@@ -6,7 +6,7 @@
             [juncture.event
              :refer [command message failure]]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -18,7 +18,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-places-order
+(defscenario customer-places-order
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -90,7 +90,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-cannot-place-order-when-cart-is-empty
+(defscenario customer-cannot-place-order-when-cart-is-empty
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -145,7 +145,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-cannot-place-order-unless-schedule-was-selected
+(defscenario customer-cannot-place-order-unless-schedule-was-selected
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -201,7 +201,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-cannot-place-order
+(defscenario customer-cannot-place-order
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id

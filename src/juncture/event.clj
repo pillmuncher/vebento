@@ -70,23 +70,23 @@
 ;(defmulti handle ::type)
 
 
-(defmacro def-event
+(defmacro defevent
   [event-kind event-type {:keys [req opt]}]
   `(s/def ~event-type
      (s/and ::spec ~event-kind (s/keys :req ~req :opt ~opt))))
 
 
-(defmacro def-command
+(defmacro defcommand
   [command-type & {:as command-keys}]
-  `(def-event ::command ~command-type ~command-keys))
+  `(defevent ::command ~command-type ~command-keys))
 
-(defmacro def-message
+(defmacro defmessage
   [message-type & {:as message-keys}]
-  `(def-event ::message ~message-type ~message-keys))
+  `(defevent ::message ~message-type ~message-keys))
 
-(defmacro def-failure
+(defmacro deffailure
   [failure-type & {:as failure-keys}]
-  `(def-event ::failure ~failure-type ~failure-keys))
+  `(defevent ::failure ~failure-type ~failure-keys))
 
 
 (defn valid?

@@ -19,12 +19,12 @@ component	./src/componad.clj	/^(defn component$/;"	f
 create	./src/juncture/entity.clj	/^(defn create$/;"	f
 create	./src/juncture/event.clj	/^(defn create$/;"	f
 customer-client	./src/frontend/customer/shop.clj	/^(defn customer-client []$/;"	f
-def-command	./src/juncture/event.clj	/^(defmacro def-command$/;"	m
-def-entity	./src/juncture/entity.clj	/^(defmacro def-entity$/;"	m
-def-failure	./src/juncture/event.clj	/^(defmacro def-failure$/;"	m
-def-event	./src/juncture/event.clj	/^(defmacro def-event$/;"	m
-def-message	./src/juncture/event.clj	/^(defmacro def-message$/;"	m
-def-scenario	./src/vebento/testing.clj	/^(defmacro def-scenario$/;"	m
+defcommand	./src/juncture/event.clj	/^(defmacro defcommand$/;"	m
+defentity	./src/juncture/entity.clj	/^(defmacro defentity$/;"	m
+deffailure	./src/juncture/event.clj	/^(defmacro deffailure$/;"	m
+defevent	./src/juncture/event.clj	/^(defmacro defevent$/;"	m
+defmessage	./src/juncture/event.clj	/^(defmacro defmessage$/;"	m
+defscenario	./src/vebento/testing.clj	/^(defmacro defscenario$/;"	m
 dispatch*	./src/juncture/event.clj	/^(defn dispatch*$/;"	f
 dispatcher	./src/vebento/testing.clj	/^(defn dispatcher []$/;"	f
 dummy-uuid	./src/util.clj	/^(def dummy-uuid #uuid "00000000-0000-0000-0000-000000000000")$/;"	d

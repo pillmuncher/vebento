@@ -6,7 +6,7 @@
             [juncture.event
              :refer [command message failure]]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -17,7 +17,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-adds-schedule
+(defscenario customer-adds-schedule
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id

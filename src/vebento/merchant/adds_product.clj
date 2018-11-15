@@ -3,7 +3,7 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [def-command def-message]]
+             :refer [defcommand defmessage]]
             [juncture.entity
              :as entity
              :refer [transform transform-in]]
@@ -17,12 +17,12 @@
 (ns-alias 'product 'vebento.product)
 
 
-(def-command ::merchant/add-product
+(defcommand ::merchant/add-product
   :req [::merchant/id
         ::product/id])
 
 
-(def-message ::merchant/product-added
+(defmessage ::merchant/product-added
   :req [::merchant/id
         ::product/id])
 

@@ -8,7 +8,7 @@
             [juncture.entity
              :as entity]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -19,7 +19,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-registers
+(defscenario customer-registers
   [customer-id ::customer/id]
   :using (test-environment)
   :after [(command
@@ -30,7 +30,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-can-register-only-once
+(defscenario customer-can-register-only-once
   [customer-id ::customer/id]
   :using (test-environment)
   :given [(command
@@ -45,7 +45,7 @@
             ::entity/id customer-id)])
 
 
-(def-scenario customer-gets-registered-with-address
+(defscenario customer-gets-registered-with-address
   [customer-id ::customer/id
    customer-address ::customer/address]
   :using (test-environment)
@@ -62,7 +62,7 @@
             ::customer/address customer-address)])
 
 
-(def-scenario customer-gets-registered-with-merchant
+(defscenario customer-gets-registered-with-merchant
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -94,7 +94,7 @@
             ::merchant/id merchant-id)])
 
 
-(def-scenario customer-gets-registered-with-payment-method
+(defscenario customer-gets-registered-with-payment-method
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id
@@ -136,7 +136,7 @@
             ::customer/payment-method payment-method)])
 
 
-(def-scenario customer-registers-but-cannot-select-retailer
+(defscenario customer-registers-but-cannot-select-retailer
   [customer-id ::customer/id
    customer-address ::customer/address
    merchant-id ::merchant/id]

@@ -8,7 +8,7 @@
             [juncture.entity
              :as entity]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -18,7 +18,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-selects-merchant
+(defscenario customer-selects-merchant
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address
@@ -46,7 +46,7 @@
             ::merchant/id merchant-id)])
 
 
-(def-scenario only-an-existing-customer-can-select-merchant
+(defscenario only-an-existing-customer-can-select-merchant
   [customer-id ::customer/id
    merchant-id ::merchant/id]
   :using (test-environment)
@@ -60,7 +60,7 @@
             ::entity/id customer-id)])
 
 
-(def-scenario customer-cannot-select-merchant-unless-customer-address-was-given
+(defscenario customer-cannot-select-merchant-unless-customer-address-was-given
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address
@@ -86,7 +86,7 @@
             ::customer/id customer-id)])
 
 
-(def-scenario customer-can-only-select-merchant-who-delivers-in-customer-area
+(defscenario customer-can-only-select-merchant-who-delivers-in-customer-area
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address

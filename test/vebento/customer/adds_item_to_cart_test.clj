@@ -6,7 +6,7 @@
             [juncture.event
              :refer [command message failure]]
             [vebento.testing
-             :refer [def-scenario]]
+             :refer [defscenario]]
             [vebento.customer-test
              :refer [test-environment]]))
 
@@ -17,7 +17,7 @@
 (ns-alias 'customer 'vebento.customer)
 
 
-(def-scenario customer-adds-item-to-cart
+(defscenario customer-adds-item-to-cart
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address
@@ -59,7 +59,7 @@
             ::product/amount amount)])
 
 
-(def-scenario customer-can-only-add-product-to-cart-if-merchant-sells-it
+(defscenario customer-can-only-add-product-to-cart-if-merchant-sells-it
   [customer-id ::customer/id
    merchant-id ::merchant/id
    customer-address ::customer/address
