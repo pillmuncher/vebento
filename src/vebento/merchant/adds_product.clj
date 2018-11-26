@@ -10,7 +10,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish fail-unless-exists]]))
+             :refer [boundary post fail-unless-exists]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -44,6 +44,6 @@
       (mdo-within (boundary component #{::merchant/account})
         (fail-unless-exists ::merchant/id merchant-id)
         (fail-unless-exists ::product/id product-id)
-        (publish ::merchant/product-added
+        (post ::merchant/product-added
                  ::merchant/id merchant-id
                  ::product/id product-id)))]})

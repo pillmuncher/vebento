@@ -12,7 +12,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary issue get-entity]]))
+             :refer [boundary get-entity call post fail]]))
 
 
 (ns-alias 'specs 'vebento.specs)
@@ -53,19 +53,16 @@
       (mdo-within (boundary component #{::customer/shop})
         customer <- (get-entity ::customer/id customer-id)
         (mwhen (-> @customer ::customer/address nil?)
-               (issue
-                 (failure ::customer/has-given-no-address
-                          ::customer/id customer-id)))
+               (fail ::customer/has-given-no-address
+                     ::customer/id customer-id))
         merchant <- (get-entity ::merchant/id merchant-id)
         (mwhen (-> @customer ::customer/address ::specs/zipcode
                    (not-in? (@merchant ::merchant/areas)))
-               (issue
-                 (failure ::customer/zipcode-not-in-merchant-areas
-                          ::customer/id customer-id
-                          ::customer/zipcode (-> @customer
-                                                 ::customer/address
-                                                 ::specs/zipcode))))
-        (issue
-          (message ::customer/merchant-selected
-                   ::customer/id customer-id
-                   ::merchant/id merchant-id))))]})
+               (fail ::customer/zipcode-not-in-merchant-areas
+                     ::customer/id customer-id
+                     ::customer/zipcode (-> @customer
+                                            ::customer/address
+                                            ::specs/zipcode)))
+        (post ::customer/merchant-selected
+              ::customer/id customer-id
+              ::merchant/id merchant-id)))]})

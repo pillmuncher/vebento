@@ -14,7 +14,7 @@
             [componad
              :refer [mdo-within munless]]
             [vebento.core
-             :refer [boundary issue get-entity]]))
+             :refer [boundary get-entity call post fail]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -55,11 +55,9 @@
         customer <- (get-entity ::customer/id customer-id)
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (munless (intersect? schedule (@merchant ::merchant/schedule))
-                 (issue
-                   (failure ::customer/schedule-not-in-merchant-schedule
-                            ::customer/id customer-id
-                            ::customer/schedule schedule)))
-        (issue
-          (message ::customer/schedule-added
-                   ::customer/id customer-id
-                   ::customer/schedule schedule))))]})
+                 (fail ::customer/schedule-not-in-merchant-schedule
+                       ::customer/id customer-id
+                       ::customer/schedule schedule))
+        (post ::customer/schedule-added
+              ::customer/id customer-id
+              ::customer/schedule schedule)))]})

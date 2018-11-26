@@ -12,7 +12,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary issue get-entity]]))
+             :refer [boundary get-entity call post fail]]))
 
 
 (ns-alias 'product 'vebento.product)
@@ -60,12 +60,10 @@
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (-> product-id
                    (not-in? (@merchant ::merchant/products)))
-               (issue
-                 (failure ::customer/product-not-in-merchant-assortment
-                          ::customer/id customer-id
-                          ::product/id product-id)))
-        (issue
-          (message ::customer/item-added-to-cart
-                   ::customer/id customer-id
-                   ::product/id product-id
-                   ::product/amount amount))))]})
+               (fail ::customer/product-not-in-merchant-assortment
+                     ::customer/id customer-id
+                     ::product/id product-id))
+        (post ::customer/item-added-to-cart
+              ::customer/id customer-id
+              ::product/id product-id
+              ::product/amount amount)))]})

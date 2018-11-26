@@ -10,7 +10,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary issue fail-unless-exists]]))
+             :refer [boundary fail-unless-exists call post fail]]))
 
 
 (ns-alias 'customer 'vebento.customer)
@@ -47,7 +47,6 @@
           address ::customer/address}]
       (mdo-within (boundary component #{::customer/account ::customer/shop})
         (fail-unless-exists ::customer/id customer-id)
-        (issue
-          (message ::customer/address-changed
-                   ::customer/id customer-id
-                   ::customer/address address))))]})
+        (post ::customer/address-changed
+              ::customer/id customer-id
+              ::customer/address address)))]})

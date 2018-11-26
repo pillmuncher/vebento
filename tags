@@ -75,8 +75,8 @@ munless	./src/componad.clj	/^(defmacro munless$/;"	m
 not-in?	./src/util.clj	/^(def not-in? (comp not in?))$/;"	d
 ns-alias	./src/util.clj	/^(defn ns-alias$/;"	f
 projection	./src/juncture/entity.clj	/^(defn projection$/;"	f
-publish	./src/vebento/core.clj	/^(defn publish$/;"	f
-publish-in	./src/vebento/core.clj	/^(defn publish-in$/;"	f
+post	./src/vebento/core.clj	/^(defn post$/;"	f
+post-in	./src/vebento/core.clj	/^(defn post-in$/;"	f
 pull	./src/util.clj	/^(defmacro pull [ns names]$/;"	m
 query	./src/vebento/core.clj	/^(defn query$/;"	f
 raise	./src/vebento/core.clj	/^(defn raise$/;"	f

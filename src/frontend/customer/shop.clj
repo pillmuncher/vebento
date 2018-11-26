@@ -163,6 +163,6 @@
 
 (def client (customer-client))
 
-(execute-in (client :shop)
+(call-in (client :shop)
             ::customer/place-order
             ::customer/id customer-id)

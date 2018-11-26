@@ -16,7 +16,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish execute raise fail-if-exists
+             :refer [boundary post call fail fail-if-exists
                      fail-unless-exists get-entity]]
             [vebento.specs
              :as specs]))
@@ -67,7 +67,7 @@
                        ::create [(fn [{product-id ::id name ::name}]
                                    (mdo-within (boundary this #{::assortment})
                                      (fail-if-exists ::id product-id)
-                                     (publish ::created
+                                     (post ::created
                                               ::id product-id
                                               ::name name)))]})))
   (stop [this]

@@ -1,6 +1,6 @@
 (ns vebento.core
   (:require [monads.core
-             :refer [mdo return fail ask asks get-state]]
+             :as m]
             [monads.util
              :refer [mwhen map-m]]
             [juncture.event
@@ -13,10 +13,10 @@
              :refer [mdo-within system >>= mdo-future]]))
 
 
-(def get-boundaries (asks :boundaries))
-(def get-repository (asks :repository))
-(def get-journal (asks :journal))
-(def get-dispatcher (asks :dispatcher))
+(def get-boundaries (m/asks :boundaries))
+(def get-repository (m/asks :repository))
+(def get-journal (m/asks :journal))
+(def get-dispatcher (m/asks :dispatcher))
 
 
 (defn boundary
@@ -29,15 +29,15 @@
 
 (defn- -issue
   [event]
-  (mdo
+  (m/mdo
     parent <- (if (-> event ::event/parent nil?)
-                (>>= get-state #(-> % ::event/parent return))
+                (>>= m/get-state #(-> % ::event/parent m/return))
                 (::event/parent event))
     (>>= get-dispatcher
-         #(return (event/dispatch % (assoc event ::event/parent parent))))
+         #(m/return (event/dispatch % (assoc event ::event/parent parent))))
     (if (failure? event)
-      (fail event)
-      (return event))))
+      (m/fail event)
+      (m/return event))))
 
 
 (defn issue
@@ -45,40 +45,40 @@
   (map-m -issue events))
 
 
-(defn execute
+(defn call
   [command-type & command-params]
   (issue (apply command command-type command-params)))
 
-(defn execute-in
+(defn call-in
   [env command-type & command-params]
   (mdo-within (system env)
-    (apply execute command-type command-params)))
+    (apply call command-type command-params)))
 
 
-(defn publish
+(defn post
   [message-type & message-params]
   (issue (apply message message-type message-params)))
 
-(defn publish-in
+(defn post-in
   [env message-type & message-params]
   (mdo-within (system env)
-    (apply publish message-type message-params)))
+    (apply post message-type message-params)))
 
 
-(defn raise
+(defn fail
   [failure-type & failure-params]
   (issue (apply failure failure-type failure-params)))
 
-(defn raise-in
+(defn fail-in
   [env failure-type & failure-params]
   (mdo-within (system env)
-    (apply raise failure-type failure-params)))
+    (apply fail failure-type failure-params)))
 
 
 (defn get-events
   [& criteria]
   (>>= get-journal
-       #(return (event/fetch % criteria))))
+       #(m/return (event/fetch % criteria))))
 
 
 (def get-commands (partial get-events ::event/kind ::event/command))
@@ -90,7 +90,7 @@
   [id-key id]
   (>>= get-repository
        #(mwhen (entity/exists? % id-key id)
-               (raise ::entity/already-exists
+               (fail ::entity/already-exists
                       ::entity/id-key id-key
                       ::entity/id id))))
 
@@ -98,17 +98,17 @@
   [id-key id]
   (>>= get-repository
        #(mwhen (not (entity/exists? % id-key id))
-               (raise ::entity/not-found
+               (fail ::entity/not-found
                       ::entity/id-key id-key
                       ::entity/id id))))
 
 
 (defn get-entity
   [id-key id]
-  (mdo
+  (m/mdo
     (fail-unless-exists id-key id)
     repository <- get-repository
-    (return (entity/fetch repository id-key id))))
+    (m/return (entity/fetch repository id-key id))))
 
 
 (defprotocol QueryStore
@@ -119,4 +119,4 @@
 (defn query
   [query-key & params]
   (mdo-future
-    (>>= ask #(-> % (get-query query-key) (apply params) (return)))))
+    (>>= m/ask #(-> % (get-query query-key) (apply params) (m/return)))))

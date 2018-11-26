@@ -14,7 +14,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary issue get-entity]]))
+             :refer [boundary get-entity call post fail]]))
 
 
 (ns-alias 'merchant 'vebento.merchant)
@@ -51,11 +51,9 @@
         merchant <- (get-entity ::merchant/id (@customer ::merchant/id))
         (mwhen (-> payment-method
                    (not-in? (@merchant ::merchant/payment-methods)))
-               (issue
-                 (failure ::merchant/does-not-support-payment-method
-                          ::merchant/id (@merchant ::entity/id)
-                          ::merchant/payment-method payment-method)))
-        (issue
-          (message ::customer/payment-method-selected
-                   ::customer/id customer-id
-                   ::customer/payment-method payment-method))))]})
+               (fail ::merchant/does-not-support-payment-method
+                     ::merchant/id (@merchant ::entity/id)
+                     ::merchant/payment-method payment-method))
+        (post ::customer/payment-method-selected
+              ::customer/id customer-id
+              ::customer/payment-method payment-method)))]})

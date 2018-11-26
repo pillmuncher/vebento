@@ -16,7 +16,7 @@
             [componad
              :refer [mdo-within]]
             [vebento.core
-             :refer [boundary publish execute raise fail-if-exists
+             :refer [boundary post call fail fail-if-exists
                      fail-unless-exists get-entity]]
             [vebento.specs
              :as specs]))
