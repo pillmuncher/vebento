@@ -9,7 +9,7 @@
              :as event
              :refer [subscribe-maps unsubscribe*]]
             [juncture.entity
-             :refer [register unregister defentity transform transform-in]]
+             :refer [register unregister defentity mutate mutate-in]]
             [vebento.core
              :as core]
             [vebento.specs
@@ -48,12 +48,12 @@
         ::pending-orders])
 
 
-(defmethod transform
+(defmethod mutate
   [::entity ::customer/merchant-selected]
   [merchant {customer-id ::customer/id}]
   (update merchant ::customers conj customer-id))
 
-(defmethod transform
+(defmethod mutate
   [::entity ::order/placed]
   [merchant {order-id ::order/id}]
   (update merchant ::customer/pending-orders conj order-id))
@@ -68,9 +68,9 @@
            (subscribe-maps
              dispatcher
              {::customer/merchant-selected
-              [(transform-in repository ::id)]
+              [(mutate-in repository ::id)]
               ::order/placed
-              [(transform-in repository ::id)]}
+              [(mutate-in repository ::id)]}
              (vebento.merchant.registers/subscriptions this)
              (vebento.merchant.adds-area/subscriptions this)
              (vebento.merchant.adds-product/subscriptions this)

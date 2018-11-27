@@ -55,19 +55,19 @@
                    ::version 0)))
 
 
-(defn- transform-dispatcher
+(defn- mutate-dispatcher
   [entity evt]
   [(::type entity) (::event/type evt)])
 
-(s/fdef transform-dispatcher
+(s/fdef mutate-dispatcher
         :args (s/cat :entity (s/nilable ::entity)
                      :event ::event/spec))
 
-(s-test/instrument `transform-dispatcher)
+(s-test/instrument `mutate-dispatcher)
 
-(defmulti transform transform-dispatcher)
+(defmulti mutate mutate-dispatcher)
 
-(defmethod transform
+(defmethod mutate
   :default
   [entity _]
   entity)
@@ -85,11 +85,11 @@
   (exists? [this id-key id]))
 
 
-(defn transform-in ;; TODO: make atomic.
+(defn mutate-in ;; TODO: make atomic.
   [repository id-key]
   (fn [event]
     (let [entity (fetch repository id-key (id-key event))]
-      (store repository id-key (transform @entity event)))))
+      (store repository id-key (mutate @entity event)))))
 
 
 (defn- run-and-attach-event-id

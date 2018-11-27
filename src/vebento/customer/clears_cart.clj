@@ -6,7 +6,7 @@
              :refer [defcommand defmessage message]]
             [juncture.entity
              :as entity
-             :refer [transform transform-in]]
+             :refer [mutate mutate-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -24,7 +24,7 @@
   :req [::customer/id])
 
 
-(defmethod transform
+(defmethod mutate
   [::customer/entity ::customer/cart-cleared]
   [customer _]
   (assoc customer ::customer/cart {}))
@@ -34,7 +34,7 @@
   [component]
 
   {::customer/cart-cleared
-   [(transform-in (:repository component) ::customer/id)]
+   [(mutate-in (:repository component) ::customer/id)]
 
    ::customer/clear-cart
    [(fn [{customer-id ::customer/id}]
