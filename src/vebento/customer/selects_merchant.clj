@@ -8,7 +8,7 @@
              :refer [defcommand defmessage deffailure message failure]]
             [juncture.entity
              :as entity
-             :refer [mutate mutate-in]]
+             :refer [promote promote-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -35,7 +35,7 @@
         ::customer/zipcode])
 
 
-(defmethod mutate
+(defmethod promote
   [::customer/entity ::customer/merchant-selected]
   [customer {merchant-id ::merchant/id}]
   (assoc customer ::merchant/id merchant-id))
@@ -45,7 +45,7 @@
   [component]
 
   {::customer/merchant-selected
-   [(mutate-in (:repository component) ::customer/id)]
+   [(promote-in (:repository component) ::customer/id)]
 
    ::customer/select-merchant
    [(fn [{customer-id ::customer/id

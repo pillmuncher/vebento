@@ -8,7 +8,7 @@
              :refer [defcommand defmessage]]
             [juncture.entity
              :as entity
-             :refer [mutate mutate-in]]
+             :refer [promote promote-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -28,7 +28,7 @@
         ::merchant/schedule])
 
 
-(defmethod mutate
+(defmethod promote
   [::merchant/entity ::merchant/schedule-added]
   [merchant {schedule ::merchant/schedule}]
   (update merchant ::merchant/schedule union schedule))
@@ -38,7 +38,7 @@
   [component]
 
   {::merchant/schedule-added
-   [(mutate-in (:repository component) ::merchant/id)]
+   [(promote-in (:repository component) ::merchant/id)]
 
    ::merchant/add-schedule
    [(fn [{merchant-id ::merchant/id schedule ::merchant/schedule}]

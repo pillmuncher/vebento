@@ -8,7 +8,7 @@
              :refer [defcommand defmessage deffailure message failure]]
             [juncture.entity
              :as entity
-             :refer [mutate mutate-in]]
+             :refer [promote promote-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -34,7 +34,7 @@
         ::product/id])
 
 
-(defmethod mutate
+(defmethod promote
   [::customer/entity ::customer/item-removed-from-cart]
   [customer {product-id ::product/id}]
   (update customer ::customer/cart dissoc product-id))
@@ -44,7 +44,7 @@
   [component]
 
   {::customer/item-removed-from-cart
-   [(mutate-in (:repository component) ::customer/id)]
+   [(promote-in (:repository component) ::customer/id)]
 
    ::customer/remove-item-from-cart
    [(fn [{customer-id ::customer/id

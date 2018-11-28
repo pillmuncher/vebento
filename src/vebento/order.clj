@@ -11,8 +11,8 @@
                      subscribe-maps unsubscribe*]]
             [juncture.entity
              :as entity
-             :refer [register unregister defentity create mutate
-                     mutate-in]]
+             :refer [register unregister defentity create promote
+                     promote-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -57,7 +57,7 @@
         ::shipped])
 
 
-(defmethod mutate
+(defmethod promote
   [nil ::placed]
   [_ {order-id ::id
       merchant-id ::merchant/id
@@ -85,7 +85,7 @@
     (register boundaries [::processing])
     (assoc this :subscriptions
            (subscribe-maps dispatcher
-                           {::placed [(mutate-in repository ::id)]})))
+                           {::placed [(promote-in repository ::id)]})))
   (stop [this]
     (apply unsubscribe* dispatcher subscriptions)
     (unregister boundaries [::processing])

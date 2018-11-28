@@ -8,10 +8,10 @@
              :refer [ns-alias]]
             [juncture.event
              :as event
-             :refer [defcommand defmessage ]]
+             :refer [defcommand defmessage]]
             [juncture.entity
              :as entity
-             :refer [create mutate mutate-in]]
+             :refer [create promote promote-in]]
             [componad
              :refer [mdo-within >>=]]
             [vebento.core
@@ -33,7 +33,7 @@
   :req [::customer/id])
 
 
-(defmethod mutate
+(defmethod promote
   [nil ::customer/registered]
   [_   {customer-id ::customer/id}]
   (create ::customer/entity
@@ -47,7 +47,7 @@
   [component]
 
   {::customer/registered
-   [(mutate-in (:repository component) ::customer/id)]
+   [(promote-in (:repository component) ::customer/id)]
 
    ::customer/register
    [(fn [{customer-id ::customer/id

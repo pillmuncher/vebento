@@ -55,19 +55,19 @@
                    ::version 0)))
 
 
-(defn- mutate-dispatcher
+(defn- promote-dispatcher
   [entity evt]
   [(::type entity) (::event/type evt)])
 
-(s/fdef mutate-dispatcher
+(s/fdef promote-dispatcher
         :args (s/cat :entity (s/nilable ::entity)
                      :event ::event/spec))
 
-(s-test/instrument `mutate-dispatcher)
+(s-test/instrument `promote-dispatcher)
 
-(defmulti mutate mutate-dispatcher)
+(defmulti promote promote-dispatcher)
 
-(defmethod mutate
+(defmethod promote
   :default
   [entity _]
   entity)
@@ -85,11 +85,11 @@
   (exists? [this id-key id]))
 
 
-(defn mutate-in ;; TODO: make atomic.
+(defn promote-in ;; TODO: make atomic.
   [repository id-key]
   (fn [event]
     (let [entity (fetch repository id-key (id-key event))]
-      (store repository id-key (mutate @entity event)))))
+      (store repository id-key (promote @entity event)))))
 
 
 (defn- run-and-attach-event-id

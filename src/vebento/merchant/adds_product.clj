@@ -6,7 +6,7 @@
              :refer [defcommand defmessage]]
             [juncture.entity
              :as entity
-             :refer [mutate mutate-in]]
+             :refer [promote promote-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -27,7 +27,7 @@
         ::product/id])
 
 
-(defmethod mutate
+(defmethod promote
   [::merchant/entity ::merchant/product-added]
   [merchant {product-id ::product/id}]
   (update merchant ::merchant/products conj product-id))
@@ -37,7 +37,7 @@
   [component]
 
   {::merchant/product-added
-   [(mutate-in (:repository component) ::merchant/id)]
+   [(promote-in (:repository component) ::merchant/id)]
 
    ::merchant/add-product
    [(fn [{merchant-id ::merchant/id product-id ::product/id}]

@@ -6,7 +6,7 @@
              :refer [defcommand defmessage deffailure message]]
             [juncture.entity
              :as entity
-             :refer [mutate mutate-in]]
+             :refer [promote promote-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -30,7 +30,7 @@
   :req [::customer/id])
 
 
-(defmethod mutate
+(defmethod promote
   [::customer/entity ::customer/address-changed]
   [customer {address ::customer/address}]
   (assoc customer ::customer/address address))
@@ -40,7 +40,7 @@
   [component]
 
   {::customer/address-changed
-   [(mutate-in (:repository component) ::customer/id)]
+   [(promote-in (:repository component) ::customer/id)]
 
    ::customer/change-address
    [(fn [{customer-id ::customer/id
