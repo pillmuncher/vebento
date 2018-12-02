@@ -11,7 +11,7 @@
              :refer [defcommand defmessage]]
             [juncture.entity
              :as entity
-             :refer [create promote promote-in]]
+             :refer [create mutate mutate-in]]
             [componad
              :refer [mdo-within >>=]]
             [vebento.core
@@ -33,7 +33,7 @@
   :req [::customer/id])
 
 
-(defmethod promote
+(defmethod mutate
   [nil ::customer/registered]
   [_   {customer-id ::customer/id}]
   (create ::customer/entity
@@ -47,7 +47,7 @@
   [component]
 
   {::customer/registered
-   [(promote-in (:repository component) ::customer/id)]
+   [(mutate-in (:repository component) ::customer/id)]
 
    ::customer/register
    [(fn [{customer-id ::customer/id

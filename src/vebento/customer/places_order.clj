@@ -10,7 +10,7 @@
              :refer [defcommand deffailure]]
             [juncture.entity
              :as entity
-             :refer [promote promote-in]]
+             :refer [mutate mutate-in]]
             [componad
              :refer [mdo-within mdo-parallel]]
             [vebento.core
@@ -44,7 +44,7 @@
   :req [::customer/id])
 
 
-(defmethod promote
+(defmethod mutate
   [::customer/entity ::order/placed]
   [customer {order-id ::order/id}]
   (update customer ::customer/pending-orders conj order-id))
@@ -54,7 +54,7 @@
   [component]
 
   {::order/placed
-   [(promote-in (:repository component) ::customer/id)]
+   [(mutate-in (:repository component) ::customer/id)]
 
    ::customer/place-order
    [(fn [{customer-id ::customer/id

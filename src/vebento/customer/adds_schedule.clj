@@ -10,7 +10,7 @@
              :refer [defcommand defmessage deffailure message failure]]
             [juncture.entity
              :as entity
-             :refer [promote promote-in]]
+             :refer [mutate mutate-in]]
             [componad
              :refer [mdo-within munless]]
             [vebento.core
@@ -36,7 +36,7 @@
         ::customer/schedule])
 
 
-(defmethod promote
+(defmethod mutate
   [::customer/entity ::customer/schedule-added]
   [customer {schedule ::customer/schedule}]
   (update customer ::customer/schedule union schedule))
@@ -46,7 +46,7 @@
   [component]
 
   {::customer/schedule-added
-   [(promote-in (:repository component) ::customer/id)]
+   [(mutate-in (:repository component) ::customer/id)]
 
    ::customer/add-schedule
    [(fn [{customer-id ::customer/id

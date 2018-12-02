@@ -13,3 +13,6 @@ pom.xml.asc
 *.vim
 tmp/*
 todo.txt
+.tmuxinator.yml
+doc/overview.dia
+src/vebento/canon

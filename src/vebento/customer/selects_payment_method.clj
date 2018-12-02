@@ -10,7 +10,7 @@
              :refer [defcommand defmessage message failure]]
             [juncture.entity
              :as entity
-             :refer [promote promote-in]]
+             :refer [mutate mutate-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -31,7 +31,7 @@
         ::customer/payment-method])
 
 
-(defmethod promote
+(defmethod mutate
   [::customer/entity ::customer/payment-method-selected]
   [customer {payment-method ::customer/payment-method}]
   (assoc customer ::customer/payment-method payment-method))
@@ -41,7 +41,7 @@
   [component]
 
   {::customer/payment-method-selected
-   [(promote-in (:repository component) ::customer/id)]
+   [(mutate-in (:repository component) ::customer/id)]
 
    ::customer/select-payment-method
    [(fn [{customer-id ::customer/id

@@ -8,7 +8,7 @@
              :refer [command message failure failure?]]
             [juncture.entity
              :as entity
-             :refer [run promote-in]]
+             :refer [run mutate-in]]
             [componad
              :refer [mdo-within system >>= mdo-future]]))
 

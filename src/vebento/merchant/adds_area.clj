@@ -6,7 +6,7 @@
              :refer [defcommand defmessage]]
             [juncture.entity
              :as entity
-             :refer [promote promote-in]]
+             :refer [mutate mutate-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -26,7 +26,7 @@
         ::merchant/zipcode])
 
 
-(defmethod promote
+(defmethod mutate
   [::merchant/entity ::merchant/area-added]
   [merchant {zipcode ::merchant/zipcode}]
   (update merchant ::merchant/areas conj zipcode))
@@ -36,7 +36,7 @@
   [component]
 
   {::merchant/area-added
-   [(promote-in (:repository component) ::merchant/id)]
+   [(mutate-in (:repository component) ::merchant/id)]
 
    ::merchant/add-area
    [(fn [{merchant-id ::merchant/id zipcode ::merchant/zipcode}]

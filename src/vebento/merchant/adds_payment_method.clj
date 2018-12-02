@@ -6,7 +6,7 @@
              :refer [defcommand defmessage deffailure]]
             [juncture.entity
              :as entity
-             :refer [promote promote-in]]
+             :refer [mutate mutate-in]]
             [componad
              :refer [mdo-within]]
             [vebento.core
@@ -31,7 +31,7 @@
         ::merchant/payment-method])
 
 
-(defmethod promote
+(defmethod mutate
   [::merchant/entity ::merchant/payment-method-added]
   [merchant {payment-method ::merchant/payment-method}]
   (update merchant ::merchant/payment-methods conj payment-method))
@@ -41,7 +41,7 @@
   [component]
 
   {::merchant/payment-method-added
-   [(promote-in (:repository component) ::merchant/id)]
+   [(mutate-in (:repository component) ::merchant/id)]
 
    ::merchant/add-payment-method
    [(fn [{merchant-id ::merchant/id payment-method ::merchant/payment-method}]
