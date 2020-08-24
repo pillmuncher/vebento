@@ -24,28 +24,22 @@
    merchant-address ::merchant/address
    schedule ::order/schedule]
   :using (test-environment)
-  :given [(command
-            ::merchant/register
-            ::merchant/id merchant-id
-            ::merchant/address merchant-address)
-          (command
-            ::merchant/add-area
-            ::merchant/id merchant-id
-            ::merchant/zipcode (::specs/zipcode customer-address))
-          (command
-            ::merchant/add-schedule
-            ::merchant/id merchant-id
-            ::merchant/schedule schedule)
-          (command
-            ::customer/register
-            ::customer/id customer-id
-            ::customer/address customer-address
-            ::merchant/id merchant-id)]
-  :after [(command
-            ::customer/add-schedule
-            ::customer/id customer-id
-            ::customer/schedule schedule)]
-  :issue [(message
-            ::customer/schedule-added
-            ::customer/id customer-id
-            ::customer/schedule schedule)])
+  :given [(command ::merchant/register
+                   ::merchant/id merchant-id
+                   ::merchant/address merchant-address)
+          (command ::merchant/add-area
+                   ::merchant/id merchant-id
+                   ::merchant/zipcode (::specs/zipcode customer-address))
+          (command ::merchant/add-schedule
+                   ::merchant/id merchant-id
+                   ::merchant/schedule schedule)
+          (command ::customer/register
+                   ::customer/id customer-id
+                   ::customer/address customer-address
+                   ::merchant/id merchant-id)]
+  :after [(command ::customer/add-schedule
+                   ::customer/id customer-id
+                   ::customer/schedule schedule)]
+  :issue [(message ::customer/schedule-added
+                   ::customer/id customer-id
+                   ::customer/schedule schedule)])

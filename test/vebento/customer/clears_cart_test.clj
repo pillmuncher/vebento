@@ -19,24 +19,19 @@
 (defscenario customer-clears-cart
   [customer-id ::customer/id]
   :using (test-environment)
-  :given [(command
-            ::customer/register
-            ::customer/id customer-id)]
-  :after [(command
-            ::customer/clear-cart
-            ::customer/id customer-id)]
-  :issue [(message
-            ::customer/cart-cleared
-            ::customer/id customer-id)])
+  :given [(command ::customer/register
+                   ::customer/id customer-id)]
+  :after [(command ::customer/clear-cart
+                   ::customer/id customer-id)]
+  :issue [(message ::customer/cart-cleared
+                   ::customer/id customer-id)])
 
 
 (defscenario only-an-existing-customer-can-clear-cart
   [customer-id ::customer/id]
   :using (test-environment)
-  :after [(command
-            ::customer/clear-cart
-            ::customer/id customer-id)]
-  :issue [(failure
-            ::entity/not-found
-            ::entity/id-key ::customer/id
-            ::entity/id customer-id)])
+  :after [(command ::customer/clear-cart
+                   ::customer/id customer-id)]
+  :issue [(failure ::entity/not-found
+                   ::entity/id-key ::customer/id
+                   ::entity/id customer-id)])

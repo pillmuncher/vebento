@@ -24,40 +24,33 @@
    customer-address ::customer/address
    merchant-address ::merchant/address]
   :using (test-environment)
-  :given [(command
-            ::merchant/register
-            ::merchant/id merchant-id
-            ::merchant/address merchant-address)
-          (command
-            ::merchant/add-area
-            ::merchant/id merchant-id
-            ::merchant/zipcode (::specs/zipcode customer-address))
-          (command
-            ::customer/register
-            ::customer/id customer-id
-            ::customer/address customer-address)]
-  :after [(command
-            ::customer/select-merchant
-            ::customer/id customer-id
-            ::merchant/id merchant-id)]
-  :issue [(message
-            ::customer/merchant-selected
-            ::customer/id customer-id
-            ::merchant/id merchant-id)])
+  :given [(command ::merchant/register
+                   ::merchant/id merchant-id
+                   ::merchant/address merchant-address)
+          (command ::merchant/add-area
+                   ::merchant/id merchant-id
+                   ::merchant/zipcode (::specs/zipcode customer-address))
+          (command ::customer/register
+                   ::customer/id customer-id
+                   ::customer/address customer-address)]
+  :after [(command ::customer/select-merchant
+                   ::customer/id customer-id
+                   ::merchant/id merchant-id)]
+  :issue [(message ::customer/merchant-selected
+                   ::customer/id customer-id
+                   ::merchant/id merchant-id)])
 
 
 (defscenario only-an-existing-customer-can-select-merchant
   [customer-id ::customer/id
    merchant-id ::merchant/id]
   :using (test-environment)
-  :after [(command
-            ::customer/select-merchant
-            ::customer/id customer-id
-            ::merchant/id merchant-id)]
-  :issue [(failure
-            ::entity/not-found
-            ::entity/id-key ::customer/id
-            ::entity/id customer-id)])
+  :after [(command ::customer/select-merchant
+                   ::customer/id customer-id
+                   ::merchant/id merchant-id)]
+  :issue [(failure ::entity/not-found
+                   ::entity/id-key ::customer/id
+                   ::entity/id customer-id)])
 
 
 (defscenario customer-cannot-select-merchant-unless-customer-address-was-given
@@ -66,24 +59,19 @@
    customer-address ::customer/address
    merchant-address ::merchant/address]
   :using (test-environment)
-  :given [(command
-            ::merchant/register
-            ::merchant/id merchant-id
-            ::merchant/address merchant-address)
-          (command
-            ::merchant/add-area
-            ::merchant/id merchant-id
-            ::merchant/zipcode (::specs/zipcode customer-address))
-          (command
-            ::customer/register
-            ::customer/id customer-id)]
-  :after [(command
-            ::customer/select-merchant
-            ::customer/id customer-id
-            ::merchant/id merchant-id)]
-  :issue [(failure
-            ::customer/has-given-no-address
-            ::customer/id customer-id)])
+  :given [(command ::merchant/register
+                   ::merchant/id merchant-id
+                   ::merchant/address merchant-address)
+          (command ::merchant/add-area
+                   ::merchant/id merchant-id
+                   ::merchant/zipcode (::specs/zipcode customer-address))
+          (command ::customer/register
+                   ::customer/id customer-id)]
+  :after [(command ::customer/select-merchant
+                   ::customer/id customer-id
+                   ::merchant/id merchant-id)]
+  :issue [(failure ::customer/has-given-no-address
+                   ::customer/id customer-id)])
 
 
 (defscenario customer-can-only-select-merchant-who-delivers-in-customer-area
@@ -92,19 +80,15 @@
    customer-address ::customer/address
    merchant-address ::merchant/address]
   :using (test-environment)
-  :given [(command
-            ::merchant/register
-            ::merchant/id merchant-id
-            ::merchant/address merchant-address)
-          (command
-            ::customer/register
-            ::customer/id customer-id
-            ::customer/address customer-address)]
-  :after [(command
-            ::customer/select-merchant
-            ::customer/id customer-id
-            ::merchant/id merchant-id)]
-  :issue [(failure
-            ::customer/zipcode-not-in-merchant-areas
-            ::customer/id customer-id
-            ::customer/zipcode (::specs/zipcode customer-address))])
+  :given [(command ::merchant/register
+                   ::merchant/id merchant-id
+                   ::merchant/address merchant-address)
+          (command ::customer/register
+                   ::customer/id customer-id
+                   ::customer/address customer-address)]
+  :after [(command ::customer/select-merchant
+                   ::customer/id customer-id
+                   ::merchant/id merchant-id)]
+  :issue [(failure ::customer/zipcode-not-in-merchant-areas
+                   ::customer/id customer-id
+                   ::customer/zipcode (::specs/zipcode customer-address))])
